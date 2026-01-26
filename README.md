@@ -1,2 +1,3 @@
-# template
-Template repository with common workflows for future clone
+# ENT Services Remote Control
+
+This repo contains thunder plugins Remote Control and Voice Control.
