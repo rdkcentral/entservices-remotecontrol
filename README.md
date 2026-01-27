@@ -1,3 +1,3 @@
-# ENT Services Remote Control
+# Remote Control Plugin
 
-This repo contains thunder plugins Remote Control and Voice Control.
+Repository for the thunder remote control plugin.
