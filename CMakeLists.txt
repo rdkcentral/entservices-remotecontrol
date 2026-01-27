@@ -36,12 +36,8 @@ string(TOLOWER ${NAMESPACE} STORAGE_DIRECTORY)
 # for writing pc and config files
 include(CmakeHelperFunctions)
 
-if(PLUGIN_VOICECONTROL)
-    add_subdirectory(VoiceControl)
-endif()
-
 if(PLUGIN_REMOTECONTROL)
-	add_subdirectory(RemoteControl)
+	add_subdirectory(plugin)
 endif()
 
 if(WPEFRAMEWORK_CREATE_IPKG_TARGETS)
