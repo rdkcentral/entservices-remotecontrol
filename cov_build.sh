@@ -54,6 +54,9 @@ cmake -G Ninja -S "$GITHUB_WORKSPACE" -B build/entservices-remotecontrol \
 -DUSE_DRM_SCREENCAPTURE -DHAS_API_SYSTEM -DHAS_API_POWERSTATE \
 -DHAS_RBUS -DDISABLE_SECURITY_TOKEN -DENABLE_DEVICE_MANUFACTURER_INFO -DUSE_THUNDER_R4=ON -DTHUNDER_VERSION=4 -DTHUNDER_VERSION_MAJOR=4 -DTHUNDER_VERSION_MINOR=4" \
 
+ls -la ${GITHUB_WORKSPACE}/build
+ls -la ${GITHUB_WORKSPACE}/build/entservices-remotecontrol
+
 cmake --build build/entservices-remotecontrol/plugin --target install
 echo "======================================================================================"
 exit 0
