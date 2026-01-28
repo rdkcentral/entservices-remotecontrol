@@ -56,7 +56,8 @@ cmake -G Ninja -S "$GITHUB_WORKSPACE" -B build/entservices-remotecontrol \
 
 ls -la ${GITHUB_WORKSPACE}/build
 ls -la ${GITHUB_WORKSPACE}/build/entservices-remotecontrol
+ls -la ${GITHUB_WORKSPACE}/build/entservices-remotecontrol/entservices-remotecontrol
 
-cmake --build build/entservices-remotecontrol/plugin --target install
+cmake --build build/entservices-remotecontrol/entservices-remotecontrol --target install
 echo "======================================================================================"
 exit 0
