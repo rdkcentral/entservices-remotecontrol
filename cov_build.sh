@@ -6,7 +6,7 @@ GITHUB_WORKSPACE="${PWD}"
 ls -la ${GITHUB_WORKSPACE}
 ############################
 # Build entservices-remotecontrol
-echo "buliding entservices-remotecontrol"
+echo "building entservices-remotecontrol"
 
 cd ${GITHUB_WORKSPACE}
 cmake -G Ninja -S "$GITHUB_WORKSPACE" -B build/entservices-remotecontrol \

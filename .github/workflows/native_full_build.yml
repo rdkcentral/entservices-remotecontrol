@@ -7,8 +7,8 @@ on:
     branches: [ main, 'sprint/**', 'release/**', topic/RDK*, develop ]
 
 jobs:
-  build-entservices-on-pr:
-    name: Build entservices-peripherals component in github rdkcentral
+  build-remotecontrol-on-pr:
+    name: Build entservices-remotecontrol component in github rdkcentral
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/rdkcentral/docker-rdk-ci:latest

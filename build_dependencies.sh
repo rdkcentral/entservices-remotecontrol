@@ -31,7 +31,7 @@ git clone --branch  R4.4.3 https://github.com/rdkcentral/ThunderTools.git
 
 git clone --branch R4.4.1 https://github.com/rdkcentral/Thunder.git
 
-git clone --branch develop https://github.com/rdkcentral/entservices-apis.git
+git clone --branch develop https://github.com/rdkcentral/entservices-remotecontrol.git
 
 git clone https://$GITHUB_TOKEN@github.com/rdkcentral/entservices-testframework.git
 
@@ -56,7 +56,7 @@ cmake --build build/ThunderTools --target install
 ############################
 # Build Thunder
 echo "======================================================================================"
-echo "buliding thunder"
+echo "building thunder"
 
 cd Thunder
 patch -p1 < $GITHUB_WORKSPACE/entservices-testframework/patches/Use_Legact_Alt_Based_On_ThunderTools_R4.4.3.patch
@@ -79,19 +79,19 @@ cmake --build build/Thunder --target install
 
 
 ############################
-# Build entservices-apis
+# Build entservices-remotecontrol
 echo "======================================================================================"
-echo "buliding entservices-apis"
-cd entservices-apis
+echo "building entservices-remotecontrol"
+cd entservices-remotecontrol
 rm -rf jsonrpc/DTV.json
 cd ..
 
-cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
+cmake -G Ninja -S entservices-remotecontrol  -B build/entservices-remotecontrol \
     -DEXCEPTIONS_ENABLE=ON \
     -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
     -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
 
-cmake --build build/entservices-apis --target install
+cmake --build build/entservices-remotecontrol --target install
 
 
 
