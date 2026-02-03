@@ -170,7 +170,7 @@ cd ..
 echo "cd up a dir"
 ls -la
 
-cmake -G Ninja -S entservices-remotecontrol  -B . \
+cmake -G Ninja -S .  -B . \
     -DEXCEPTIONS_ENABLE=ON \
     -DCMAKE_INSTALL_PREFIX="install/usr" \
     -DCMAKE_MODULE_PATH="install/tools/cmake" \
