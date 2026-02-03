@@ -31,7 +31,7 @@ git clone --branch  R4.4.3 https://github.com/rdkcentral/ThunderTools.git
 
 git clone --branch R4.4.1 https://github.com/rdkcentral/Thunder.git
 
-git clone --branch develop https://github.com/rdkcentral/entservices-remotecontrol.git
+# git clone --branch develop https://github.com/rdkcentral/entservices-remotecontrol.git
 
 git clone https://$GITHUB_TOKEN@github.com/rdkcentral/entservices-testframework.git
 
@@ -177,4 +177,8 @@ echo "==========================================================================
 cd ../../
 cp -r /usr/include/gstreamer-1.0/gst /usr/include/glib-2.0/* /usr/lib/x86_64-linux-gnu/glib-2.0/include/* /usr/local/include/trower-base64/base64.h .
 
+echo "Printing out github workspace"
 ls -la ${GITHUB_WORKSPACE}
+
+echo "Printing out current working dir"
+ls -la
