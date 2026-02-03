@@ -11,8 +11,8 @@ echo "building entservices-remotecontrol"
 cd ${GITHUB_WORKSPACE}
 cmake -G Ninja -S . -B . \
 -DUSE_THUNDER_R4=ON \
--DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
--DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
+-DCMAKE_INSTALL_PREFIX="install/usr" \
+-DCMAKE_MODULE_PATH="install/tools/cmake" \
 -DCMAKE_VERBOSE_MAKEFILE=ON \
 -DCMAKE_DISABLE_FIND_PACKAGE_IARMBus=ON \
 -DCMAKE_DISABLE_FIND_PACKAGE_RFC=ON \
