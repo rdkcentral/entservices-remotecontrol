@@ -9,7 +9,7 @@ ls -la ${GITHUB_WORKSPACE}
 echo "building entservices-remotecontrol"
 
 cd ${GITHUB_WORKSPACE}
-cmake -G Ninja -S . -B . \
+cmake -G Ninja -S . -B build/entservices-remotecontrol \
 -DUSE_THUNDER_R4=ON \
 -DCMAKE_INSTALL_PREFIX="install/usr" \
 -DCMAKE_MODULE_PATH="install/tools/cmake" \
@@ -54,6 +54,6 @@ cmake -G Ninja -S . -B . \
 -DUSE_DRM_SCREENCAPTURE -DHAS_API_SYSTEM -DHAS_API_POWERSTATE \
 -DHAS_RBUS -DDISABLE_SECURITY_TOKEN -DENABLE_DEVICE_MANUFACTURER_INFO -DUSE_THUNDER_R4=ON -DTHUNDER_VERSION=4 -DTHUNDER_VERSION_MAJOR=4 -DTHUNDER_VERSION_MINOR=4" \
 
-cmake --build . --target install
+cmake --build build/entservices-remotecontrol --target install
 echo "======================================================================================"
 exit 0
