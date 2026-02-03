@@ -78,6 +78,21 @@ cmake -G Ninja -S Thunder -B build/Thunder \
 cmake --build build/Thunder --target install
 
 ############################
+# Build entservices-apis
+echo "======================================================================================"
+echo "buliding entservices-apis"
+cd entservices-apis
+rm -rf jsonrpc/DTV.json
+cd ..
+
+cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
+    -DEXCEPTIONS_ENABLE=ON \
+    -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
+    -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
+
+cmake --build build/entservices-apis --target install
+
+############################
 # generating external headers
 cd $GITHUB_WORKSPACE
 cd entservices-testframework/Tests
@@ -161,20 +176,20 @@ cp -r /usr/include/gstreamer-1.0/gst /usr/include/glib-2.0/* /usr/lib/x86_64-lin
 
 ############################
 # Build entservices-remotecontrol
-echo "======================================================================================"
-echo "building entservices-remotecontrol"
-ls -la
-# cd entservices-remotecontrol
-# rm -rf jsonrpc/DTV.json
-cd ..
-echo "cd up a dir"
-ls -la
+# echo "======================================================================================"
+# echo "building entservices-remotecontrol"
+# ls -la
+# # cd entservices-remotecontrol
+# # rm -rf jsonrpc/DTV.json
+# cd ..
+# echo "cd up a dir"
+# ls -la
 
-cmake -G Ninja -S .  -B . \
-    -DEXCEPTIONS_ENABLE=ON \
-    -DCMAKE_INSTALL_PREFIX="entservices-remotecontrol/install/usr" \
-    -DCMAKE_MODULE_PATH="entservices-remotecontrol/install/tools/cmake" \
+# cmake -G Ninja -S .  -B . \
+#     -DEXCEPTIONS_ENABLE=ON \
+#     -DCMAKE_INSTALL_PREFIX="install/usr" \
+#     -DCMAKE_MODULE_PATH="install/tools/cmake" \
 
-cmake --build . --target install
+# cmake --build . --target install
 
-ls -la ${GITHUB_WORKSPACE}
+# ls -la ${GITHUB_WORKSPACE}
