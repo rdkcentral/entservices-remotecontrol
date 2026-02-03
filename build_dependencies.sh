@@ -172,8 +172,8 @@ ls -la
 
 cmake -G Ninja -S entservices-remotecontrol  -B . \
     -DEXCEPTIONS_ENABLE=ON \
-    -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
-    -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
+    -DCMAKE_INSTALL_PREFIX="install/usr" \
+    -DCMAKE_MODULE_PATH="install/tools/cmake" \
 
 cmake --build . --target install
 
