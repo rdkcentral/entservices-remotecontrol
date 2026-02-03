@@ -45,6 +45,14 @@ else (CTRLM_FOUND)
     target_link_libraries(${MODULE_NAME} PRIVATE ${NAMESPACE}Plugins::${NAMESPACE}Plugins)
 endif(CTRLM_FOUND)
 
+find_library(TESTMOCKLIB_LIBRARIES NAMES TestMocklib)
+if (TESTMOCKLIB_LIBRARIES)
+    message ("linking mock libraries ${TESTMOCKLIB_LIBRARIES} library")
+    target_link_libraries(${PLUGIN_IMPLEMENTATION} PRIVATE ${TESTMOCKLIB_LIBRARIES})
+else (TESTMOCKLIB_LIBRARIES)
+    message ("Require ${TESTMOCKLIB_LIBRARIES} library")
+endif (TESTMOCKLIB_LIBRARIES)
+
 install(TARGETS ${MODULE_NAME}
         DESTINATION lib/${STORAGE_DIRECTORY}/plugins)
 
