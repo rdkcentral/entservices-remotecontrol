@@ -82,17 +82,19 @@ cmake --build build/Thunder --target install
 # Build entservices-remotecontrol
 echo "======================================================================================"
 echo "building entservices-remotecontrol"
-cd entservices-remotecontrol
-rm -rf jsonrpc/DTV.json
+ls -la
+# cd entservices-remotecontrol
+# rm -rf jsonrpc/DTV.json
 cd ..
+echo "cd up a dir"
+ls -la
 
-cmake -G Ninja -S entservices-remotecontrol  -B build/entservices-remotecontrol \
+cmake -G Ninja -S entservices-remotecontrol  -B . \
     -DEXCEPTIONS_ENABLE=ON \
     -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
     -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
 
-cmake --build build/entservices-remotecontrol --target install
-
+cmake --build . --target install
 
 
 ############################
@@ -177,8 +179,4 @@ echo "==========================================================================
 cd ../../
 cp -r /usr/include/gstreamer-1.0/gst /usr/include/glib-2.0/* /usr/lib/x86_64-linux-gnu/glib-2.0/include/* /usr/local/include/trower-base64/base64.h .
 
-echo "Printing out github workspace"
 ls -la ${GITHUB_WORKSPACE}
-
-echo "Printing out current working dir"
-ls -la
