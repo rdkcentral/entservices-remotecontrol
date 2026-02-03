@@ -172,8 +172,8 @@ ls -la
 
 cmake -G Ninja -S .  -B . \
     -DEXCEPTIONS_ENABLE=ON \
-    -DCMAKE_INSTALL_PREFIX="install/usr" \
-    -DCMAKE_MODULE_PATH="install/tools/cmake" \
+    -DCMAKE_INSTALL_PREFIX="entservices-remotecontrol/install/usr" \
+    -DCMAKE_MODULE_PATH="entservices-remotecontrol/install/tools/cmake" \
 
 cmake --build . --target install
 
