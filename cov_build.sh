@@ -17,9 +17,14 @@ echo "building entservices-remotecontrol"
 # -DPLUGIN_MOTION_DETECTION=ON \
 
 echo "Search for test mock lib"
-find / -name "*TestMockLib*"
+find / -name "*Mock*"
 
 cd ${GITHUB_WORKSPACE}
+
+echo "Printing out some dirs..."
+ls -la build/*
+ls -la ${GITHUB_WORKSPACE}/install*
+
 cmake -G Ninja -S "$GITHUB_WORKSPACE" -B build/entservices-remotecontrol \
 -DUSE_THUNDER_R4=ON \
 -DCMAKE_INSTALL_PREFIX="${GITHUB_WORKSPACE}/install/usr" \
