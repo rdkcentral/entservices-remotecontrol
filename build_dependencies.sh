@@ -33,6 +33,8 @@ git clone --branch R4.4.1 https://github.com/rdkcentral/Thunder.git
 
 git clone --branch develop https://github.com/rdkcentral/entservices-apis.git
 
+git clone --branch 1.1.9 https://github.com/rdkcentral/control.git
+
 git clone https://$GITHUB_TOKEN@github.com/rdkcentral/entservices-testframework.git
 
 ############################
@@ -91,6 +93,18 @@ cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
     -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
 
 cmake --build build/entservices-apis --target install
+
+############################
+# Build control manager
+echo "======================================================================================"
+echo "buliding control manager"
+
+cmake -G Ninja -S control  -B build/control \
+    -DEXCEPTIONS_ENABLE=ON \
+    -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
+    -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
+
+cmake --build build/control --target install
 
 ############################
 # generating external headers
