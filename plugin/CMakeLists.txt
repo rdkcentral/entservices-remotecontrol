@@ -34,6 +34,8 @@ set_target_properties(${MODULE_NAME} PROPERTIES
 
 target_include_directories(${MODULE_NAME} PRIVATE ../helpers)
 
+set(CMAKE_FIND_DEBUG_MODE TRUE)
+
 find_package(CTRLM REQUIRED)
 if (CTRLM_FOUND)
     find_package(IARMBus)
