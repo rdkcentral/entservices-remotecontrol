@@ -22,7 +22,7 @@ set(MODULE_NAME ${NAMESPACE}${PLUGIN_NAME})
 
 find_package(${NAMESPACE}Plugins REQUIRED)
 
-# add_subdirectory(test)
+add_subdirectory(test)
 
 add_library(${MODULE_NAME} SHARED
         RemoteControl.cpp
@@ -34,9 +34,7 @@ set_target_properties(${MODULE_NAME} PROPERTIES
 
 target_include_directories(${MODULE_NAME} PRIVATE ../helpers)
 
-set(CMAKE_FIND_DEBUG_MODE TRUE)
-
-find_package(CTRLM REQUIRED)
+find_package(CTRLM)
 if (CTRLM_FOUND)
     find_package(IARMBus)
     add_definitions(-DCTRLM_FOUND)
