@@ -26,13 +26,6 @@ else ()
     find_package(${NAMESPACE}Protocols REQUIRED)
 endif (USE_THUNDER_R4)
 
-add_executable(${PLUGIN_NAME} remoteControlTestClient.cpp)
-
-set_target_properties(${PLUGIN_NAME} PROPERTIES
-    CXX_STANDARD 11
-    CXX_STANDARD_REQUIRED YES
-    )
-
 find_library(TESTMOCKLIB_LIBRARIES NAMES TestMocklib)
 if (TESTMOCKLIB_LIBRARIES)
     message ("Found mock library - ${TESTMOCKLIB_LIBRARIES}")
@@ -40,6 +33,13 @@ if (TESTMOCKLIB_LIBRARIES)
 else (TESTMOCKLIB_LIBRARIES)
     message ("Require ${TESTMOCKLIB_LIBRARIES} library")
 endif (TESTMOCKLIB_LIBRARIES)
+
+add_executable(${PLUGIN_NAME} remoteControlTestClient.cpp)
+
+set_target_properties(${PLUGIN_NAME} PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED YES
+    )
 
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}Core::${NAMESPACE}Core)
 
