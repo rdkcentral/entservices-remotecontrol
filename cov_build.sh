@@ -22,8 +22,9 @@ find / -name "*Mock*"
 cd ${GITHUB_WORKSPACE}
 
 echo "Printing out some dirs..."
-ls -la build/*
-ls -la ${GITHUB_WORKSPACE}/install*
+pwd
+ls -laR build
+ls -laR ${GITHUB_WORKSPACE}/install*
 
 cmake -G Ninja -S "$GITHUB_WORKSPACE" -B build/entservices-remotecontrol \
 -DUSE_THUNDER_R4=ON \
