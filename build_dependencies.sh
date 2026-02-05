@@ -35,10 +35,9 @@ git clone --branch develop https://github.com/rdkcentral/entservices-apis.git
 
 git clone --branch 1.1.9 https://github.com/rdkcentral/control.git
 
-git clone --branch 1.0.2.1 https://github.com/rdkcentral/iarmbus.git
+# git clone --branch 1.0.2.1 https://github.com/rdkcentral/iarmbus.git
 
-#git clone --branch feature/RDKEMW-12797 https://$GITHUB_TOKEN@github.com/rdkcentral/entservices-testframework.git
-git clone  https://$GITHUB_TOKEN@github.com/rdkcentral/entservices-testframework.git
+git clone --branch feature/RDKEMW-12797 https://$GITHUB_TOKEN@github.com/rdkcentral/entservices-testframework.git
 
 ############################
 # Build Thunder-Tools
