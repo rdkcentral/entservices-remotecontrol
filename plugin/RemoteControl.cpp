@@ -155,14 +155,14 @@ namespace WPEFramework {
         {
             if (strcmp(owner, CTRLM_MAIN_IARM_BUS_NAME))
             {
-                LOGERR("ERROR - unexpected event: owner %s, eventId: %d, data: %p, size: %d.",
+                LOGERR("ERROR - unexpected event: owner %s, eventId: %d, data: %p, size: %ld.",
                        owner, (int)eventId, data, len);
                 return;
             }
 
             if ((data == NULL) || (len == 0))
             {
-                LOGERR("ERROR - event with NO DATA: eventId: %d, data: %p, size: %d.", (int)eventId, data, len);
+                LOGERR("ERROR - event with NO DATA: eventId: %d, data: %p, size: %ld.", (int)eventId, data, len);
                 return;
             }
             ctrlm_main_iarm_event_json_t *eventData = static_cast<ctrlm_main_iarm_event_json_t *>(data);
@@ -183,7 +183,7 @@ namespace WPEFramework {
                     onFirmwareUpdateProgress(eventData);
                     break;
                 default:
-                    LOGERR("ERROR - unexpected ctrlm event: eventId: %d, data: %p, size: %d.",
+                    LOGERR("ERROR - unexpected ctrlm event: eventId: %d, data: %p, size: %ld.",
                            (int)eventId, data, len);
                     break;
             }
