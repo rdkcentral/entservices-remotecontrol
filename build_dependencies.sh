@@ -35,6 +35,8 @@ git clone --branch develop https://github.com/rdkcentral/entservices-apis.git
 
 git clone --branch 1.1.9 https://github.com/rdkcentral/control.git
 
+git clone --branch 1.0.2.1 https://github.com/rdkcentral/iarmbus.git
+
 git clone https://$GITHUB_TOKEN@github.com/rdkcentral/entservices-testframework.git
 
 ############################
@@ -151,9 +153,13 @@ touch rdk/ds/videoResolution.hpp
 touch rdk/ds/frontPanelIndicator.hpp
 touch rdk/ds/frontPanelConfig.hpp
 touch rdk/ds/frontPanelTextDisplay.hpp
-touch rdk/iarmbus/libIARM.h
-touch rdk/iarmbus/libIBus.h
-touch rdk/iarmbus/libIBusDaemon.h
+
+# Copy IARMBus headers
+cp ${GITHUB_WORKSPACE}/iarmbus/core/include/* .
+# touch rdk/iarmbus/libIARM.h
+# touch rdk/iarmbus/libIBus.h
+# touch rdk/iarmbus/libIBusDaemon.h
+
 touch rdk/iarmmgrs-hal/deepSleepMgr.h
 touch rdk/iarmmgrs-hal/mfrMgr.h
 touch rdk/iarmmgrs-hal/sysMgr.h
