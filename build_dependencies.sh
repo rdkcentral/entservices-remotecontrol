@@ -181,9 +181,10 @@ touch rtNotifier.h
 touch dsFPD.h
 
 # Copy ctrlm headers
-cp ${GITHUB_WORKSPACE}/control/include/ctrlm_ipc.h .
-cp ${GITHUB_WORKSPACE}/control/include/ctrlm_ipc_rcu.h .
-cp ${GITHUB_WORKSPACE}/control/include/ctrlm_ipc_ble.h .
+cp ${GITHUB_WORKSPACE}/control/include/* .
+# cp ${GITHUB_WORKSPACE}/control/include/ctrlm_ipc.h .
+# cp ${GITHUB_WORKSPACE}/control/include/ctrlm_ipc_rcu.h .
+# cp ${GITHUB_WORKSPACE}/control/include/ctrlm_ipc_ble.h .
 
 # touch ctrlm_ipc.h
 # touch ctrlm_ipc_rcu.h
