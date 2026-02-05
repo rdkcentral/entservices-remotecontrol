@@ -96,15 +96,15 @@ cmake --build build/entservices-apis --target install
 
 ############################
 # Build control manager
-echo "======================================================================================"
-echo "buliding control manager"
+# echo "======================================================================================"
+# echo "buliding control manager"
 
-cmake -G Ninja -S control  -B build/control \
-    -DEXCEPTIONS_ENABLE=ON \
-    -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
-    -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
+# cmake -G Ninja -S control  -B build/control \
+#     -DEXCEPTIONS_ENABLE=ON \
+#     -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
+#     -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
 
-cmake --build build/control --target install
+# cmake --build build/control --target install
 
 ############################
 # generating external headers
