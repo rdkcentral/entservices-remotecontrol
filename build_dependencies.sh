@@ -155,7 +155,10 @@ touch rdk/ds/frontPanelConfig.hpp
 touch rdk/ds/frontPanelTextDisplay.hpp
 
 # Copy IARMBus headers
-cp ${GITHUB_WORKSPACE}/iarmbus/core/include/* .
+cp ${GITHUB_WORKSPACE}/iarmbus/core/include/libIARM.h .
+cp ${GITHUB_WORKSPACE}/iarmbus/core/include/libIBus.h .
+cp ${GITHUB_WORKSPACE}/iarmbus/core/include/libIBusDaemon.h .
+# cp ${GITHUB_WORKSPACE}/iarmbus/core/include/* .
 # touch rdk/iarmbus/libIARM.h
 # touch rdk/iarmbus/libIBus.h
 # touch rdk/iarmbus/libIBusDaemon.h
