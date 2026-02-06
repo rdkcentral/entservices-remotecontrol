@@ -199,7 +199,7 @@ if $BUILD_TESTS; then
           -I /usr/include/libdrm \
           -I $GITHUB_WORKSPACE/install/usr/include" \
 
-    cmake --build build/mocks -j8
+    cmake --build $GITHUB_WORKSPACE/build/mocks -j8
 
-    cmake --install build/mocks
+    cmake --install $GITHUB_WORKSPACE/build/mocks
 fi
