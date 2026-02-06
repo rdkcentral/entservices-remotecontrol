@@ -195,6 +195,7 @@ if $BUILD_TESTS; then
           -I $GITHUB_WORKSPACE/entservices-testframework/Tests/headers \
           -I /usr/include/gstreamer-1.0 \
           -I /usr/include/glib-2.0 \
+          -I /usr/lib/x86_64-linux-gnu/glib-2.0/include \
           -I $GITHUB_WORKSPACE/install/usr/include" \
 
     cmake --build build/mocks -j8
