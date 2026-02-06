@@ -20,7 +20,7 @@
 set(PLUGIN_NAME RemoteControl)
 set(MODULE_NAME ${NAMESPACE}${PLUGIN_NAME})
 
-option(BUILD_TESTS "Will build remote control test client and include dependencies", OFF)
+option(BUILD_TESTS "Will build remote control test client and include dependencies" OFF)
 
 find_package(${NAMESPACE}Plugins REQUIRED)
 
