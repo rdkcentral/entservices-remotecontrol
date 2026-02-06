@@ -184,10 +184,6 @@ echo "==========================================================================
 cd ../../
 cp -r /usr/include/gstreamer-1.0/gst /usr/include/glib-2.0/* /usr/lib/x86_64-linux-gnu/glib-2.0/include/* /usr/local/include/trower-base64/base64.h /usr/include/libdrm/drm.h /usr/include/libdrm/drm_mode.h /usr/include/xf86drm.h .
 
-ls -la /usr/include/gstreamer-1.0/gst
-
-ls -laR /usr/include
-
 ############################
 # Build entservices-testframework (mocks)
 if $BUILD_TESTS; then
@@ -197,7 +193,8 @@ if $BUILD_TESTS; then
           -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
           -DCMAKE_CXX_FLAGS=" \
           -I $GITHUB_WORKSPACE/entservices-testframework/Tests/headers \
-          -I /usr/include/gstreamer-1.0/ \
+          -I /usr/include/gstreamer-1.0 \
+          -I /usr/lib/x86_64-linux-gnu/glib-2.0/include \
           -I $GITHUB_WORKSPACE/install/usr/include" \
 
     cmake --build build/mocks -j8
