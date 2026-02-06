@@ -103,22 +103,6 @@ cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
 cmake --build build/entservices-apis --target install
 
 ############################
-# Build entservices-testframework (mocks)
-if $BUILD_TESTS; then
-    cmake -S "$GITHUB_WORKSPACE/entservices-testframework/Tests/mocks" -B build/mocks \
-          -DBUILD_SHARED_LIBS=ON \
-          -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
-          -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
-          -DCMAKE_CXX_FLAGS=" \
-          -I $GITHUB_WORKSPACE/entservices-testframework/Tests/headers \
-          -I $GITHUB_WORKSPACE/install/usr/include" \
-
-    cmake --build build/mocks -j8
-
-    cmake --install build/mocks
-fi
-
-############################
 # generating external headers
 cd $GITHUB_WORKSPACE
 cd entservices-testframework/Tests
@@ -199,3 +183,19 @@ echo "==========================================================================
 
 cd ../../
 cp -r /usr/include/gstreamer-1.0/gst /usr/include/glib-2.0/* /usr/lib/x86_64-linux-gnu/glib-2.0/include/* /usr/local/include/trower-base64/base64.h .
+
+############################
+# Build entservices-testframework (mocks)
+if $BUILD_TESTS; then
+    cmake -S "$GITHUB_WORKSPACE/entservices-testframework/Tests/mocks" -B build/mocks \
+          -DBUILD_SHARED_LIBS=ON \
+          -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
+          -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
+          -DCMAKE_CXX_FLAGS=" \
+          -I $GITHUB_WORKSPACE/entservices-testframework/Tests/headers \
+          -I $GITHUB_WORKSPACE/install/usr/include" \
+
+    cmake --build build/mocks -j8
+
+    cmake --install build/mocks
+fi
