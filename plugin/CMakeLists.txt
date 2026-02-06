@@ -20,9 +20,13 @@
 set(PLUGIN_NAME RemoteControl)
 set(MODULE_NAME ${NAMESPACE}${PLUGIN_NAME})
 
+option(BUILD_TESTS "Will build remote control test client and include dependencies", OFF)
+
 find_package(${NAMESPACE}Plugins REQUIRED)
 
-add_subdirectory(test)
+if (BUILD_TESTS)
+    add_subdirectory(test)
+endif(BUILD_TESTS)
 
 add_library(${MODULE_NAME} SHARED
         RemoteControl.cpp
