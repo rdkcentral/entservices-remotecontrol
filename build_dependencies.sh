@@ -185,10 +185,29 @@ cd ../../
 cp -r /usr/include/gstreamer-1.0/gst /usr/include/glib-2.0/* /usr/lib/x86_64-linux-gnu/glib-2.0/include/* /usr/local/include/trower-base64/base64.h /usr/include/libdrm/drm.h /usr/include/libdrm/drm_mode.h /usr/include/xf86drm.h .
 
 ############################
-# Build entservices-testframework (mocks)
+# Build test dependencies
 if $BUILD_TESTS; then
     cd $GITHUB_WORKSPACE
 
+    ############################
+    # Build google test
+    git clone https://github.com/google/googletest.git
+
+    cmake -G Ninja -S "googletest" -B build/googletest \
+          -DCMAKE_INSTALL_PREFIX="install/usr" \
+          -DCMAKE_MODULE_PATH="install/tools/cmake" \
+          -DGENERIC_CMAKE_MODULE_PATH="install/tools/cmake" \
+          -DBUILD_TYPE=Debug \
+          -DBUILD_GMOCK=ON \
+          -DBUILD_SHARED_LIBS=OFF \
+          -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+
+    cmake --build build/googletest -j8
+
+    cmake --install build/googletest
+
+    ############################
+    # Build entservices-testframework (mocks)
     cmake -S "entservices-testframework/Tests/mocks" -B build/mocks \
           -DBUILD_SHARED_LIBS=ON \
           -DCMAKE_INSTALL_PREFIX="install/usr" \
