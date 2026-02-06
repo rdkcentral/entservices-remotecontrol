@@ -199,6 +199,13 @@ if $BUILD_TESTS; then
           -I /usr/include/libdrm \
           -I $GITHUB_WORKSPACE/install/usr/include" \
 
+    echo "printing build/mocks"
+    ls -la build/mocks
+    echo "printing build"
+    ls -laR build
+
+    # cp build/mocks/secure_storage.grpc.pb.h
+
     cmake --build build/mocks -j8
 
     cmake --install build/mocks
