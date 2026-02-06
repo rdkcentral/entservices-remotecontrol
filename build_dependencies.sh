@@ -14,12 +14,6 @@ for arg in "$@"; do
     fi
 done
 
-if $BUILD_TESTS; then
-    echo "Build tests enabled
-else
-    echo "Built tests disabled
-fi
-
 # # ############################# 
 #1. Install Dependencies and packages
 
@@ -107,6 +101,22 @@ cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
     -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
 
 cmake --build build/entservices-apis --target install
+
+############################
+# Build entservices-testframework (mocks)
+if $BUILD_TESTS; then
+    cmake -S "$GITHUB_WORKSPACE/entservices-testframework/Tests/mocks" -B build/mocks \
+          -DBUILD_SHARED_LIBS=ON \
+          -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
+          -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
+          -DCMAKE_CXX_FLAGS=" \
+          -I $GITHUB_WORKSPACE/entservices-testframework/Tests/headers \
+          -I $GITHUB_WORKSPACE/install/usr/include" \
+
+    cmake --build build/mocks -j8
+
+    cmake --install build/mocks
+fi
 
 ############################
 # generating external headers
