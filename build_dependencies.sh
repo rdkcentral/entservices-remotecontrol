@@ -187,7 +187,7 @@ cp -r /usr/include/gstreamer-1.0/gst /usr/include/glib-2.0/* /usr/lib/x86_64-lin
 ############################
 # Build entservices-testframework (mocks)
 if $BUILD_TESTS; then
-    cmake -S "$GITHUB_WORKSPACE/entservices-testframework/Tests/mocks" -B build/mocks \
+    cmake -S "$GITHUB_WORKSPACE/entservices-testframework/Tests/mocks" -B $GITHUB_WORKSPACE/build/mocks \
           -DBUILD_SHARED_LIBS=ON \
           -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
           -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
@@ -198,8 +198,6 @@ if $BUILD_TESTS; then
           -I /usr/lib/x86_64-linux-gnu/glib-2.0/include \
           -I /usr/include/libdrm \
           -I $GITHUB_WORKSPACE/install/usr/include" \
-
-    find / -name "secure_storage.grpc.pb.h"
 
     cmake --build build/mocks -j8
 
