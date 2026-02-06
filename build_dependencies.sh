@@ -6,6 +6,20 @@ GITHUB_WORKSPACE="${PWD}"
 ls -la ${GITHUB_WORKSPACE}
 cd ${GITHUB_WORKSPACE}
 
+BUILD_TESTS=false
+for arg in "$@"; do
+    if [ "$arg" = "--build-tests" ]; then
+        BUILD_TESTS=true
+        break
+    fi
+done
+
+if $BUILD_TESTS
+    echo "Build tests enabled
+else
+    echo "Built tests disabled
+fi
+
 # # ############################# 
 #1. Install Dependencies and packages
 

@@ -5,19 +5,23 @@ set -e
 GITHUB_WORKSPACE="${PWD}"
 ls -la ${GITHUB_WORKSPACE}
 ############################
+
+BUILD_TESTS=false
+for arg in "$@"; do
+    if [ "$arg" = "--build-tests" ]; then
+        BUILD_TESTS=true
+        break
+    fi
+done
+
+if $BUILD_TESTS
+    echo "Build tests enabled
+else
+    echo "Built tests disabled
+fi
+
 # Build entservices-remotecontrol
 echo "building entservices-remotecontrol"
-
-# Flags removed
-# -DCMAKE_DISABLE_FIND_PACKAGE_RFC=ON \
-# -DCMAKE_DISABLE_FIND_PACKAGE_DS=ON \
-# -DRDK_SERVICES_COVERITY=ON \
-# -DRDK_SERVICES_L1_TEST=ON \
-# -DDS_FOUND=ON \
-# -DPLUGIN_MOTION_DETECTION=ON \
-
-# -DCMAKE_INCLUDE_PATH="${GITHUB_WORKSPACE}/entservices-testframework/Tests/headers" \
-
 
 cmake -G Ninja -S "$GITHUB_WORKSPACE" -B build/entservices-remotecontrol \
 -DUSE_THUNDER_R4=ON \
