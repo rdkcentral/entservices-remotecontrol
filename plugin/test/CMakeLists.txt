@@ -26,16 +26,6 @@ else ()
     find_package(${NAMESPACE}Protocols REQUIRED)
 endif (USE_THUNDER_R4)
 
-set(CMAKE_FIND_DEBUG_MODE TRUE)
-find_library(TESTMOCKLIB_LIBRARIES NAMES TestMocklib)
-if (TESTMOCKLIB_LIBRARIES)
-    message ("Found mock library - ${TESTMOCKLIB_LIBRARIES}")
-    target_link_libraries(${PLUGIN_NAME} PRIVATE ${TESTMOCKLIB_LIBRARIES})
-else (TESTMOCKLIB_LIBRARIES)
-    message ("Require ${TESTMOCKLIB_LIBRARIES} library")
-endif (TESTMOCKLIB_LIBRARIES)
-set(CMAKE_FIND_DEBUG_MODE FALSE)
-
 add_executable(${PLUGIN_NAME} remoteControlTestClient.cpp)
 
 set_target_properties(${PLUGIN_NAME} PROPERTIES
@@ -50,6 +40,14 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}COM::${NAMESPACE}COM  $
 else ()
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}Protocols::${NAMESPACE}Protocols)
 endif (USE_THUNDER_R4)
+
+find_library(TESTMOCKLIB_LIBRARIES NAMES TestMocklib)
+if (TESTMOCKLIB_LIBRARIES)
+    message ("Found mock library - ${TESTMOCKLIB_LIBRARIES}")
+    target_link_libraries(${PLUGIN_NAME} PRIVATE ${TESTMOCKLIB_LIBRARIES})
+else (TESTMOCKLIB_LIBRARIES)
+    message ("Require ${TESTMOCKLIB_LIBRARIES} library")
+endif (TESTMOCKLIB_LIBRARIES)
 
 
 install(TARGETS ${PLUGIN_NAME} DESTINATION bin)

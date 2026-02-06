@@ -187,19 +187,21 @@ cp -r /usr/include/gstreamer-1.0/gst /usr/include/glib-2.0/* /usr/lib/x86_64-lin
 ############################
 # Build entservices-testframework (mocks)
 if $BUILD_TESTS; then
-    cmake -S "$GITHUB_WORKSPACE/entservices-testframework/Tests/mocks" -B $GITHUB_WORKSPACE/build/mocks \
+    cd $GITHUB_WORKSPACE
+
+    cmake -S "entservices-testframework/Tests/mocks" -B build/mocks \
           -DBUILD_SHARED_LIBS=ON \
-          -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
-          -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
+          -DCMAKE_INSTALL_PREFIX="install/usr" \
+          -DCMAKE_MODULE_PATH="install/tools/cmake" \
           -DCMAKE_CXX_FLAGS=" \
-          -I $GITHUB_WORKSPACE/entservices-testframework/Tests/headers \
+          -I entservices-testframework/Tests/headers \
           -I /usr/include/gstreamer-1.0 \
           -I /usr/include/glib-2.0 \
           -I /usr/lib/x86_64-linux-gnu/glib-2.0/include \
           -I /usr/include/libdrm \
-          -I $GITHUB_WORKSPACE/install/usr/include" \
+          -I install/usr/include" \
 
-    cmake --build $GITHUB_WORKSPACE/build/mocks -j8
+    cmake --build build/mocks -j8
 
-    cmake --install $GITHUB_WORKSPACE/build/mocks
+    cmake --install build/mocks
 fi
