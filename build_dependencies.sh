@@ -197,7 +197,7 @@ if $BUILD_TESTS; then
           -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
           -DCMAKE_CXX_FLAGS=" \
           -I $GITHUB_WORKSPACE/entservices-testframework/Tests/headers \
-          -I $GITHUB_WORKSPACE/install/usr/include/gstreamer-1.0/gst \
+          -I /usr/include/gstreamer-1.0/ \
           -I $GITHUB_WORKSPACE/install/usr/include" \
 
     cmake --build build/mocks -j8
