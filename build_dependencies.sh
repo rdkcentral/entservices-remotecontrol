@@ -141,15 +141,9 @@ touch rdk/ds/videoResolution.hpp
 touch rdk/ds/frontPanelIndicator.hpp
 touch rdk/ds/frontPanelConfig.hpp
 touch rdk/ds/frontPanelTextDisplay.hpp
-
-# Copy IARMBus headers
-# cp ${GITHUB_WORKSPACE}/iarmbus/core/include/libIARM.h .
-# cp ${GITHUB_WORKSPACE}/iarmbus/core/include/libIBus.h .
-# cp ${GITHUB_WORKSPACE}/iarmbus/core/include/libIBusDaemon.h .
 touch rdk/iarmbus/libIARM.h
 touch rdk/iarmbus/libIBus.h
 touch rdk/iarmbus/libIBusDaemon.h
-
 touch rdk/iarmmgrs-hal/deepSleepMgr.h
 touch rdk/iarmmgrs-hal/mfrMgr.h
 touch rdk/iarmmgrs-hal/sysMgr.h
@@ -175,16 +169,8 @@ touch rtObject.h
 touch rtError.h
 touch rtNotifier.h
 touch dsFPD.h
-
 # Copy ctrlm headers
 cp ${GITHUB_WORKSPACE}/control/include/* .
-# cp ${GITHUB_WORKSPACE}/control/include/ctrlm_ipc.h .
-# cp ${GITHUB_WORKSPACE}/control/include/ctrlm_ipc_rcu.h .
-# cp ${GITHUB_WORKSPACE}/control/include/ctrlm_ipc_ble.h .
-
-# touch ctrlm_ipc.h
-# touch ctrlm_ipc_rcu.h
-# touch ctrlm_ipc_ble.h
 
 echo "files created successfully"
 echo "======================================================================================"
