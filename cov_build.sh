@@ -14,7 +14,7 @@ for arg in "$@"; do
     fi
 done
 
-if $BUILD_TESTS
+if $BUILD_TESTS; then
     echo "Build tests enabled
 else
     echo "Built tests disabled
