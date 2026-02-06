@@ -6,19 +6,13 @@ GITHUB_WORKSPACE="${PWD}"
 ls -la ${GITHUB_WORKSPACE}
 ############################
 
-BUILD_TESTS=false
+BUILD_TESTS="OFF"
 for arg in "$@"; do
     if [ "$arg" = "--build-tests" ]; then
-        BUILD_TESTS=true
+        BUILD_TESTS="ON"
         break
     fi
 done
-
-if $BUILD_TESTS; then
-    echo "Build tests enabled
-else
-    echo "Built tests disabled
-fi
 
 # Build entservices-remotecontrol
 echo "building entservices-remotecontrol"
@@ -32,6 +26,7 @@ cmake -G Ninja -S "$GITHUB_WORKSPACE" -B build/entservices-remotecontrol \
 -DCMAKE_DISABLE_FIND_PACKAGE_IARMBus=ON \
 -DCOMCAST_CONFIG=OFF \
 -DHIDE_NON_EXTERNAL_SYMBOLS=OFF \
+-DBUILD_TESTS=${BUILD_TESTS} \
 -DCMAKE_CXX_FLAGS="-DEXCEPTIONS_ENABLE=ON \
 -I ${GITHUB_WORKSPACE}/entservices-testframework/Tests/headers \
 -I ${GITHUB_WORKSPACE}/entservices-testframework/Tests/headers/audiocapturemgr \
