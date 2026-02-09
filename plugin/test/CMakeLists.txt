@@ -35,7 +35,7 @@ set_target_properties(${PLUGIN_NAME} PROPERTIES
     CXX_STANDARD_REQUIRED YES
     )
 
-target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}Core::${NAMESPACE}Core gtest_main gmock gtest)
+target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}Core::${NAMESPACE}Core GTest::gtest_main)
 
 if (USE_THUNDER_R4)
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}COM::${NAMESPACE}COM  ${NAMESPACE}WebSocket::${NAMESPACE}WebSocket)
