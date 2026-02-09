@@ -3,8 +3,8 @@ applyTo: "**/*Implementation.cpp,**/*Implementation.h,**/*.cpp,**/*.h"
 ---
 
 # Instruction Summary
-  1. [Inter-Plugin Communication](https://github.com/rdkcentral/entservices-peripherals/blob/develop/.github/instructions/Pluginimplementation.instructions.md#inter-plugin-communication)
-  2. [On-Demand Plugin Interface Acquisition](https://github.com/rdkcentral/entservices-peripherals/blob/develop/.github/instructions/Pluginimplementation.instructions.md#on-demand-plugin-interface-acquisition)
+  1. [Inter-Plugin Communication](https://github.com/rdkcentral/entservices-remotecontrol/blob/develop/.github/instructions/Pluginimplementation.instructions.md#inter-plugin-communication)
+  2. [On-Demand Plugin Interface Acquisition](https://github.com/rdkcentral/entservices-remotecontrol/blob/develop/.github/instructions/Pluginimplementation.instructions.md#on-demand-plugin-interface-acquisition)
 
 ### Inter-Plugin Communication
 
