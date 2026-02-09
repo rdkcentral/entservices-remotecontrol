@@ -29,8 +29,8 @@ cmake -G Ninja -S "$GITHUB_WORKSPACE" -B build/entservices-remotecontrol \
 -DHIDE_NON_EXTERNAL_SYMBOLS=OFF \
 -DBUILD_TESTS=${BUILD_TESTS} \
 -DCMAKE_CXX_FLAGS="-DEXCEPTIONS_ENABLE=ON \
--fprofile-arcs
--ftest-coverage
+-fprofile-arcs \
+-ftest-coverage \
 -I ${GITHUB_WORKSPACE}/entservices-testframework/Tests/headers \
 -I ${GITHUB_WORKSPACE}/entservices-testframework/Tests/headers/audiocapturemgr \
 -I ${GITHUB_WORKSPACE}/entservices-testframework/Tests/headers/rdk/ds \
