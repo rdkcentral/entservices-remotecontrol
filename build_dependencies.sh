@@ -191,7 +191,7 @@ if $BUILD_TESTS; then
 
     ############################
     # Build google test
-    git clone https://github.com/google/googletest.git
+    git clone --branch v1.15.0 https://github.com/google/googletest.git
 
     cmake -G Ninja -S "googletest" -B build/googletest \
           -DCMAKE_INSTALL_PREFIX="install/usr" \
