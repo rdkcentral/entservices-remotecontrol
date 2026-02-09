@@ -41,7 +41,7 @@ git clone --branch R4.4.1 https://github.com/rdkcentral/Thunder.git
 
 git clone --branch develop https://github.com/rdkcentral/entservices-apis.git
 
-git clone --branch 1.1.9 https://github.com/rdkcentral/control.git
+# git clone --branch 1.1.9 https://github.com/rdkcentral/control.git
 
 git clone --branch feature/RDKEMW-12797 https://$GITHUB_TOKEN@github.com/rdkcentral/entservices-testframework.git
 
@@ -175,8 +175,11 @@ touch rtObject.h
 touch rtError.h
 touch rtNotifier.h
 touch dsFPD.h
+touch ctrlm_ipc.h
+touch ctrlm_ipc_rcu.h
+touch ctrlm_ipc_ble.h
 # Copy ctrlm headers
-cp ${GITHUB_WORKSPACE}/control/include/* .
+# cp ${GITHUB_WORKSPACE}/control/include/* .
 
 echo "files created successfully"
 echo "======================================================================================"

@@ -1,10 +1,11 @@
 name: Build Component in Native Environment with Tests
 
 on:
-  push:
-    branches: [ main, 'sprint/**', 'release/**', develop ]
-  pull_request:
-    branches: [ main, 'sprint/**', 'release/**', topic/RDK*, develop ]
+  workflow_dispatch:
+  # push:
+  #   branches: [ main, 'sprint/**', 'release/**', develop ]
+  # pull_request:
+  #   branches: [ main, 'sprint/**', 'release/**', topic/RDK*, develop ]
 
 jobs:
   build-remotecontrol-on-pr:
