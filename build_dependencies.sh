@@ -24,7 +24,7 @@ pip install jsonref
 ############################
 # Build trevor-base64
 if [ ! -d "trower-base64" ]; then
-git clone https://github.com/xmidt-org/trower-base64.git
+git clone --depth 1 https://github.com/xmidt-org/trower-base64.git
 fi
 cd trower-base64
 meson setup --warnlevel 3 --werror build
@@ -35,15 +35,15 @@ cd ..
 # Clone the required repositories
 
 
-git clone --branch  R4.4.3 https://github.com/rdkcentral/ThunderTools.git
+git clone --depth 1 --branch  R4.4.3 https://github.com/rdkcentral/ThunderTools.git
 
-git clone --branch R4.4.1 https://github.com/rdkcentral/Thunder.git
+git clone --depth 1 --branch R4.4.1 https://github.com/rdkcentral/Thunder.git
 
-git clone --branch develop https://github.com/rdkcentral/entservices-apis.git
+git clone --depth 1 --branch develop https://github.com/rdkcentral/entservices-apis.git
 
-# git clone --branch 1.1.9 https://github.com/rdkcentral/control.git
+git clone --depth 1 --branch $CTRLM_TAG https://github.com/rdkcentral/control.git
 
-git clone --branch feature/RDKEMW-12797 https://$GITHUB_TOKEN@github.com/rdkcentral/entservices-testframework.git
+git clone --depth 1 --branch feature/RDKEMW-12797 https://$GITHUB_TOKEN@github.com/rdkcentral/entservices-testframework.git
 
 ############################
 # Build Thunder-Tools
@@ -175,11 +175,8 @@ touch rtObject.h
 touch rtError.h
 touch rtNotifier.h
 touch dsFPD.h
-touch ctrlm_ipc.h
-touch ctrlm_ipc_rcu.h
-touch ctrlm_ipc_ble.h
 # Copy ctrlm headers
-# cp ${GITHUB_WORKSPACE}/control/include/* .
+cp ${GITHUB_WORKSPACE}/control/include/* .
 
 echo "files created successfully"
 echo "======================================================================================"
@@ -194,7 +191,7 @@ if $BUILD_TESTS; then
 
     ############################
     # Build google test
-    git clone --branch v1.15.0 https://github.com/google/googletest.git
+    git clone --depth 1 --branch v1.15.0 https://github.com/google/googletest.git
 
     cmake -G Ninja -S "googletest" -B build/googletest \
           -DCMAKE_INSTALL_PREFIX="install/usr" \

@@ -22,6 +22,7 @@ jobs:
           sh -x build_dependencies.sh
         env:
           GITHUB_TOKEN: ${{ secrets.RDKCM_RDKE }}
+          CTRLM_TAG: ${{ vars.CTRLM_TAG }}
 
       - name: cov build
         run: |
