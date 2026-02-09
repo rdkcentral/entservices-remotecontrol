@@ -27,6 +27,10 @@ else ()
 endif (USE_THUNDER_R4)
 
 find_package(GTest REQUIRED)
+message(STATUS "GTest found: ${GTest_FOUND}")
+message(STATUS "GTest include dirs: ${GTEST_INCLUDE_DIRS}")
+message(STATUS "GTest libraries: ${GTEST_LIBRARIES}")
+message(STATUS "GTest targets: ${GTEST_BOTH_LIBRARIES}")
 
 add_executable(${PLUGIN_NAME} remoteControlTestClient.cpp)
 
@@ -35,7 +39,7 @@ set_target_properties(${PLUGIN_NAME} PROPERTIES
     CXX_STANDARD_REQUIRED YES
     )
 
-target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}Core::${NAMESPACE}Core GTest::gtest_main)
+target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}Core::${NAMESPACE}Core GTest::gtest_main GTest::gtest)
 
 if (USE_THUNDER_R4)
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}COM::${NAMESPACE}COM  ${NAMESPACE}WebSocket::${NAMESPACE}WebSocket)
