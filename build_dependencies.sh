@@ -58,7 +58,7 @@ cmake -G Ninja -S ThunderTools -B build/ThunderTools \
     -DEXCEPTIONS_ENABLE=ON \
     -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
     -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
-    -DGENERIC_CMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
+    -DGENERIC_CMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake"
 
 cmake --build build/ThunderTools --target install
 
@@ -83,7 +83,7 @@ cmake -G Ninja -S Thunder -B build/Thunder \
     -DBUILD_TYPE=Debug \
     -DBINDING=127.0.0.1 \
     -DPORT=55555 \
-    -DEXCEPTIONS_ENABLE=ON \
+    -DEXCEPTIONS_ENABLE=ON
 
 cmake --build build/Thunder --target install
 
@@ -200,7 +200,7 @@ if $BUILD_TESTS; then
           -DBUILD_TYPE=Debug \
           -DBUILD_GMOCK=ON \
           -DBUILD_SHARED_LIBS=OFF \
-          -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+          -DCMAKE_POSITION_INDEPENDENT_CODE=ON
 
     cmake --build build/googletest -j8
 
@@ -218,7 +218,7 @@ if $BUILD_TESTS; then
           -I /usr/include/glib-2.0 \
           -I /usr/lib/x86_64-linux-gnu/glib-2.0/include \
           -I /usr/include/libdrm \
-          -I install/usr/include" \
+          -I install/usr/include"
 
     cmake --build build/mocks -j8
 
