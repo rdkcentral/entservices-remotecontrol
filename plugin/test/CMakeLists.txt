@@ -27,10 +27,6 @@ else ()
 endif (USE_THUNDER_R4)
 
 find_package(GTest REQUIRED)
-message(STATUS "GTest found: ${GTest_FOUND}")
-message(STATUS "GTest include dirs: ${GTEST_INCLUDE_DIRS}")
-message(STATUS "GTest libraries: ${GTEST_LIBRARIES}")
-message(STATUS "GTest targets: ${GTEST_BOTH_LIBRARIES}")
 
 add_executable(${PLUGIN_NAME} remoteControlTestClient.cpp)
 
