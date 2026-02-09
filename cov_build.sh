@@ -22,12 +22,15 @@ cmake -G Ninja -S "$GITHUB_WORKSPACE" -B build/entservices-remotecontrol \
 -DCMAKE_INSTALL_PREFIX="${GITHUB_WORKSPACE}/install/usr" \
 -DCMAKE_INCLUDE_PATH="${GITHUB_WORKSPACE}/entservices-testframework/Tests/headers" \
 -DCMAKE_MODULE_PATH="${GITHUB_WORKSPACE}/install/tools/cmake" \
+-DCMAKE_PREFIX_PATH="${GITHUB_WORKSPACE}/install/usr" \
 -DCMAKE_VERBOSE_MAKEFILE=ON \
 -DCMAKE_DISABLE_FIND_PACKAGE_IARMBus=ON \
 -DCOMCAST_CONFIG=OFF \
 -DHIDE_NON_EXTERNAL_SYMBOLS=OFF \
 -DBUILD_TESTS=${BUILD_TESTS} \
 -DCMAKE_CXX_FLAGS="-DEXCEPTIONS_ENABLE=ON \
+-fprofile-arcs
+-ftest-coverage
 -I ${GITHUB_WORKSPACE}/entservices-testframework/Tests/headers \
 -I ${GITHUB_WORKSPACE}/entservices-testframework/Tests/headers/audiocapturemgr \
 -I ${GITHUB_WORKSPACE}/entservices-testframework/Tests/headers/rdk/ds \
