@@ -34,6 +34,8 @@ set_target_properties(${PLUGIN_NAME} PROPERTIES
     )
 
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}Core::${NAMESPACE}Core)
+# Testing
+target_link_libraries(${PLUGIN_NAME} PRIVATE -lgtest_main -lgtestCore)
 
 if (USE_THUNDER_R4)
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}COM::${NAMESPACE}COM  ${NAMESPACE}WebSocket::${NAMESPACE}WebSocket)
