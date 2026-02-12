@@ -234,7 +234,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -282,7 +282,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -330,7 +330,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -380,7 +380,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -430,7 +430,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -480,7 +480,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -530,7 +530,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -578,7 +578,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -626,7 +626,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -674,7 +674,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -722,7 +722,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -770,7 +770,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -818,7 +818,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -868,7 +868,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -916,7 +916,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -964,7 +964,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -1012,7 +1012,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)
@@ -1060,7 +1060,7 @@ namespace WPEFramework {
             JsonObject result;
             result.FromString(call->result);
             bSuccess = result["success"].Boolean();
-            response = result;
+            response = std::move(result);
             free(call);
 
             if (bSuccess)

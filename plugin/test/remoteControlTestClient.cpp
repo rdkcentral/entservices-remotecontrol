@@ -1,4 +1,4 @@
-/*
+364/*
  * If not stated otherwise in this file or this component's license file
  * the following copyright and licenses apply:
  *
@@ -361,7 +361,7 @@ void handleParams(string& cmd)
                 std::cout << "Enter the TV code: ";
                 std::getline(std::cin, digits);
             }
-            currentTVCode = digits;
+            currentTVCode = std::move(digits);
         }
         break;
 
@@ -374,7 +374,7 @@ void handleParams(string& cmd)
                 std::cout << "Enter the AVR code: ";
                 std::getline(std::cin, digits);
             }
-            currentAMPCode = digits;
+            currentAMPCode = std::move(digits);
         }
         break;
 
@@ -387,7 +387,7 @@ void handleParams(string& cmd)
 
             if(!model.empty())
             {
-                currentModel = model;
+                currentModel = std::move(model);
             }
             else
             {
