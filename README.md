@@ -68,16 +68,16 @@ curl -d '{"jsonrpc":"2.0","id":"5","method":"org.rdk.RemoteControl.1.getNetStatu
 curl -d '{"jsonrpc":"2.0","id":"6","method":"org.rdk.RemoteControl.1.getIRDBManufacturers"}' http://127.0.0.1:9998/jsonrpc
 ```
 
+### Test Client
+
+A test client is available in the `plugin/test` directory for validating plugin functionality.
+
 ## Dependencies
 
 - WPE Framework
 - IARM Bus
 - CTRLM
 - jsoncpp
-
-## Testing
-
-A test client is available in the `plugin/test` directory for validating plugin functionality.
 
 ## License
 
