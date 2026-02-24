@@ -23,6 +23,14 @@ set(MODULE_NAME ${NAMESPACE}${PLUGIN_NAME})
 option(BUILD_TESTS "Will build remote control test client and include dependencies" OFF)
 
 find_package(${NAMESPACE}Plugins REQUIRED)
+find_package(${NAMESPACE}Core REQUIRED)
+
+if (USE_THUNDER_R4)
+    find_package(${NAMESPACE}COM REQUIRED)
+    find_package(${NAMESPACE}WebSocket REQUIRED)
+else()
+    find_package(${NAMESPACE}Protocols REQUIRED)
+endif()
 
 if (BUILD_TESTS)
     add_subdirectory(test)

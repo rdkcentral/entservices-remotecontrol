@@ -18,13 +18,6 @@
 ###
 
 set(PLUGIN_NAME remoteControlTestClient)
-find_package(${NAMESPACE}Core REQUIRED)
-
-if (USE_THUNDER_R4)
-    find_package(${NAMESPACE}COM REQUIRED)
-else ()
-    find_package(${NAMESPACE}Protocols REQUIRED)
-endif (USE_THUNDER_R4)
 
 find_package(GTest REQUIRED)
 
