@@ -38,6 +38,7 @@
         LOGTRACEMETHODFIN(); \
         return (successBoolean ? WPEFramework::Core::ERROR_NONE : WPEFramework::Core::ERROR_GENERAL); \
     }
+// This is the legacy behavior of returnResponse.  Once Web Apps can properly catch exceptions to handle an error return, the the above originalReturnResponse() can be used.
 #define returnResponse(success) \
     { \
         response["success"] = success; \
