@@ -38,7 +38,6 @@
         LOGTRACEMETHODFIN(); \
         return (successBoolean ? WPEFramework::Core::ERROR_NONE : WPEFramework::Core::ERROR_GENERAL); \
     }
-// returnResponse macro after applying patch '0001-RDKTV-20749-Revert-Merge-pull-request-3336-from-npol.patch', use 'originalReturnResponse' for original bahavior
 #define returnResponse(success) \
     { \
         response["success"] = success; \
