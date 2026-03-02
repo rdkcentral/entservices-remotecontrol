@@ -1,4 +1,0 @@
-precondition = ["Platform"]
-callsign = "org.rdk.VoiceControl"
-autostart = "false"
-startuporder = "@PLUGIN_VOICECONTROL_STARTUPORDER@"
