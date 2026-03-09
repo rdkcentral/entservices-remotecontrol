@@ -25,6 +25,8 @@
 #include "UtilsIarm.h"
 #include "UtilsString.h"
 
+#include <telemetry_busmessage_sender.h>
+
 #include <exception>
 
 #define IARM_FACTORY_RESET_TIMEOUT  (15 * 1000)  // 15 seconds, in milliseconds
@@ -484,9 +486,15 @@ namespace WPEFramework {
             free(call);
 
             if (bSuccess)
+            {
                 LOGINFO("IRDB AUTO LOOKUP call SUCCESS!");
+                t2_event_d("CTRLM_ERROR_GetIRSuccessNoCodes", 1);
+            }
             else
+            {
                 LOGERR("ERROR - CTRLM_MAIN_IARM_CALL_IR_AUTO_LOOKUP returned FAILURE!");
+                t2_event_d("CTRLM_ERROR_GetIRCodeFail", 1);
+            }
 
             returnResponse(bSuccess);
         }
