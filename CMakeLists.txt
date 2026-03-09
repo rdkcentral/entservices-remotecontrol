@@ -34,7 +34,11 @@ include(CmakeHelperFunctions)
 # Add remote control plugin
 add_subdirectory(plugin)
 
-target_link_libraries(-ltelemetry_msgsender)
+set(PLUGIN_NAME RemoteControl)
+set(MODULE_NAME ${NAMESPACE}${PLUGIN_NAME})
+set(PLUGIN_IMPLEMENTATION ${MODULE_NAME}Implementation)
+
+target_link_libraries(${PLUGIN_IMPLEMENTATION} PRIVATE -ltelemetry_msgsender)
 
 if(WPEFRAMEWORK_CREATE_IPKG_TARGETS)
     set(CPACK_GENERATOR "DEB")
