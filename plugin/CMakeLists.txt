@@ -24,6 +24,7 @@ set(PLUGIN_IMPLEMENTATION "${MODULE_NAME}Implementation" CACHE STRING "Library w
 option(BUILD_TESTS "Will build remote control test client and include dependencies" OFF)
 
 find_package(${NAMESPACE}Plugins REQUIRED)
+find_package(${NAMESPACE}Definitions REQUIRED)
 find_package(${NAMESPACE}Core REQUIRED)
 
 if (USE_THUNDER_R4)
