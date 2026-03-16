@@ -347,7 +347,7 @@ namespace Plugin {
                 supportedTypes.push_back(static_cast<uint32_t>(arr[i].Number()));
             }
         }
-        netTypeSupported = Core::ServiceType<RPC::ValueIterator>::Create<Exchange::IUint32Iterator>(supportedTypes);
+        netTypeSupported = Core::Service<RPC::ValueIterator>::Create<Exchange::IUint32Iterator>(supportedTypes);
 
         // Parse remoteData array
         std::list<Exchange::RemoteData> remotes;
@@ -377,7 +377,7 @@ namespace Plugin {
                 remotes.push_back(rd);
             }
         }
-        remoteData = Core::ServiceType<RPC::IteratorType<Exchange::IRemoteDataIterator>>::Create<Exchange::IRemoteDataIterator>(remotes);
+        remoteData = Core::Service<RPC::IteratorType<Exchange::IRemoteDataIterator>>::Create<Exchange::IRemoteDataIterator>(remotes);
 
         return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
     }
@@ -407,7 +407,7 @@ namespace Plugin {
                 mfrs.push_back(arr[i].String());
             }
         }
-        manufacturers = Core::ServiceType<RPC::StringIterator>::Create<Exchange::IStringIterator>(mfrs);
+        manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(mfrs);
 
         return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
     }
@@ -439,7 +439,7 @@ namespace Plugin {
                 mdls.push_back(arr[i].String());
             }
         }
-        models = Core::ServiceType<RPC::StringIterator>::Create<Exchange::IStringIterator>(mdls);
+        models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(mdls);
 
         return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
     }
@@ -471,7 +471,7 @@ namespace Plugin {
                 tv.push_back(arr[i].String());
             }
         }
-        tvCodes = Core::ServiceType<RPC::StringIterator>::Create<Exchange::IStringIterator>(tv);
+        tvCodes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(tv);
 
         std::list<string> avr;
         if (result.HasLabel("avrCodes")) {
@@ -480,7 +480,7 @@ namespace Plugin {
                 avr.push_back(arr[i].String());
             }
         }
-        avrCodes = Core::ServiceType<RPC::StringIterator>::Create<Exchange::IStringIterator>(avr);
+        avrCodes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(avr);
 
         return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
     }
@@ -513,7 +513,7 @@ namespace Plugin {
                 codeList.push_back(arr[i].String());
             }
         }
-        codes = Core::ServiceType<RPC::StringIterator>::Create<Exchange::IStringIterator>(codeList);
+        codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(codeList);
 
         return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
     }
@@ -705,7 +705,7 @@ namespace Plugin {
                 sessions.push_back(arr[i].String());
             }
         }
-        sessionIdList = Core::ServiceType<RPC::StringIterator>::Create<Exchange::IStringIterator>(sessions);
+        sessionIdList = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(sessions);
 
         return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
     }
