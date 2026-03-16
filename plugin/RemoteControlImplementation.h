@@ -63,8 +63,8 @@ namespace Plugin {
         Core::hresult CancelFirmwareUpdate(const Exchange::CancelFirmwareUpdateRequest& request, bool& success) override;
         Core::hresult StatusFirmwareUpdate(const Exchange::StatusFirmwareUpdateRequest& request, Exchange::StatusFirmwareUpdateResponse& response) override;
 
-        void Register(Exchange::IRemoteControl::INotification* notification) override;
-        void Unregister(const Exchange::IRemoteControl::INotification* notification) override;
+        virtual Core::hresult Register(Exchange::IRemoteControl::INotification* notification) override;
+        virtual Core::hresult Unregister(const Exchange::IRemoteControl::INotification* notification) override;
 
     private:
         void InitializeIARM();
