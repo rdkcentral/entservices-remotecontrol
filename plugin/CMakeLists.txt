@@ -81,7 +81,7 @@ else (CTRLM_FOUND)
             ${NAMESPACE}Definitions::${NAMESPACE}Definitions)
 endif(CTRLM_FOUND)
 
-install(TARGETS ${PLUGIN_IMPLEMENTATION}
+install(TARGETS ${MODULE_NAME}
         DESTINATION lib/${STORAGE_DIRECTORY}/plugins)
 
 write_config(${PLUGIN_NAME})
