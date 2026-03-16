@@ -36,17 +36,29 @@ namespace Plugin {
 
     RemoteControlImplementation::RemoteControlImplementation()
         : _adminLock()
+        , _service(nullptr)
         , _notifications()
         , _hasOwnProcess(false)
     {
         _instance = this;
-        InitializeIARM();
     }
 
     RemoteControlImplementation::~RemoteControlImplementation()
     {
         DeinitializeIARM();
         _instance = nullptr;
+        _service = nullptr;
+    }
+
+    uint32_t RemoteControlImplementation::Configure(PluginHost::IShell* service)
+    {
+        LOGINFO("Configuring RemoteControlImplementation");
+        uint32_t result = Core::ERROR_NONE;
+        ASSERT(service != nullptr);
+        _service = service;
+        _service->AddRef();
+        InitializeIARM();
+        return result;
     }
 
     // ─── INotification management ───

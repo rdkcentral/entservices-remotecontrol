@@ -21,6 +21,7 @@
 
 #include "Module.h"
 #include <interfaces/IRemoteControl.h>
+#include <interfaces/IConfiguration.h>
 
 #include "libIBus.h"
 #include "ctrlm_ipc.h"
@@ -30,7 +31,7 @@
 namespace WPEFramework {
 namespace Plugin {
 
-    class RemoteControlImplementation : public Exchange::IRemoteControl {
+    class RemoteControlImplementation : public Exchange::IRemoteControl, public Exchange::IConfiguration {
     public:
         RemoteControlImplementation(const RemoteControlImplementation&) = delete;
         RemoteControlImplementation& operator=(const RemoteControlImplementation&) = delete;
@@ -40,6 +41,7 @@ namespace Plugin {
 
         BEGIN_INTERFACE_MAP(RemoteControlImplementation)
             INTERFACE_ENTRY(Exchange::IRemoteControl)
+            INTERFACE_ENTRY(Exchange::IConfiguration)
         END_INTERFACE_MAP
 
         // IRemoteControl methods
@@ -66,6 +68,9 @@ namespace Plugin {
         virtual Core::hresult Register(Exchange::IRemoteControl::INotification* notification) override;
         virtual Core::hresult Unregister(const Exchange::IRemoteControl::INotification* notification) override;
 
+        // IConfiguration interface
+        uint32_t Configure(PluginHost::IShell* service) override;
+
     private:
         void InitializeIARM();
         void DeinitializeIARM();
@@ -80,6 +85,7 @@ namespace Plugin {
         Core::hresult IARMBusCall(const string& method, const string& jsonParams, JsonObject& result, int timeoutMs = 0);
 
         Core::CriticalSection _adminLock;
+        PluginHost::IShell* _service;
         std::vector<Exchange::IRemoteControl::INotification*> _notifications;
         bool _hasOwnProcess;
 

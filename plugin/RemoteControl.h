@@ -3,6 +3,7 @@
 #include "Module.h"
 #include <interfaces/IRemoteControl.h>
 #include <interfaces/json/JRemoteControl.h>
+#include <interfaces/IConfiguration.h>
 
 namespace WPEFramework {
 namespace Plugin {
@@ -82,6 +83,7 @@ namespace Plugin {
         PluginHost::IShell* _service;
         Core::SinkType<ConnectionNotification> _connectionNotification;
         Core::SinkType<Notification> _notification;
+        Exchange::IConfiguration* _configure{};
     };
 
 } // namespace Plugin
