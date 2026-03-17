@@ -30,7 +30,7 @@
 namespace WPEFramework {
 namespace Plugin {
 
-    SERVICE_REGISTRATION(RemoteControlImplementation, 1, 0)
+    SERVICE_REGISTRATION(RemoteControlImplementation, 1, 0, 0)
 
     RemoteControlImplementation* RemoteControlImplementation::_instance = nullptr;
 
