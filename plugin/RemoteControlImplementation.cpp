@@ -46,8 +46,13 @@ namespace Plugin {
     RemoteControlImplementation::~RemoteControlImplementation()
     {
         DeinitializeIARM();
+
+        if (_service != nullptr) {
+            _service->Release();
+            _service = nullptr;
+        }
+
         _instance = nullptr;
-        _service = nullptr;
     }
 
     uint32_t RemoteControlImplementation::Configure(PluginHost::IShell* service)
