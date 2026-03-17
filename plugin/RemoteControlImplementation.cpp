@@ -24,13 +24,17 @@
 
 #include <algorithm>
 
+#define API_VERSION_NUMBER_MAJOR 1
+#define API_VERSION_NUMBER_MINOR 0
+#define API_VERSION_NUMBER_PATCH 1
+
 #define IARM_FACTORY_RESET_TIMEOUT  (15 * 1000)  // 15 seconds, in milliseconds
 #define IARM_IRDB_CALLS_TIMEOUT     (10 * 1000)  // 10 seconds, in milliseconds
 
 namespace WPEFramework {
 namespace Plugin {
 
-    SERVICE_REGISTRATION(RemoteControlImplementation, 1, 0, 0)
+    SERVICE_REGISTRATION(RemoteControlImplementation, API_VERSION_NUMBER_MAJOR, API_VERSION_NUMBER_MINOR, API_VERSION_NUMBER_PATCH)
 
     RemoteControlImplementation* RemoteControlImplementation::_instance = nullptr;
 
