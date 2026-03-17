@@ -63,7 +63,7 @@ namespace Plugin {
         Core::hresult Unpair(bool& success, Exchange::IStringIterator* const macAddressList) override;
         Core::hresult StartFirmwareUpdate(const Exchange::StartFirmwareUpdateRequest& request, bool& success, Exchange::IStringIterator*& sessionIdList) override;
         Core::hresult CancelFirmwareUpdate(const Exchange::CancelFirmwareUpdateRequest& request, bool& success) override;
-        Core::hresult StatusFirmwareUpdate(const Exchange::StatusFirmwareUpdateRequest& request, Exchange::StatusFirmwareUpdateResponse& response) override;
+        Core::hresult StatusFirmwareUpdate(const Exchange::CancelFirmwareUpdateRequest& request, Exchange::StatusFirmwareUpdateResponse& response) override;
 
         virtual Core::hresult Register(Exchange::IRemoteControl::INotification* notification) override;
         virtual Core::hresult Unregister(const Exchange::IRemoteControl::INotification* notification) override;

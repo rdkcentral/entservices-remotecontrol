@@ -81,8 +81,8 @@ namespace Plugin {
         Exchange::IRemoteControl* _implementation;
         uint32_t _connectionId;
         PluginHost::IShell* _service;
-        Core::SinkType<ConnectionNotification> _connectionNotification;
-        Core::SinkType<Notification> _notification;
+        Core::Sink<ConnectionNotification> _connectionNotification;
+        Core::Sink<Notification> _notification;
         Exchange::IConfiguration* _configure{};
     };
 

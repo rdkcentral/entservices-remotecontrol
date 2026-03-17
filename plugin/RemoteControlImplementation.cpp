@@ -729,7 +729,7 @@ namespace Plugin {
         return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
     }
 
-    Core::hresult RemoteControlImplementation::StatusFirmwareUpdate(const Exchange::StatusFirmwareUpdateRequest& request, Exchange::StatusFirmwareUpdateResponse& response)
+    Core::hresult RemoteControlImplementation::StatusFirmwareUpdate(const Exchange::CancelFirmwareUpdateRequest& request, Exchange::StatusFirmwareUpdateResponse& response)
     {
         JsonObject params;
         params["sessionId"] = request.sessionId;
