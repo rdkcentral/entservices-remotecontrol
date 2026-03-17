@@ -11,10 +11,10 @@ namespace Plugin {
     {
         string message;
 
-        ASSERT(nullptr != service);
-        ASSERT(nullptr == _service);
-        ASSERT(nullptr == _implementation);
-        ASSERT(0 == _connectionId);
+        ASSERT(service != nullptr);
+        ASSERT(_service == nullptr);
+        ASSERT(_implementation == nullptr);
+        ASSERT(_connectionId == 0);
 
         _service = service;
         _service->AddRef();

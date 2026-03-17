@@ -51,13 +51,13 @@ namespace Plugin {
         Core::hresult GetNetStatus(const Exchange::GetNetStatusRequest& request, Exchange::GetNetStatusResponse& response, Exchange::IUint32Iterator*& netTypeSupported, Exchange::IRemoteDataIterator*& remoteData) override;
         Core::hresult GetIRDBManufacturers(const Exchange::GetIRDBManufacturersRequest& request, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers) override;
         Core::hresult GetIRDBModels(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models) override;
-        Core::hresult GetIRCodesByAutoLookup(const Exchange::GetIRCodesByAutoLookupRequest& request, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
-        Core::hresult GetIRCodesByNames(const Exchange::GetIRCodesByNamesRequest& request, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes) override;
+        Core::hresult GetIRCodesByAutoLookup(const Exchange::GetNetStatusRequest& request, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
+        Core::hresult GetIRCodesByNames(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes) override;
         Core::hresult SetIRCode(const Exchange::SetIRCodeRequest& request, bool& success) override;
         Core::hresult ClearIRCodes(const Exchange::ClearIRCodesRequest& request, bool& success) override;
         Core::hresult GetLastKeypressSource(Exchange::GetLastKeypressSourceResponse& response) override;
         Core::hresult ConfigureWakeupKeys(const Exchange::ConfigureWakeupKeysRequest& request, bool& success) override;
-        Core::hresult InitializeIRDB(const Exchange::InitializeIRDBRequest& request, bool& success) override;
+        Core::hresult InitializeIRDB(const Exchange::GetNetStatusRequest& request, bool& success) override;
         Core::hresult FindMyRemote(const Exchange::FindMyRemoteRequest& request, bool& success) override;
         Core::hresult FactoryReset(bool& success) override;
         Core::hresult Unpair(bool& success, Exchange::IStringIterator* const macAddressList) override;
