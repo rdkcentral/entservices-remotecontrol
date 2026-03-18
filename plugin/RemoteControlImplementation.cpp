@@ -297,7 +297,7 @@ namespace Plugin {
         if (res != IARM_RESULT_SUCCESS) {
             LOGERR("ERROR - %s Bus Call FAILED, res: %d.", method.c_str(), (int)res);
             free(call);
-            return (timeoutMs > 0) ? Core::ERROR_TIMEDOUT : Core::ERROR_RPC_CALL_FAILED;
+            return (res == IARM_RESULT_TIMEOUT) ? Core::ERROR_TIMEDOUT : Core::ERROR_RPC_CALL_FAILED;
         }
 
         result.FromString(call->result);
