@@ -72,6 +72,7 @@ namespace Plugin {
     {
         LOGINFO("Configuring RemoteControlImplementation");
         ASSERT(service != nullptr);
+        ASSERT(_service == nullptr);
         _service = service;
         _service->AddRef();
 
