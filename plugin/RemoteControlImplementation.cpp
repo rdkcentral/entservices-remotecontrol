@@ -101,7 +101,9 @@ namespace Plugin {
         ASSERT(notification != nullptr);
 
         _adminLock.Lock();
-        auto it = std::find(_notifications.begin(), _notifications.end(), notification);
+        auto it = std::find_if(_notifications.begin(), _notifications.end(), [notification](const Exchange::IRemoteControl::INotification* current) {
+            return current == notification;
+        });
         if (it != _notifications.end()) {
             (*it)->Release();
             _notifications.erase(it);
@@ -297,7 +299,7 @@ namespace Plugin {
         if (res != IARM_RESULT_SUCCESS) {
             LOGERR("ERROR - %s Bus Call FAILED, res: %d.", method.c_str(), (int)res);
             free(call);
-            return (res == IARM_RESULT_TIMEOUT) ? Core::ERROR_TIMEDOUT : Core::ERROR_RPC_CALL_FAILED;
+            return Core::ERROR_RPC_CALL_FAILED;
         }
 
         result.FromString(call->result);
