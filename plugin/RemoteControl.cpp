@@ -16,7 +16,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- 
+
 #include "RemoteControl.h"
 
 #define API_VERSION_NUMBER_MAJOR 1
@@ -119,7 +119,7 @@ namespace Plugin {
 
         _service->Unregister(&_connectionNotification);
 
-        if (nullptr != _implementation)
+        if (_implementation != nullptr)
         {
             _implementation->Unregister(&_notification);
             Exchange::JRemoteControl::Unregister(*this);
@@ -135,7 +135,7 @@ namespace Plugin {
 
             ASSERT(result == Core::ERROR_DESTRUCTION_SUCCEEDED);
 
-            if (nullptr != connection)
+            if (connection != nullptr)
             {
                 connection->Terminate();
                 connection->Release();
