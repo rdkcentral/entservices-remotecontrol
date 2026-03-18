@@ -69,15 +69,14 @@ namespace Plugin {
         _instance = nullptr;
     }
 
-    uint32_t RemoteControlImplementation::Configure(PluginHost::IShell* service)
+    Core::hresult RemoteControlImplementation::Configure(PluginHost::IShell* service)
     {
         LOGINFO("Configuring RemoteControlImplementation");
-        uint32_t result = Core::ERROR_NONE;
         ASSERT(service != nullptr);
         _service = service;
         _service->AddRef();
         InitializeIARM();
-        return result;
+        return Core::ERROR_NONE;
     }
 
     // ─── INotification management ───
