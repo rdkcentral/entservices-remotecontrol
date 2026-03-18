@@ -27,7 +27,7 @@ find_package(${NAMESPACE}Plugins REQUIRED)
 find_package(${NAMESPACE}Definitions REQUIRED)
 find_package(${NAMESPACE}Core REQUIRED)
 find_package(CTRLM REQUIRED)
-find_package(IARMBus REQUIRED)
+find_package(IARMBus)
 
 if (USE_THUNDER_R4)
     find_package(${NAMESPACE}COM REQUIRED)
@@ -65,12 +65,15 @@ set_target_properties(${PLUGIN_IMPLEMENTATION} PROPERTIES
 target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ../helpers)
 
 add_definitions(-DCTRLM_FOUND)
-target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ${IARMBUS_INCLUDE_DIRS})
 target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ${CTRLM_INCLUDE_DIRS})
 target_link_libraries(${PLUGIN_IMPLEMENTATION} PRIVATE
         ${NAMESPACE}Plugins::${NAMESPACE}Plugins
-        ${NAMESPACE}Definitions::${NAMESPACE}Definitions
-        ${IARMBUS_LIBRARIES})
+        ${NAMESPACE}Definitions::${NAMESPACE}Definitions)
+
+if(IARMBus_FOUND)
+    target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ${IARMBUS_INCLUDE_DIRS})
+    target_link_libraries(${PLUGIN_IMPLEMENTATION} PRIVATE ${IARMBUS_LIBRARIES})
+endif()
 
 install(TARGETS ${MODULE_NAME} ${PLUGIN_IMPLEMENTATION}
         DESTINATION lib/${STORAGE_DIRECTORY}/plugins)
