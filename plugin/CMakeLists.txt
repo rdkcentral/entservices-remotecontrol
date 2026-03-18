@@ -26,6 +26,8 @@ option(BUILD_TESTS "Will build remote control test client and include dependenci
 find_package(${NAMESPACE}Plugins REQUIRED)
 find_package(${NAMESPACE}Definitions REQUIRED)
 find_package(${NAMESPACE}Core REQUIRED)
+find_package(CTRLM REQUIRED)
+find_package(IARMBus REQUIRED)
 
 if (USE_THUNDER_R4)
     find_package(${NAMESPACE}COM REQUIRED)
@@ -62,8 +64,6 @@ set_target_properties(${PLUGIN_IMPLEMENTATION} PROPERTIES
 
 target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ../helpers)
 
-find_package(CTRLM REQUIRED)
-find_package(IARMBus)
 add_definitions(-DCTRLM_FOUND)
 target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ${IARMBUS_INCLUDE_DIRS})
 target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ${CTRLM_INCLUDE_DIRS})
