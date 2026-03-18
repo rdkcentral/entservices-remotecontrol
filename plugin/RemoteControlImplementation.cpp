@@ -119,8 +119,9 @@ namespace Plugin {
 
     void RemoteControlImplementation::InitializeIARM()
     {
+        bool alreadyConnected = Utils::IARM::isConnected();
         if (Utils::IARM::init()) {
-            _hasOwnProcess = true;
+            _hasOwnProcess = !alreadyConnected;
             IARM_Result_t res;
             IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_RCU_STATUS, remoteEventHandler) );
             IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_FIRMWARE_UPDATE_PROGRESS, remoteEventHandler) );
