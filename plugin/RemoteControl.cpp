@@ -155,9 +155,11 @@ namespace Plugin {
             PluginHost::IShell* service = _service;
 
             if (service != nullptr) {
+                service->AddRef();
                 Core::IWorkerPool::Instance().Submit(
                     PluginHost::IShell::Job::Create(service,
                         PluginHost::IShell::DEACTIVATED, PluginHost::IShell::FAILURE));
+                service->Release();
             }
         }
     }
