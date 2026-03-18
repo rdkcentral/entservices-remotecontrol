@@ -102,10 +102,16 @@ namespace Plugin {
 
     void RemoteControl::Deactivated(RPC::IRemoteConnection* connection)
     {
-        if (connection->Id() == _connectionId) {
-            Core::IWorkerPool::Instance().Submit(
-                PluginHost::IShell::Job::Create(_service,
-                    PluginHost::IShell::DEACTIVATED, PluginHost::IShell::FAILURE));
+        ASSERT(connection != nullptr);
+
+        if ((connection->Id() == _connectionId)) {
+            PluginHost::IShell* service = _service;
+
+            if (service != nullptr) {
+                Core::IWorkerPool::Instance().Submit(
+                    PluginHost::IShell::Job::Create(service,
+                        PluginHost::IShell::DEACTIVATED, PluginHost::IShell::FAILURE));
+            }
         }
     }
 
