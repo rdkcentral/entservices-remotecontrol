@@ -49,6 +49,16 @@ namespace Plugin {
 
     RemoteControlImplementation::~RemoteControlImplementation()
     {
+        // Release any still-registered notification observers.
+        _adminLock.Lock();
+        for (auto* notification : _notifications) {
+            if (notification != nullptr) {
+                 notification->Release();
+            }
+        }
+        _notifications.clear();
+        _adminLock.Unlock();
+
         DeinitializeIARM();
 
         if (_service != nullptr) {
@@ -192,11 +202,18 @@ namespace Plugin {
         status.pairingState = params.HasLabel("pairingState") ? static_cast<Exchange::PairingState>(static_cast<uint8_t>(params["pairingState"].Number())) : Exchange::PairingState::IDLE;
         status.irProgState = params.HasLabel("irProgState") ? static_cast<Exchange::IRProgState>(static_cast<uint8_t>(params["irProgState"].Number())) : Exchange::IRProgState::IDLE;
 
+        std::vector<Exchange::IRemoteControl::INotification*> observers;
         _adminLock.Lock();
         for (auto* notification : _notifications) {
-            notification->OnStatus(status);
+            notification->AddRef();
+            observers.push_back(notification);
         }
         _adminLock.Unlock();
+
+        for (auto* notification : observers) {
+            notification->OnStatus(status);
+            notification->Release();
+        }
     }
 
     void RemoteControlImplementation::NotifyValidation(ctrlm_main_iarm_event_json_t* eventData)
@@ -210,11 +227,18 @@ namespace Plugin {
         status.validationDigit2 = params.HasLabel("validationDigit2") ? static_cast<uint32_t>(params["validationDigit2"].Number()) : 0;
         status.validationDigit3 = params.HasLabel("validationDigit3") ? static_cast<uint32_t>(params["validationDigit3"].Number()) : 0;
 
+        std::vector<Exchange::IRemoteControl::INotification*> observers;
         _adminLock.Lock();
         for (auto* notification : _notifications) {
-            notification->OnValidation(status);
+            notification->AddRef();
+            observers.push_back(notification);
         }
         _adminLock.Unlock();
+
+        for (auto* notification : observers) {
+            notification->OnValidation(status);
+            notification->Release();
+        }
     }
 
     void RemoteControlImplementation::NotifyFirmwareUpdateProgress(ctrlm_main_iarm_event_json_t* eventData)
@@ -231,11 +255,18 @@ namespace Plugin {
             progress.status.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
         }
 
+        std::vector<Exchange::IRemoteControl::INotification*> observers;
         _adminLock.Lock();
         for (auto* notification : _notifications) {
-            notification->OnFirmwareUpdateProgress(progress);
+            notification->AddRef();
+            observers.push_back(notification);
         }
         _adminLock.Unlock();
+
+        for (auto* notification : observers) {
+            notification->OnFirmwareUpdateProgress(progress);
+            notification->Release();
+        }
     }
 
     // ─── IARM call helper ───
