@@ -74,7 +74,12 @@ namespace Plugin {
         ASSERT(service != nullptr);
         _service = service;
         _service->AddRef();
+
         InitializeIARM();
+        if (Utils::IARM::isConnected() == false) {
+            LOGERR("Failed to initialize IARM for RemoteControlImplementation, configuration will fail");
+            return Core::ERROR_GENERAL;
+         }
         return Core::ERROR_NONE;
     }
 
