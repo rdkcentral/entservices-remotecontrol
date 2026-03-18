@@ -271,9 +271,8 @@ namespace Plugin {
     }
 
     // ─── IARM call helper ───
-    // Encapsulates the boilerplate: allocate ctrlm_main_iarm_call_json_t, copy JSON payload,
-    // make the IARM bus call, parse the JSON result.  Returns Core::ERROR_NONE on success,
-    // Core::ERROR_TIMEDOUT if a timed call fails, or Core::ERROR_RPC_CALL_FAILED otherwise.
+    // Encapsulates the boilerplate: allocate ctrlm_main_iarm_call_json_t, copy JSON payload, make the IARM bus call, parse the JSON result.
+    // Returns Core::ERROR_NONE on success, Core::ERROR_GENERAL for allocation failure, or Core::ERROR_RPC_CALL_FAILED if the IARM call itself fails
     Core::hresult RemoteControlImplementation::IARMBusCall(const string& method, const string& jsonParams, JsonObject& result, int timeoutMs)
     {
         size_t totalsize = sizeof(ctrlm_main_iarm_call_json_t) + jsonParams.size() + 1;

@@ -64,7 +64,7 @@ set_target_properties(${PLUGIN_IMPLEMENTATION} PROPERTIES
 
 target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ../helpers)
 
-add_definitions(-DCTRLM_FOUND)
+target_compile_definitions(${PLUGIN_IMPLEMENTATION} PRIVATE CTRLM_FOUND)
 target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ${CTRLM_INCLUDE_DIRS})
 target_link_libraries(${PLUGIN_IMPLEMENTATION} PRIVATE
         ${NAMESPACE}Plugins::${NAMESPACE}Plugins
@@ -78,4 +78,4 @@ endif()
 install(TARGETS ${MODULE_NAME} ${PLUGIN_IMPLEMENTATION}
         DESTINATION lib/${STORAGE_DIRECTORY}/plugins)
 
-write_config(${PLUGIN_NAME})
+write_config(PLUGINS ${PLUGIN_NAME} CLASSNAME ${PLUGIN_NAME})
