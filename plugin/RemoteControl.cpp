@@ -151,11 +151,13 @@ namespace Plugin {
     {
         ASSERT(connection != nullptr);
 
-        if ((connection->Id() == _connectionId)) {
-            if (_service != nullptr) {
+        if ((connection->Id() == _connectionId))
+        {
+            if (_service != nullptr)
+            {
                 _service->AddRef();
                 Core::IWorkerPool::Instance().Submit(
-                    PluginHost::IShell::Job::Create(service,
+                    PluginHost::IShell::Job::Create(_service,
                         PluginHost::IShell::DEACTIVATED, PluginHost::IShell::FAILURE));
                 _service->Release();
             }
