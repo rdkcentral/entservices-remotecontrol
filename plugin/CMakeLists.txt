@@ -52,9 +52,6 @@ target_link_libraries(${MODULE_NAME} PRIVATE
         ${NAMESPACE}Plugins::${NAMESPACE}Plugins
         ${NAMESPACE}Definitions::${NAMESPACE}Definitions)
 
-install(TARGETS ${MODULE_NAME}
-        DESTINATION lib/${STORAGE_DIRECTORY}/plugins)
-
 add_library(${PLUGIN_IMPLEMENTATION} SHARED
         RemoteControlImplementation.cpp
         Module.cpp)
@@ -75,7 +72,7 @@ target_link_libraries(${PLUGIN_IMPLEMENTATION} PRIVATE
         ${NAMESPACE}Definitions::${NAMESPACE}Definitions
         ${IARMBUS_LIBRARIES})
 
-install(TARGETS ${MODULE_NAME}
+install(TARGETS ${MODULE_NAME} ${PLUGIN_IMPLEMENTATION}
         DESTINATION lib/${STORAGE_DIRECTORY}/plugins)
 
 write_config(${PLUGIN_NAME})

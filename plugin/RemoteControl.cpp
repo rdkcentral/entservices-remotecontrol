@@ -39,7 +39,7 @@ namespace Plugin {
         // Instantiate the out-of-process implementation (e.g. RemoteControlImplementation)
         _implementation = _service->Root<Exchange::IRemoteControl>(_connectionId, 2000, _T("RemoteControlImplementation"));
 
-        if (nullptr != _implementation)
+        if (_implementation != nullptr)
         {
             _configure = _implementation->QueryInterface<Exchange::IConfiguration>();
             if (_configure != nullptr)
@@ -55,12 +55,40 @@ namespace Plugin {
                 message = _T("RemoteControl implementation did not provide a configuration interface");
             }
 
-            _implementation->Register(&_notification);
-            Exchange::JRemoteControl::Register(*this, _implementation);
+            if (message.empty())
+            {
+                _implementation->Register(&_notification);
+                Exchange::JRemoteControl::Register(*this, _implementation);
+            }
         }
         else
         {
             message = _T("RemoteControl could not be instantiated");
+        }
+
+        if (!message.empty())
+        {
+            // Roll back any resources acquired during a failed initialization.
+             if (_implementation != nullptr)
+             {
+                 if (_configure != nullptr)
+                 {
+                     _configure->Release();
+                     _configure = nullptr;
+                 }
+                 RPC::IRemoteConnection* connection = service->RemoteConnection(_connectionId);
+                 VARIABLE_IS_NOT_USED uint32_t result = _implementation->Release();
+                 _implementation = nullptr;
+                 ASSERT(result == Core::ERROR_DESTRUCTION_SUCCEEDED);
+                 if (connection != nullptr) {
+                     connection->Terminate();
+                     connection->Release();
+                 }
+             }
+             _connectionId = 0;
+             _service->Unregister(&_connectionNotification);
+             _service->Release();
+             _service = nullptr;
         }
 
         return message;
