@@ -22,7 +22,7 @@
 #include "Module.h"
 #include <interfaces/IRemoteControl.h>
 #include <interfaces/IConfiguration.h>
-
+#include <vector>
 #include "libIBus.h"
 #include "ctrlm_ipc.h"
 #include "ctrlm_ipc_rcu.h"
