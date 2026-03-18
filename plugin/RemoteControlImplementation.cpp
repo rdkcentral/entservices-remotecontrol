@@ -49,6 +49,7 @@ namespace Plugin {
 
     RemoteControlImplementation::~RemoteControlImplementation()
     {
+        _instance = nullptr;
         // Release any still-registered notification observers.
         _adminLock.Lock();
         for (auto* notification : _notifications) {
@@ -65,8 +66,6 @@ namespace Plugin {
             _service->Release();
             _service = nullptr;
         }
-
-        _instance = nullptr;
     }
 
     Core::hresult RemoteControlImplementation::Configure(PluginHost::IShell* service)
