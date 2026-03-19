@@ -20,6 +20,7 @@
 set(PLUGIN_NAME RemoteControl)
 set(MODULE_NAME ${NAMESPACE}${PLUGIN_NAME})
 set(PLUGIN_IMPLEMENTATION "${MODULE_NAME}Implementation" CACHE STRING "Library with RemoteControl implementation")
+set(PLUGIN_REMOTECONTROL_MODE "Local" CACHE STRING "Controls if the plugin should run in its own process, in process or remote.")
 
 option(BUILD_TESTS "Will build remote control test client and include dependencies" OFF)
 
