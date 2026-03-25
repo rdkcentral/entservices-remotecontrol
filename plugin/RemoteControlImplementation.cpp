@@ -21,7 +21,6 @@
 #include "PluginVersion.h"
 #include "libIBusDaemon.h"
 #include "UtilsIarm.h"
-#include "UtilsJsonRpc.h"
 
 #include <algorithm>
 #include <list>
@@ -77,10 +76,14 @@ namespace Plugin {
 
         if (InitializeIARM() == false) {
              LOGERR("Failed to initialize IARM for RemoteControlImplementation, configuration will fail");
+             _service->Release();
+             _service = nullptr;
              return Core::ERROR_GENERAL;
         }
         if (Utils::IARM::isConnected() == false) {
             LOGERR("Failed to initialize IARM for RemoteControlImplementation, configuration will fail");
+            _service->Release();
+            _service = nullptr;
             return Core::ERROR_GENERAL;
          }
         return Core::ERROR_NONE;
