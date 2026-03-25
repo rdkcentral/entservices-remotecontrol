@@ -18,15 +18,12 @@
 **/
 
 #include "RemoteControlImplementation.h"
+#include "PluginVersion.h"
 #include "libIBusDaemon.h"
 #include "UtilsIarm.h"
 #include "UtilsJsonRpc.h"
 
 #include <algorithm>
-
-#define API_VERSION_NUMBER_MAJOR 1
-#define API_VERSION_NUMBER_MINOR 0
-#define API_VERSION_NUMBER_PATCH 1
 
 #define IARM_FACTORY_RESET_TIMEOUT  (15 * 1000)  // 15 seconds, in milliseconds
 #define IARM_IRDB_CALLS_TIMEOUT     (10 * 1000)  // 10 seconds, in milliseconds
@@ -319,7 +316,7 @@ namespace Plugin {
 
     Core::hresult RemoteControlImplementation::GetApiVersionNumber(Exchange::GetApiVersionNumberResponse& response)
     {
-        response.version = 1;
+        response.version = API_VERSION_NUMBER_MAJOR;
         response.success = true;
         return Core::ERROR_NONE;
     }
