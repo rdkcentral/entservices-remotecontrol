@@ -24,6 +24,7 @@
 #include "UtilsJsonRpc.h"
 
 #include <algorithm>
+#include <list>
 
 #define IARM_FACTORY_RESET_TIMEOUT  (15 * 1000)  // 15 seconds, in milliseconds
 #define IARM_IRDB_CALLS_TIMEOUT     (10 * 1000)  // 10 seconds, in milliseconds
@@ -40,6 +41,7 @@ namespace Plugin {
         , _service(nullptr)
         , _notifications()
         , _hasOwnProcess(false)
+        , _handlersRegistered(false)
     {
         _instance = this;
     }
@@ -129,6 +131,7 @@ namespace Plugin {
             IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_VALIDATION_STATUS, remoteEventHandler) );
             IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_CONFIGURATION_COMPLETE, remoteEventHandler) );
             IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_RF4CE_PAIRING_WINDOW_TIMEOUT, remoteEventHandler) );
+            _handlersRegistered = true;
         } else {
             _hasOwnProcess = false;
             return false;
@@ -138,14 +141,18 @@ namespace Plugin {
 
     void RemoteControlImplementation::DeinitializeIARM()
     {
-        if (_hasOwnProcess) {
+        if (_handlersRegistered) {
             IARM_Result_t res; // Used in IARM_CHECK macro calls below
             IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_RCU_STATUS, remoteEventHandler) );
             IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_FIRMWARE_UPDATE_PROGRESS, remoteEventHandler) );
             IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_VALIDATION_STATUS, remoteEventHandler) );
             IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_CONFIGURATION_COMPLETE, remoteEventHandler) );
             IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_RF4CE_PAIRING_WINDOW_TIMEOUT, remoteEventHandler) );
+            _handlersRegistered = false;
+        }
 
+        if (_hasOwnProcess) {
+            IARM_Result_t res; // Used in IARM_CHECK macro calls below
             IARM_CHECK( IARM_Bus_Disconnect() );
             IARM_CHECK( IARM_Bus_Term() );
             _hasOwnProcess = false;

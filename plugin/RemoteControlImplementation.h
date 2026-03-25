@@ -88,6 +88,7 @@ namespace Plugin {
         PluginHost::IShell* _service;
         std::vector<Exchange::IRemoteControl::INotification*> _notifications;
         bool _hasOwnProcess;
+        bool _handlersRegistered;
 
         static RemoteControlImplementation* _instance;
     };
