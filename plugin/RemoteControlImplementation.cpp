@@ -73,7 +73,10 @@ namespace Plugin {
         _service = service;
         _service->AddRef();
 
-        InitializeIARM();
+        if (InitializeIARM() == false) {
+             LOGERR("Failed to initialize IARM for RemoteControlImplementation, configuration will fail");
+             return Core::ERROR_GENERAL;
+        }
         if (Utils::IARM::isConnected() == false) {
             LOGERR("Failed to initialize IARM for RemoteControlImplementation, configuration will fail");
             return Core::ERROR_GENERAL;
@@ -115,7 +118,7 @@ namespace Plugin {
 
     // ─── IARM lifecycle ───
 
-    void RemoteControlImplementation::InitializeIARM()
+    bool RemoteControlImplementation::InitializeIARM()
     {
         bool alreadyConnected = Utils::IARM::isConnected();
         if (Utils::IARM::init()) {
@@ -128,7 +131,9 @@ namespace Plugin {
             IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_RF4CE_PAIRING_WINDOW_TIMEOUT, remoteEventHandler) );
         } else {
             _hasOwnProcess = false;
+            return false;
         }
+        return true;
     }
 
     void RemoteControlImplementation::DeinitializeIARM()
