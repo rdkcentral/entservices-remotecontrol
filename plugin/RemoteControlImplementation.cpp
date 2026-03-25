@@ -31,7 +31,7 @@
 namespace WPEFramework {
 namespace Plugin {
 
-    SERVICE_REGISTRATION(RemoteControlImplementation, API_VERSION_NUMBER_MAJOR, API_VERSION_NUMBER_MINOR, API_VERSION_NUMBER_PATCH)
+    SERVICE_REGISTRATION(RemoteControlImplementation, API_VERSION_NUMBER_MAJOR, API_VERSION_NUMBER_MINOR, API_VERSION_NUMBER_PATCH);
 
     RemoteControlImplementation* RemoteControlImplementation::_instance = nullptr;
 
