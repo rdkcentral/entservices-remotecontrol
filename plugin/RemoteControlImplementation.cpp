@@ -128,13 +128,21 @@ namespace Plugin {
         bool alreadyConnected = Utils::IARM::isConnected();
         if (Utils::IARM::init()) {
             _hasOwnProcess = !alreadyConnected;
-            IARM_Result_t res; // Used in IARM_CHECK macro calls below
-            IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_RCU_STATUS, remoteEventHandler) );
-            IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_FIRMWARE_UPDATE_PROGRESS, remoteEventHandler) );
-            IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_VALIDATION_STATUS, remoteEventHandler) );
-            IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_CONFIGURATION_COMPLETE, remoteEventHandler) );
-            IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_RF4CE_PAIRING_WINDOW_TIMEOUT, remoteEventHandler) );
+            IARM_Result_t res;
+#define RC_REGISTER(EVENT) \
+            IARM_CHECK( IARM_Bus_RegisterEventHandler(CTRLM_MAIN_IARM_BUS_NAME, EVENT, remoteEventHandler) ); \
+            if (res != IARM_RESULT_SUCCESS) { \
+                LOGERR("Failed to register IARM event handler for " #EVENT ", rolling back."); \
+                DeinitializeIARM(); \
+                return false; \
+            } \
             _handlersRegistered = true;
+            RC_REGISTER(CTRLM_RCU_IARM_EVENT_RCU_STATUS)
+            RC_REGISTER(CTRLM_RCU_IARM_EVENT_FIRMWARE_UPDATE_PROGRESS)
+            RC_REGISTER(CTRLM_RCU_IARM_EVENT_VALIDATION_STATUS)
+            RC_REGISTER(CTRLM_RCU_IARM_EVENT_CONFIGURATION_COMPLETE)
+            RC_REGISTER(CTRLM_RCU_IARM_EVENT_RF4CE_PAIRING_WINDOW_TIMEOUT)
+#undef RC_REGISTER
         } else {
             _hasOwnProcess = false;
             return false;
