@@ -618,7 +618,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRCodesByAutoLookup(const Exchange::GetNetStatusRequest& request, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes)
+    Core::hresult RemoteControlImplementation::GetIRCodesByAutoLookup(const Exchange::GetIRCodesByAutoLookupRequest& request, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes)
     {
         JsonObject params;
         params["netType"] = request.netType;
@@ -659,7 +659,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRCodesByNames(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes)
+    Core::hresult RemoteControlImplementation::GetIRCodesByNames(const Exchange::GetIRCodesByNamesRequest& request, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes)
     {
         JsonObject params;
         params["avDevType"] = enumToString(request.avDevType);
@@ -780,7 +780,7 @@ namespace Plugin {
         return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
     }
 
-    Core::hresult RemoteControlImplementation::InitializeIRDB(const Exchange::GetNetStatusRequest& request, bool& success)
+    Core::hresult RemoteControlImplementation::InitializeIRDB(const Exchange::InitializeIRDBRequest& request, bool& success)
     {
         JsonObject params;
         params["netType"] = request.netType;
