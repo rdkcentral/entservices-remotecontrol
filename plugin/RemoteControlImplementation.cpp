@@ -452,7 +452,7 @@ namespace Plugin {
     Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::GetIRDBManufacturersRequest& request, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers)
     {
         JsonObject params;
-        params["avDevType"] = static_cast<uint8_t>(request.avDevType);
+        params["avDevType"] = (request.avDevType == Exchange::AVDevType::AMP) ? "AMP" : "TV";
         params["manufacturer"] = request.manufacturer;
 
         string jsonParams;
@@ -461,6 +461,7 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MANUFACTURERS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
+            manufacturers = nullptr;
             return callResult;
         }
 
@@ -482,7 +483,7 @@ namespace Plugin {
     Core::hresult RemoteControlImplementation::GetIRDBModels(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models)
     {
         JsonObject params;
-        params["avDevType"] = static_cast<uint8_t>(request.avDevType);
+        params["avDevType"] = (request.avDevType == Exchange::AVDevType::AMP) ? "AMP" : "TV";
         params["manufacturer"] = request.manufacturer;
         params["model"] = request.model;
 
@@ -492,6 +493,7 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MODELS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
+            models = nullptr;
             return callResult;
         }
 
@@ -555,7 +557,7 @@ namespace Plugin {
     Core::hresult RemoteControlImplementation::GetIRCodesByNames(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes)
     {
         JsonObject params;
-        params["avDevType"] = static_cast<uint8_t>(request.avDevType);
+        params["avDevType"] = (request.avDevType == Exchange::AVDevType::AMP) ? "AMP" : "TV";
         params["manufacturer"] = request.manufacturer;
         params["model"] = request.model;
 
@@ -590,7 +592,7 @@ namespace Plugin {
         JsonObject params;
         params["remoteId"] = request.remoteId;
         params["netType"] = request.netType;
-        params["avDevType"] = static_cast<uint8_t>(request.avDevType);
+        params["avDevType"] = (request.avDevType == Exchange::AVDevType::AMP) ? "AMP" : "TV";
         params["code"] = request.code;
 
         string jsonParams;
