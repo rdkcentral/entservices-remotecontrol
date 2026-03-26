@@ -446,7 +446,7 @@ namespace Plugin {
         }
         remoteData = Core::Service<RPC::IteratorType<Exchange::IRemoteDataIterator>>::Create<Exchange::IRemoteDataIterator>(remotes);
 
-        return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::GetIRDBManufacturersRequest& request, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers)
@@ -476,7 +476,7 @@ namespace Plugin {
         }
         manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(mfrs);
 
-        return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::GetIRDBModels(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models)
@@ -508,7 +508,7 @@ namespace Plugin {
         }
         models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(mdls);
 
-        return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::GetIRCodesByAutoLookup(const Exchange::GetNetStatusRequest& request, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes)
@@ -549,7 +549,7 @@ namespace Plugin {
         }
         avrCodes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(avr);
 
-        return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::GetIRCodesByNames(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes)
@@ -582,7 +582,7 @@ namespace Plugin {
         }
         codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(codeList);
 
-        return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::SetIRCode(const Exchange::SetIRCodeRequest& request, bool& success)
@@ -774,7 +774,7 @@ namespace Plugin {
         }
         sessionIdList = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(sessions);
 
-        return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::CancelFirmwareUpdate(const Exchange::CancelFirmwareUpdateRequest& request, bool& success)
