@@ -124,7 +124,7 @@ namespace Plugin {
         , _service(nullptr)
         , _notifications()
         , _hasOwnProcess(false)
-        , _handlersRegistered(false)
+        , _handlersRegistered(0)
     {
         _instance = this;
     }
@@ -221,7 +221,7 @@ namespace Plugin {
                 DeinitializeIARM(); \
                 return false; \
             } \
-            _handlersRegistered = true;
+            _handlersRegistered++;
             RC_REGISTER(CTRLM_RCU_IARM_EVENT_RCU_STATUS)
             RC_REGISTER(CTRLM_RCU_IARM_EVENT_FIRMWARE_UPDATE_PROGRESS)
             RC_REGISTER(CTRLM_RCU_IARM_EVENT_VALIDATION_STATUS)
@@ -237,14 +237,21 @@ namespace Plugin {
 
     void RemoteControlImplementation::DeinitializeIARM()
     {
-        if (_handlersRegistered) {
+        if (_handlersRegistered > 0) {
+            // Handlers are registered in order; remove only those that were successfully registered, in reverse.
+            // The registration order is:
+            //   1: CTRLM_RCU_IARM_EVENT_RCU_STATUS
+            //   2: CTRLM_RCU_IARM_EVENT_FIRMWARE_UPDATE_PROGRESS
+            //   3: CTRLM_RCU_IARM_EVENT_VALIDATION_STATUS
+            //   4: CTRLM_RCU_IARM_EVENT_CONFIGURATION_COMPLETE
+            //   5: CTRLM_RCU_IARM_EVENT_RF4CE_PAIRING_WINDOW_TIMEOUT
             IARM_Result_t res; // Used in IARM_CHECK macro calls below
-            IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_RCU_STATUS, remoteEventHandler) );
-            IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_FIRMWARE_UPDATE_PROGRESS, remoteEventHandler) );
-            IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_VALIDATION_STATUS, remoteEventHandler) );
-            IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_CONFIGURATION_COMPLETE, remoteEventHandler) );
-            IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_RF4CE_PAIRING_WINDOW_TIMEOUT, remoteEventHandler) );
-            _handlersRegistered = false;
+            if (_handlersRegistered >= 5) { IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_RF4CE_PAIRING_WINDOW_TIMEOUT, remoteEventHandler) ); }
+            if (_handlersRegistered >= 4) { IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_CONFIGURATION_COMPLETE, remoteEventHandler) ); }
+            if (_handlersRegistered >= 3) { IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_VALIDATION_STATUS, remoteEventHandler) ); }
+            if (_handlersRegistered >= 2) { IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_FIRMWARE_UPDATE_PROGRESS, remoteEventHandler) ); }
+            if (_handlersRegistered >= 1) { IARM_CHECK( IARM_Bus_RemoveEventHandler(CTRLM_MAIN_IARM_BUS_NAME, CTRLM_RCU_IARM_EVENT_RCU_STATUS, remoteEventHandler) ); }
+            _handlersRegistered = 0;
         }
 
         if (_hasOwnProcess) {
