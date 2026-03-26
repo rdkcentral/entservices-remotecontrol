@@ -31,6 +31,90 @@
 namespace WPEFramework {
 namespace Plugin {
 
+    namespace {
+        // ─── Enum ↔ string helpers for ctrlm IARM serialization ───
+        // ctrlm expects/sends string representations of enums over JSON.
+        // These templated helpers centralize the conversions.
+
+        template <typename E>
+        const char* enumToString(E value);
+
+        template <typename E>
+        E stringToEnum(const string& str, E defaultValue);
+
+        // --- WakeupConfig: ctrlm expects lowercase "all"/"none"/"custom" ---
+        template <>
+        const char* enumToString<Exchange::WakeupConfig>(Exchange::WakeupConfig value) {
+            switch (value) {
+                case Exchange::WakeupConfig::ALL:    return "all";
+                case Exchange::WakeupConfig::NONE:   return "none";
+                case Exchange::WakeupConfig::CUSTOM: return "custom";
+                default:                             return "all";
+            }
+        }
+
+        template <>
+        Exchange::WakeupConfig stringToEnum<Exchange::WakeupConfig>(const string& str, Exchange::WakeupConfig defaultValue) {
+            if (str == "all")    return Exchange::WakeupConfig::ALL;
+            if (str == "none")   return Exchange::WakeupConfig::NONE;
+            if (str == "custom") return Exchange::WakeupConfig::CUSTOM;
+            return defaultValue;
+        }
+
+        // --- FindMyRemoteLevel: ctrlm expects lowercase "off"/"mid"/"high" ---
+        template <>
+        const char* enumToString<Exchange::FindMyRemoteLevel>(Exchange::FindMyRemoteLevel value) {
+            switch (value) {
+                case Exchange::FindMyRemoteLevel::OFF:  return "off";
+                case Exchange::FindMyRemoteLevel::MID:  return "mid";
+                case Exchange::FindMyRemoteLevel::HIGH: return "high";
+                default:                                return "off";
+            }
+        }
+
+        // --- AVDevType: ctrlm expects uppercase "TV"/"AMP" ---
+        template <>
+        const char* enumToString<Exchange::AVDevType>(Exchange::AVDevType value) {
+            switch (value) {
+                case Exchange::AVDevType::TV:  return "TV";
+                case Exchange::AVDevType::AMP: return "AMP";
+                default:                       return "TV";
+            }
+        }
+
+        // --- PairingState: ctrlm sends uppercase strings ---
+        template <>
+        Exchange::PairingState stringToEnum<Exchange::PairingState>(const string& str, Exchange::PairingState defaultValue) {
+            if (str == "INITIALIZING" || str == "INITIALISING") return Exchange::PairingState::INITIALISING;
+            if (str == "IDLE")      return Exchange::PairingState::IDLE;
+            if (str == "SEARCHING") return Exchange::PairingState::SEARCHING;
+            if (str == "PAIRING")   return Exchange::PairingState::PAIRING;
+            if (str == "COMPLETE")  return Exchange::PairingState::COMPLETE;
+            if (str == "FAILED")    return Exchange::PairingState::FAILED;
+            return defaultValue;
+        }
+
+        // --- IRProgState: ctrlm sends uppercase strings ---
+        template <>
+        Exchange::IRProgState stringToEnum<Exchange::IRProgState>(const string& str, Exchange::IRProgState defaultValue) {
+            if (str == "IDLE")     return Exchange::IRProgState::IDLE;
+            if (str == "WAITING")  return Exchange::IRProgState::WAITING;
+            if (str == "COMPLETE") return Exchange::IRProgState::COMPLETE;
+            if (str == "FAILED")   return Exchange::IRProgState::FAILED;
+            return defaultValue;
+        }
+
+        // --- FirmwareUpdateState: ctrlm sends strings like "SUCCESS"/"IDLE"/"ERROR" etc. ---
+        // Maps ctrlm's richer set of states to our three-value enum.
+        template <>
+        Exchange::FirmwareUpdateState stringToEnum<Exchange::FirmwareUpdateState>(const string& str, Exchange::FirmwareUpdateState defaultValue) {
+            if (str == "DOWNLOADING" || str == "PENDING" || str == "RETRYING") return Exchange::FirmwareUpdateState::DOWNLOADING;
+            if (str == "COMPLETE" || str == "SUCCESS")                         return Exchange::FirmwareUpdateState::COMPLETE;
+            if (str == "FAILED" || str == "ERROR" || str == "CANCELED" || str == "INVALID") return Exchange::FirmwareUpdateState::FAILED;
+            return defaultValue;
+        }
+    } // anonymous namespace
+
     SERVICE_REGISTRATION(RemoteControlImplementation, API_VERSION_NUMBER_MAJOR, API_VERSION_NUMBER_MINOR, API_VERSION_NUMBER_PATCH);
 
     RemoteControlImplementation* RemoteControlImplementation::_instance = nullptr;
@@ -227,8 +311,13 @@ namespace Plugin {
         Exchange::StatusEventData status;
         status.netType = params.HasLabel("netType") ? static_cast<uint32_t>(params["netType"].Number()) : 0;
         status.netTypeSupported = params.HasLabel("netTypeSupported") ? params["netTypeSupported"].Boolean() : false;
-        status.pairingState = params.HasLabel("pairingState") ? static_cast<Exchange::PairingState>(static_cast<uint8_t>(params["pairingState"].Number())) : Exchange::PairingState::IDLE;
-        status.irProgState = params.HasLabel("irProgState") ? static_cast<Exchange::IRProgState>(static_cast<uint8_t>(params["irProgState"].Number())) : Exchange::IRProgState::IDLE;
+
+        JsonObject statusObj;
+        if (params.HasLabel("status")) {
+            statusObj = params["status"].Object();
+        }
+        status.pairingState = statusObj.HasLabel("pairingState") ? stringToEnum<Exchange::PairingState>(statusObj["pairingState"].String(), Exchange::PairingState::IDLE) : Exchange::PairingState::IDLE;
+        status.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
 
         std::vector<Exchange::IRemoteControl::INotification*> observers;
         _adminLock.Lock();
@@ -275,12 +364,16 @@ namespace Plugin {
         params.FromString(eventData->payload);
 
         Exchange::FirmwareUpdateProgressEvent progress;
-        progress.sessionId = params.HasLabel("sessionId") ? params["sessionId"].String() : "";
 
         if (params.HasLabel("status")) {
             JsonObject statusObj = params["status"].Object();
-            progress.status.state = statusObj.HasLabel("state") ? static_cast<Exchange::FirmwareUpdateState>(static_cast<uint8_t>(statusObj["state"].Number())) : Exchange::FirmwareUpdateState::FAILED;
+            progress.sessionId = statusObj.HasLabel("upgradeSessionId") ? statusObj["upgradeSessionId"].String() : "";
+            progress.status.state = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::FAILED) : Exchange::FirmwareUpdateState::FAILED;
             progress.status.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
+        } else {
+            progress.sessionId = "";
+            progress.status.state = Exchange::FirmwareUpdateState::FAILED;
+            progress.status.percentComplete = 0;
         }
 
         std::vector<Exchange::IRemoteControl::INotification*> observers;
@@ -402,8 +495,13 @@ namespace Plugin {
         }
 
         response.netType = result.HasLabel("netType") ? static_cast<uint32_t>(result["netType"].Number()) : request.netType;
-        response.pairingState = result.HasLabel("pairingState") ? static_cast<Exchange::PairingState>(static_cast<uint8_t>(result["pairingState"].Number())) : Exchange::PairingState::IDLE;
-        response.irProgState = result.HasLabel("irProgState") ? static_cast<Exchange::IRProgState>(static_cast<uint8_t>(result["irProgState"].Number())) : Exchange::IRProgState::IDLE;
+
+        JsonObject statusObj;
+        if (result.HasLabel("status")) {
+            statusObj = result["status"].Object();
+        }
+        response.pairingState = statusObj.HasLabel("pairingState") ? stringToEnum<Exchange::PairingState>(statusObj["pairingState"].String(), Exchange::PairingState::IDLE) : Exchange::PairingState::IDLE;
+        response.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         // Parse netTypeSupported array
@@ -438,7 +536,7 @@ namespace Plugin {
                 rd.tvIRCode = rObj.HasLabel("tvIRCode") ? rObj["tvIRCode"].String() : "";
                 rd.ampIRCode = rObj.HasLabel("ampIRCode") ? rObj["ampIRCode"].String() : "";
                 rd.wakeupKeyCode = rObj.HasLabel("wakeupKeyCode") ? static_cast<uint32_t>(rObj["wakeupKeyCode"].Number()) : 0;
-                rd.wakeupConfig = rObj.HasLabel("wakeupConfig") ? static_cast<Exchange::WakeupConfig>(static_cast<uint8_t>(rObj["wakeupConfig"].Number())) : Exchange::WakeupConfig::ALL;
+                rd.wakeupConfig = rObj.HasLabel("wakeupConfig") ? stringToEnum<Exchange::WakeupConfig>(rObj["wakeupConfig"].String(), Exchange::WakeupConfig::ALL) : Exchange::WakeupConfig::ALL;
                 rd.wakeupCustomList = rObj.HasLabel("wakeupCustomList") ? rObj["wakeupCustomList"].String() : "";
                 rd.upgradeSessionId = rObj.HasLabel("upgradeSessionId") ? rObj["upgradeSessionId"].String() : "";
                 remotes.push_back(rd);
@@ -452,7 +550,7 @@ namespace Plugin {
     Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::GetIRDBManufacturersRequest& request, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers)
     {
         JsonObject params;
-        params["avDevType"] = (request.avDevType == Exchange::AVDevType::AMP) ? "AMP" : "TV";
+        params["avDevType"] = enumToString(request.avDevType);
         params["manufacturer"] = request.manufacturer;
 
         string jsonParams;
@@ -483,7 +581,7 @@ namespace Plugin {
     Core::hresult RemoteControlImplementation::GetIRDBModels(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models)
     {
         JsonObject params;
-        params["avDevType"] = (request.avDevType == Exchange::AVDevType::AMP) ? "AMP" : "TV";
+        params["avDevType"] = enumToString(request.avDevType);
         params["manufacturer"] = request.manufacturer;
         params["model"] = request.model;
 
@@ -557,7 +655,7 @@ namespace Plugin {
     Core::hresult RemoteControlImplementation::GetIRCodesByNames(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes)
     {
         JsonObject params;
-        params["avDevType"] = (request.avDevType == Exchange::AVDevType::AMP) ? "AMP" : "TV";
+        params["avDevType"] = enumToString(request.avDevType);
         params["manufacturer"] = request.manufacturer;
         params["model"] = request.model;
 
@@ -592,7 +690,7 @@ namespace Plugin {
         JsonObject params;
         params["remoteId"] = request.remoteId;
         params["netType"] = request.netType;
-        params["avDevType"] = (request.avDevType == Exchange::AVDevType::AMP) ? "AMP" : "TV";
+        params["avDevType"] = enumToString(request.avDevType);
         params["code"] = request.code;
 
         string jsonParams;
@@ -656,7 +754,7 @@ namespace Plugin {
     Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::ConfigureWakeupKeysRequest& request, bool& success)
     {
         JsonObject params;
-        params["wakeupConfig"] = static_cast<uint8_t>(request.wakeupConfig);
+        params["wakeupConfig"] = enumToString(request.wakeupConfig);
         if (!request.customKeys.empty()) {
             params["customKeys"] = request.customKeys;
         }
@@ -697,7 +795,7 @@ namespace Plugin {
     Core::hresult RemoteControlImplementation::FindMyRemote(const Exchange::FindMyRemoteRequest& request, bool& success)
     {
         JsonObject params;
-        params["level"] = static_cast<uint8_t>(request.level);
+        params["level"] = enumToString(request.level);
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -814,9 +912,9 @@ namespace Plugin {
 
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
-        if (result.HasLabel("result")) {
-            JsonObject statusObj = result["result"].Object();
-            response.result.state = statusObj.HasLabel("state") ? static_cast<Exchange::FirmwareUpdateState>(static_cast<uint8_t>(statusObj["state"].Number())) : Exchange::FirmwareUpdateState::FAILED;
+        if (result.HasLabel("status")) {
+            JsonObject statusObj = result["status"].Object();
+            response.result.state = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::FAILED) : Exchange::FirmwareUpdateState::FAILED;
             response.result.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
         }
 
