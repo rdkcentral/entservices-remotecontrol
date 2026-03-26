@@ -464,7 +464,7 @@ namespace Plugin {
         }
 
         success = result["success"].Boolean();
-        return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::StopPairing(const Exchange::StopPairingRequest& request, bool& success)
@@ -484,7 +484,7 @@ namespace Plugin {
         }
 
         success = result["success"].Boolean();
-        return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::GetNetStatus(const Exchange::GetNetStatusRequest& request, Exchange::GetNetStatusResponse& response, Exchange::IUint32Iterator*& netTypeSupported, Exchange::IRemoteDataIterator*& remoteData)
@@ -629,6 +629,9 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_AUTO_LOOKUP, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
+            response.success = false;
+            tvCodes = nullptr;
+            avrCodes = nullptr;
             return callResult;
         }
 
@@ -672,6 +675,8 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_CODES, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
+            response.success = false;
+            codes = nullptr;
             return callResult;
         }
 
@@ -711,7 +716,7 @@ namespace Plugin {
         }
 
         success = result["success"].Boolean();
-        return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::ClearIRCodes(const Exchange::ClearIRCodesRequest& request, bool& success)
@@ -731,7 +736,7 @@ namespace Plugin {
         }
 
         success = result["success"].Boolean();
-        return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::GetLastKeypressSource(Exchange::GetLastKeypressSourceResponse& response)
@@ -743,6 +748,7 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_LAST_KEYPRESS_GET, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
+            response.success = false;
             return callResult;
         }
 
@@ -755,7 +761,7 @@ namespace Plugin {
         response.remoteKeypadConfig = result.HasLabel("remoteKeypadConfig") ? static_cast<uint32_t>(result["remoteKeypadConfig"].Number()) : 0;
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
-        return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::ConfigureWakeupKeysRequest& request, bool& success)
@@ -777,7 +783,7 @@ namespace Plugin {
         }
 
         success = result["success"].Boolean();
-        return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::InitializeIRDB(const Exchange::InitializeIRDBRequest& request, bool& success)
@@ -796,7 +802,7 @@ namespace Plugin {
         }
 
         success = result["success"].Boolean();
-        return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::FindMyRemote(const Exchange::FindMyRemoteRequest& request, bool& success)
@@ -815,7 +821,7 @@ namespace Plugin {
         }
 
         success = result["success"].Boolean();
-        return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::FactoryReset(bool& success)
@@ -832,7 +838,7 @@ namespace Plugin {
         }
 
         success = result["success"].Boolean();
-        return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::Unpair(bool& success, Exchange::IStringIterator* const /* macAddressList */)
@@ -849,7 +855,7 @@ namespace Plugin {
         }
 
         success = result["success"].Boolean();
-        return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::StartFirmwareUpdate(const Exchange::StartFirmwareUpdateRequest& request, bool& success, Exchange::IStringIterator*& sessionIdList)
@@ -900,7 +906,7 @@ namespace Plugin {
         }
 
         success = result["success"].Boolean();
-        return success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
     Core::hresult RemoteControlImplementation::StatusFirmwareUpdate(const Exchange::CancelFirmwareUpdateRequest& request, Exchange::StatusFirmwareUpdateResponse& response)
@@ -914,6 +920,7 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_STATUS_FIRMWARE_UPDATE, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
+            response.success = false;
             return callResult;
         }
 
@@ -925,7 +932,7 @@ namespace Plugin {
             response.result.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
         }
 
-        return response.success ? Core::ERROR_NONE : Core::ERROR_GENERAL;
+        return Core::ERROR_NONE;
     }
 
 } // namespace Plugin
