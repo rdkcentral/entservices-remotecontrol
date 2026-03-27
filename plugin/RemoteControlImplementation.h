@@ -82,6 +82,9 @@ namespace Plugin {
         void NotifyValidation(ctrlm_main_iarm_event_json_t* eventData);
         void NotifyFirmwareUpdateProgress(ctrlm_main_iarm_event_json_t* eventData);
 
+        std::vector<Exchange::IRemoteControl::INotification*> ObserverSnapshot();
+        void ReleaseObserverSnapshot(std::vector<Exchange::IRemoteControl::INotification*>& observers);
+
         Core::hresult IARMBusCall(const string& method, const string& jsonParams, JsonObject& result, int timeoutMs = 0);
 
         Core::CriticalSection _adminLock;
