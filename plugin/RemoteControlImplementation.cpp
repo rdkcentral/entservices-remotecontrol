@@ -46,10 +46,11 @@ namespace Plugin {
         template <>
         const char* enumToString<Exchange::WakeupConfig>(Exchange::WakeupConfig value) {
             switch (value) {
+                case Exchange::WakeupConfig::INVALID: return "";
                 case Exchange::WakeupConfig::ALL:    return "all";
                 case Exchange::WakeupConfig::NONE:   return "none";
                 case Exchange::WakeupConfig::CUSTOM: return "custom";
-                default:                             return "all";
+                default:                             return "";
             }
         }
 
@@ -65,10 +66,11 @@ namespace Plugin {
         template <>
         const char* enumToString<Exchange::FindMyRemoteLevel>(Exchange::FindMyRemoteLevel value) {
             switch (value) {
+                case Exchange::FindMyRemoteLevel::INVALID: return "";
                 case Exchange::FindMyRemoteLevel::OFF:  return "off";
                 case Exchange::FindMyRemoteLevel::MID:  return "mid";
                 case Exchange::FindMyRemoteLevel::HIGH: return "high";
-                default:                                return "off";
+                default:                                return "";
             }
         }
 
@@ -76,10 +78,26 @@ namespace Plugin {
         template <>
         const char* enumToString<Exchange::AVDevType>(Exchange::AVDevType value) {
             switch (value) {
+                case Exchange::AVDevType::INVALID: return "";
                 case Exchange::AVDevType::TV:  return "TV";
                 case Exchange::AVDevType::AMP: return "AMP";
-                default:                       return "TV";
+                default:                       return "";
             }
+        }
+
+        bool isValidRequestEnum(const Exchange::AVDevType value)
+        {
+            return value != Exchange::AVDevType::INVALID;
+        }
+
+        bool isValidRequestEnum(const Exchange::WakeupConfig value)
+        {
+            return value != Exchange::WakeupConfig::INVALID;
+        }
+
+        bool isValidRequestEnum(const Exchange::FindMyRemoteLevel value)
+        {
+            return value != Exchange::FindMyRemoteLevel::INVALID;
         }
 
         // --- PairingState: ctrlm sends uppercase strings ---
@@ -556,6 +574,22 @@ namespace Plugin {
 
     Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::GetIRDBManufacturersRequest& request, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers)
     {
+        if (isValidRequestEnum(request.avDevType) == false) {
+            LOGERR("GetIRDBManufacturers requires avDevType.");
+            response.avDevType = request.avDevType;
+            response.success = false;
+            manufacturers = nullptr;
+            return Core::ERROR_BAD_REQUEST;
+        }
+
+        if (request.manufacturer.empty()) {
+            LOGERR("GetIRDBManufacturers requires a non-empty manufacturer parameter.");
+            response.avDevType = request.avDevType;
+            response.success = false;
+            manufacturers = nullptr;
+            return Core::ERROR_BAD_REQUEST;
+        }
+
         JsonObject params;
         params["avDevType"] = enumToString(request.avDevType);
         params["manufacturer"] = request.manufacturer;
@@ -587,6 +621,15 @@ namespace Plugin {
 
     Core::hresult RemoteControlImplementation::GetIRDBModels(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models)
     {
+        if (isValidRequestEnum(request.avDevType) == false) {
+            LOGERR("GetIRDBModels requires avDevType.");
+            response.avDevType = request.avDevType;
+            response.manufacturer = request.manufacturer;
+            response.success = false;
+            models = nullptr;
+            return Core::ERROR_BAD_REQUEST;
+        }
+
         JsonObject params;
         params["avDevType"] = enumToString(request.avDevType);
         params["manufacturer"] = request.manufacturer;
@@ -664,6 +707,16 @@ namespace Plugin {
 
     Core::hresult RemoteControlImplementation::GetIRCodesByNames(const Exchange::GetIRCodesByNamesRequest& request, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes)
     {
+        if (isValidRequestEnum(request.avDevType) == false) {
+            LOGERR("GetIRCodesByNames requires avDevType.");
+            response.avDevType = request.avDevType;
+            response.manufacturer = request.manufacturer;
+            response.model = request.model;
+            response.success = false;
+            codes = nullptr;
+            return Core::ERROR_BAD_REQUEST;
+        }
+
         JsonObject params;
         params["avDevType"] = enumToString(request.avDevType);
         params["manufacturer"] = request.manufacturer;
@@ -699,6 +752,12 @@ namespace Plugin {
 
     Core::hresult RemoteControlImplementation::SetIRCode(const Exchange::SetIRCodeRequest& request, bool& success)
     {
+        if (isValidRequestEnum(request.avDevType) == false) {
+            LOGERR("SetIRCode requires avDevType.");
+            success = false;
+            return Core::ERROR_BAD_REQUEST;
+        }
+
         JsonObject params;
         params["remoteId"] = request.remoteId;
         params["netType"] = request.netType;
@@ -766,6 +825,12 @@ namespace Plugin {
 
     Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::ConfigureWakeupKeysRequest& request, bool& success)
     {
+        if (isValidRequestEnum(request.wakeupConfig) == false) {
+            LOGERR("ConfigureWakeupKeys requires wakeupConfig.");
+            success = false;
+            return Core::ERROR_BAD_REQUEST;
+        }
+
         JsonObject params;
         params["wakeupConfig"] = enumToString(request.wakeupConfig);
         if (!request.customKeys.empty()) {
@@ -807,6 +872,12 @@ namespace Plugin {
 
     Core::hresult RemoteControlImplementation::FindMyRemote(const Exchange::FindMyRemoteRequest& request, bool& success)
     {
+        if (isValidRequestEnum(request.level) == false) {
+            LOGERR("FindMyRemote requires level.");
+            success = false;
+            return Core::ERROR_BAD_REQUEST;
+        }
+
         JsonObject params;
         params["level"] = enumToString(request.level);
 
