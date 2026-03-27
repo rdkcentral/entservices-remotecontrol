@@ -579,7 +579,7 @@ namespace Plugin {
             response.avDevType = request.avDevType;
             response.success = false;
             manufacturers = nullptr;
-            return Core::ERROR_BAD_REQUEST;
+            return Core::ERROR_NONE;
         }
 
         if (request.manufacturer.empty()) {
@@ -587,7 +587,7 @@ namespace Plugin {
             response.avDevType = request.avDevType;
             response.success = false;
             manufacturers = nullptr;
-            return Core::ERROR_BAD_REQUEST;
+            return Core::ERROR_NONE;
         }
 
         JsonObject params;
@@ -627,7 +627,7 @@ namespace Plugin {
             response.manufacturer = request.manufacturer;
             response.success = false;
             models = nullptr;
-            return Core::ERROR_BAD_REQUEST;
+            return Core::ERROR_NONE;
         }
 
         JsonObject params;
@@ -714,7 +714,7 @@ namespace Plugin {
             response.model = request.model;
             response.success = false;
             codes = nullptr;
-            return Core::ERROR_BAD_REQUEST;
+            return Core::ERROR_NONE;
         }
 
         JsonObject params;
@@ -755,7 +755,7 @@ namespace Plugin {
         if (isValidRequestEnum(request.avDevType) == false) {
             LOGERR("SetIRCode requires avDevType.");
             success = false;
-            return Core::ERROR_BAD_REQUEST;
+            return Core::ERROR_NONE;
         }
 
         JsonObject params;
@@ -828,7 +828,7 @@ namespace Plugin {
         if (isValidRequestEnum(request.wakeupConfig) == false) {
             LOGERR("ConfigureWakeupKeys requires wakeupConfig.");
             success = false;
-            return Core::ERROR_BAD_REQUEST;
+            return Core::ERROR_NONE;
         }
 
         JsonObject params;
@@ -875,7 +875,7 @@ namespace Plugin {
         if (isValidRequestEnum(request.level) == false) {
             LOGERR("FindMyRemote requires level.");
             success = false;
-            return Core::ERROR_BAD_REQUEST;
+            return Core::ERROR_NONE;
         }
 
         JsonObject params;
