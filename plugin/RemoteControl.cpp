@@ -73,8 +73,15 @@ namespace Plugin {
 
             if (message.empty())
             {
-                _implementation->Register(&_notification);
-                Exchange::JRemoteControl::Register(*this, _implementation);
+                const uint32_t registerResult = _implementation->Register(&_notification);
+                if (registerResult != Core::ERROR_NONE)
+                {
+                    message = _T("RemoteControl failed to register notification handler");
+                }
+                else
+                {
+                    Exchange::JRemoteControl::Register(*this, _implementation);
+                }
             }
         }
         else

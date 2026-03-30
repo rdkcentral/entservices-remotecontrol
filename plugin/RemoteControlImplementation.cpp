@@ -514,6 +514,9 @@ namespace Plugin {
 
     Core::hresult RemoteControlImplementation::GetNetStatus(const Exchange::GetNetStatusRequest& request, Exchange::GetNetStatusResponse& response, Exchange::IUint32Iterator*& netTypeSupported, Exchange::IRemoteDataIterator*& remoteData)
     {
+        netTypeSupported = nullptr;
+        remoteData = nullptr;
+
         JsonObject params;
         params["netType"] = request.netType;
 
@@ -938,6 +941,8 @@ namespace Plugin {
 
     Core::hresult RemoteControlImplementation::StartFirmwareUpdate(const Exchange::StartFirmwareUpdateRequest& request, bool& success, Exchange::IStringIterator*& sessionIdList)
     {
+        sessionIdList = nullptr;
+
         JsonObject params;
         params["macAddress"] = request.macAddress;
         params["fileName"] = request.fileName;
