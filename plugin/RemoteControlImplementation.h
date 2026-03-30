@@ -49,7 +49,7 @@ namespace Plugin {
         Core::hresult StartPairing(const Exchange::StartPairingRequest& request, bool& success, Exchange::IStringIterator* const macAddressList) override;
         Core::hresult StopPairing(const Exchange::StopPairingRequest& request, bool& success) override;
         Core::hresult GetNetStatus(const Exchange::GetNetStatusRequest& request, Exchange::GetNetStatusResponse& response, Exchange::IUint32Iterator*& netTypeSupported, Exchange::IRemoteDataIterator*& remoteData) override;
-        Core::hresult GetIRDBManufacturers(const Exchange::GetIRDBManufacturersRequest& request, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers) override;
+        Core::hresult GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers) override;
         Core::hresult GetIRDBModels(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models) override;
         Core::hresult GetIRCodesByAutoLookup(const Exchange::GetIRCodesByAutoLookupRequest& request, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
         Core::hresult GetIRCodesByNames(const Exchange::GetIRCodesByNamesRequest& request, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes) override;

@@ -582,27 +582,27 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::GetIRDBManufacturersRequest& request, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers)
+    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers)
     {
-        if (isValidRequestEnum(request.avDevType) == false) {
+        if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRDBManufacturers requires avDevType.");
-            response.avDevType = request.avDevType;
+            response.avDevType = avDevType;
             response.success = false;
             manufacturers = nullptr;
             return Core::ERROR_NONE;
         }
 
-        if (request.manufacturer.empty()) {
+        if (manufacturer.empty()) {
             LOGERR("GetIRDBManufacturers requires a non-empty manufacturer parameter.");
-            response.avDevType = request.avDevType;
+            response.avDevType = avDevType;
             response.success = false;
             manufacturers = nullptr;
             return Core::ERROR_NONE;
         }
 
         JsonObject params;
-        params["avDevType"] = enumToString(request.avDevType);
-        params["manufacturer"] = request.manufacturer;
+        params["avDevType"] = enumToString(avDevType);
+        params["manufacturer"] = manufacturer;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -614,7 +614,7 @@ namespace Plugin {
             return callResult;
         }
 
-        response.avDevType = request.avDevType;
+        response.avDevType = avDevType;
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         std::list<string> mfrs;
