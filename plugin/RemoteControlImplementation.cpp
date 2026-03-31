@@ -470,13 +470,13 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartPairing(const Exchange::StartPairingRequest& request, bool& success, Exchange::IStringIterator* const /* macAddressList */)
+    Core::hresult RemoteControlImplementation::StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, bool& success, Exchange::IStringIterator* const /* macAddressList */)
     {
         JsonObject params;
-        params["netType"] = request.netType;
-        params["timeout"] = request.timeout;
-        params["screenBindEnable"] = request.screenBindEnable;
-        params["scanEnable"] = request.scanEnable;
+        params["netType"] = netType;
+        params["timeout"] = timeout;
+        params["screenBindEnable"] = screenBindEnable;
+        params["scanEnable"] = scanEnable;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -492,11 +492,11 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StopPairing(const Exchange::StopPairingRequest& request, bool& success)
+    Core::hresult RemoteControlImplementation::StopPairing(const bool screenBindDisable, const bool scanDisable, bool& success)
     {
         JsonObject params;
-        params["screenBindDisable"] = request.screenBindDisable;
-        params["scanDisable"] = request.scanDisable;
+        params["screenBindDisable"] = screenBindDisable;
+        params["scanDisable"] = scanDisable;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -512,13 +512,13 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetNetStatus(const Exchange::GetNetStatusRequest& request, Exchange::GetNetStatusResponse& response, Exchange::IUint32Iterator*& netTypeSupported, Exchange::IRemoteDataIterator*& remoteData)
+    Core::hresult RemoteControlImplementation::GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResponse& response, Exchange::IUint32Iterator*& netTypeSupported, Exchange::IRemoteDataIterator*& remoteData)
     {
         netTypeSupported = nullptr;
         remoteData = nullptr;
 
         JsonObject params;
-        params["netType"] = request.netType;
+        params["netType"] = netType;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -529,7 +529,7 @@ namespace Plugin {
             return callResult;
         }
 
-        response.netType = result.HasLabel("netType") ? static_cast<uint32_t>(result["netType"].Number()) : request.netType;
+        response.netType = result.HasLabel("netType") ? static_cast<uint32_t>(result["netType"].Number()) : netType;
 
         JsonObject statusObj;
         if (result.HasLabel("status")) {
@@ -629,21 +629,21 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRDBModels(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models)
+    Core::hresult RemoteControlImplementation::GetIRDBModels(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models)
     {
-        if (isValidRequestEnum(request.avDevType) == false) {
+        if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRDBModels requires avDevType.");
-            response.avDevType = request.avDevType;
-            response.manufacturer = request.manufacturer;
+            response.avDevType = avDevType;
+            response.manufacturer = manufacturer;
             response.success = false;
             models = nullptr;
             return Core::ERROR_NONE;
         }
 
         JsonObject params;
-        params["avDevType"] = enumToString(request.avDevType);
-        params["manufacturer"] = request.manufacturer;
-        params["model"] = request.model;
+        params["avDevType"] = enumToString(avDevType);
+        params["manufacturer"] = manufacturer;
+        params["model"] = model;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -655,8 +655,8 @@ namespace Plugin {
             return callResult;
         }
 
-        response.avDevType = request.avDevType;
-        response.manufacturer = request.manufacturer;
+        response.avDevType = avDevType;
+        response.manufacturer = manufacturer;
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         std::list<string> mdls;
@@ -671,10 +671,10 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRCodesByAutoLookup(const Exchange::GetIRCodesByAutoLookupRequest& request, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes)
+    Core::hresult RemoteControlImplementation::GetIRCodesByAutoLookup(const uint32_t netType, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes)
     {
         JsonObject params;
-        params["netType"] = request.netType;
+        params["netType"] = netType;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -715,22 +715,22 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRCodesByNames(const Exchange::GetIRCodesByNamesRequest& request, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes)
+    Core::hresult RemoteControlImplementation::GetIRCodesByNames(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes)
     {
-        if (isValidRequestEnum(request.avDevType) == false) {
+        if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRCodesByNames requires avDevType.");
-            response.avDevType = request.avDevType;
-            response.manufacturer = request.manufacturer;
-            response.model = request.model;
+            response.avDevType = avDevType;
+            response.manufacturer = manufacturer;
+            response.model = model;
             response.success = false;
             codes = nullptr;
             return Core::ERROR_NONE;
         }
 
         JsonObject params;
-        params["avDevType"] = enumToString(request.avDevType);
-        params["manufacturer"] = request.manufacturer;
-        params["model"] = request.model;
+        params["avDevType"] = enumToString(avDevType);
+        params["manufacturer"] = manufacturer;
+        params["model"] = model;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -743,9 +743,9 @@ namespace Plugin {
             return callResult;
         }
 
-        response.avDevType = request.avDevType;
-        response.manufacturer = request.manufacturer;
-        response.model = request.model;
+        response.avDevType = avDevType;
+        response.manufacturer = manufacturer;
+        response.model = model;
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         std::list<string> codeList;
@@ -760,19 +760,19 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::SetIRCode(const Exchange::SetIRCodeRequest& request, bool& success)
+    Core::hresult RemoteControlImplementation::SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, bool& success)
     {
-        if (isValidRequestEnum(request.avDevType) == false) {
+        if (isValidRequestEnum(avDevType) == false) {
             LOGERR("SetIRCode requires avDevType.");
             success = false;
             return Core::ERROR_NONE;
         }
 
         JsonObject params;
-        params["remoteId"] = request.remoteId;
-        params["netType"] = request.netType;
-        params["avDevType"] = enumToString(request.avDevType);
-        params["code"] = request.code;
+        params["remoteId"] = remoteId;
+        params["netType"] = netType;
+        params["avDevType"] = enumToString(avDevType);
+        params["code"] = code;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -788,11 +788,11 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::ClearIRCodes(const Exchange::ClearIRCodesRequest& request, bool& success)
+    Core::hresult RemoteControlImplementation::ClearIRCodes(const uint32_t remoteId, const uint32_t netType, bool& success)
     {
         JsonObject params;
-        params["remoteId"] = request.remoteId;
-        params["netType"] = request.netType;
+        params["remoteId"] = remoteId;
+        params["netType"] = netType;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -833,18 +833,18 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::ConfigureWakeupKeysRequest& request, bool& success)
+    Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const string& customKeys, bool& success)
     {
-        if (isValidRequestEnum(request.wakeupConfig) == false) {
+        if (isValidRequestEnum(wakeupConfig) == false) {
             LOGERR("ConfigureWakeupKeys requires wakeupConfig.");
             success = false;
             return Core::ERROR_NONE;
         }
 
         JsonObject params;
-        params["wakeupConfig"] = enumToString(request.wakeupConfig);
-        if (!request.customKeys.empty()) {
-            params["customKeys"] = request.customKeys;
+        params["wakeupConfig"] = enumToString(wakeupConfig);
+        if (!customKeys.empty()) {
+            params["customKeys"] = customKeys;
         }
 
         string jsonParams;
@@ -861,10 +861,10 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::InitializeIRDB(const Exchange::InitializeIRDBRequest& request, bool& success)
+    Core::hresult RemoteControlImplementation::InitializeIRDB(const uint32_t netType, bool& success)
     {
         JsonObject params;
-        params["netType"] = request.netType;
+        params["netType"] = netType;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -880,16 +880,16 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::FindMyRemote(const Exchange::FindMyRemoteRequest& request, bool& success)
+    Core::hresult RemoteControlImplementation::FindMyRemote(const Exchange::FindMyRemoteLevel level, bool& success)
     {
-        if (isValidRequestEnum(request.level) == false) {
+        if (isValidRequestEnum(level) == false) {
             LOGERR("FindMyRemote requires level.");
             success = false;
             return Core::ERROR_NONE;
         }
 
         JsonObject params;
-        params["level"] = enumToString(request.level);
+        params["level"] = enumToString(level);
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -939,15 +939,15 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartFirmwareUpdate(const Exchange::StartFirmwareUpdateRequest& request, bool& success, Exchange::IStringIterator*& sessionIdList)
+    Core::hresult RemoteControlImplementation::StartFirmwareUpdate(const string& macAddress, const string& fileName, const string& fileType, const uint32_t percentIncrement, bool& success, Exchange::IStringIterator*& sessionIdList)
     {
         sessionIdList = nullptr;
 
         JsonObject params;
-        params["macAddress"] = request.macAddress;
-        params["fileName"] = request.fileName;
-        params["fileType"] = request.fileType;
-        params["percentIncrement"] = request.percentIncrement;
+        params["macAddress"] = macAddress;
+        params["fileName"] = fileName;
+        params["fileType"] = fileType;
+        params["percentIncrement"] = percentIncrement;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -973,10 +973,10 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::CancelFirmwareUpdate(const Exchange::CancelFirmwareUpdateRequest& request, bool& success)
+    Core::hresult RemoteControlImplementation::CancelFirmwareUpdate(const string& sessionId, bool& success)
     {
         JsonObject params;
-        params["sessionId"] = request.sessionId;
+        params["sessionId"] = sessionId;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -992,10 +992,10 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StatusFirmwareUpdate(const Exchange::CancelFirmwareUpdateRequest& request, Exchange::StatusFirmwareUpdateResponse& response)
+    Core::hresult RemoteControlImplementation::StatusFirmwareUpdate(const string& sessionId, Exchange::StatusFirmwareUpdateResponse& response)
     {
         JsonObject params;
-        params["sessionId"] = request.sessionId;
+        params["sessionId"] = sessionId;
 
         string jsonParams;
         params.ToString(jsonParams);

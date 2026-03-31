@@ -46,24 +46,24 @@ namespace Plugin {
 
         // IRemoteControl methods
         Core::hresult GetApiVersionNumber(Exchange::GetApiVersionNumberResponse& response) override;
-        Core::hresult StartPairing(const Exchange::StartPairingRequest& request, bool& success, Exchange::IStringIterator* const macAddressList) override;
-        Core::hresult StopPairing(const Exchange::StopPairingRequest& request, bool& success) override;
-        Core::hresult GetNetStatus(const Exchange::GetNetStatusRequest& request, Exchange::GetNetStatusResponse& response, Exchange::IUint32Iterator*& netTypeSupported, Exchange::IRemoteDataIterator*& remoteData) override;
+        Core::hresult StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, bool& success, Exchange::IStringIterator* const macAddressList) override;
+        Core::hresult StopPairing(const bool screenBindDisable, const bool scanDisable, bool& success) override;
+        Core::hresult GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResponse& response, Exchange::IUint32Iterator*& netTypeSupported, Exchange::IRemoteDataIterator*& remoteData) override;
         Core::hresult GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers) override;
-        Core::hresult GetIRDBModels(const Exchange::GetIRDBModelsRequest& request, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models) override;
-        Core::hresult GetIRCodesByAutoLookup(const Exchange::GetIRCodesByAutoLookupRequest& request, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
-        Core::hresult GetIRCodesByNames(const Exchange::GetIRCodesByNamesRequest& request, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes) override;
-        Core::hresult SetIRCode(const Exchange::SetIRCodeRequest& request, bool& success) override;
-        Core::hresult ClearIRCodes(const Exchange::ClearIRCodesRequest& request, bool& success) override;
+        Core::hresult GetIRDBModels(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models) override;
+        Core::hresult GetIRCodesByAutoLookup(const uint32_t netType, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
+        Core::hresult GetIRCodesByNames(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes) override;
+        Core::hresult SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, bool& success) override;
+        Core::hresult ClearIRCodes(const uint32_t remoteId, const uint32_t netType, bool& success) override;
         Core::hresult GetLastKeypressSource(Exchange::GetLastKeypressSourceResponse& response) override;
-        Core::hresult ConfigureWakeupKeys(const Exchange::ConfigureWakeupKeysRequest& request, bool& success) override;
-        Core::hresult InitializeIRDB(const Exchange::InitializeIRDBRequest& request, bool& success) override;
-        Core::hresult FindMyRemote(const Exchange::FindMyRemoteRequest& request, bool& success) override;
+        Core::hresult ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const string& customKeys, bool& success) override;
+        Core::hresult InitializeIRDB(const uint32_t netType, bool& success) override;
+        Core::hresult FindMyRemote(const Exchange::FindMyRemoteLevel level, bool& success) override;
         Core::hresult FactoryReset(bool& success) override;
         Core::hresult Unpair(bool& success, Exchange::IStringIterator* const macAddressList) override;
-        Core::hresult StartFirmwareUpdate(const Exchange::StartFirmwareUpdateRequest& request, bool& success, Exchange::IStringIterator*& sessionIdList) override;
-        Core::hresult CancelFirmwareUpdate(const Exchange::CancelFirmwareUpdateRequest& request, bool& success) override;
-        Core::hresult StatusFirmwareUpdate(const Exchange::CancelFirmwareUpdateRequest& request, Exchange::StatusFirmwareUpdateResponse& response) override;
+        Core::hresult StartFirmwareUpdate(const string& macAddress, const string& fileName, const string& fileType, const uint32_t percentIncrement, bool& success, Exchange::IStringIterator*& sessionIdList) override;
+        Core::hresult CancelFirmwareUpdate(const string& sessionId, bool& success) override;
+        Core::hresult StatusFirmwareUpdate(const string& sessionId, Exchange::StatusFirmwareUpdateResponse& response) override;
 
         virtual Core::hresult Register(Exchange::IRemoteControl::INotification* notification) override;
         virtual Core::hresult Unregister(const Exchange::IRemoteControl::INotification* notification) override;
