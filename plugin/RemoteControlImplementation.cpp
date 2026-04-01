@@ -586,6 +586,7 @@ namespace Plugin {
     {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRDBManufacturers requires avDevType.");
+            response.avDevType = avDevType;
             response.success = false;
             manufacturers = nullptr;
             return Core::ERROR_NONE;
@@ -593,6 +594,7 @@ namespace Plugin {
 
         if (manufacturer.empty()) {
             LOGERR("GetIRDBManufacturers requires a non-empty manufacturer parameter.");
+            response.avDevType = avDevType;
             response.success = false;
             manufacturers = nullptr;
             return Core::ERROR_NONE;
@@ -612,10 +614,8 @@ namespace Plugin {
             return callResult;
         }
 
+        response.avDevType = avDevType;
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
-        if (response.success) {
-            response.avDevType = avDevType;
-        }
 
         std::list<string> mfrs;
         if (result.HasLabel("manufacturers")) {
