@@ -582,21 +582,17 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers)
+    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, string& response)
     {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRDBManufacturers requires avDevType.");
-            response.avDevType = avDevType;
-            response.success = false;
-            manufacturers = nullptr;
+            response = R"({"success":false})";
             return Core::ERROR_NONE;
         }
 
         if (manufacturer.empty()) {
             LOGERR("GetIRDBManufacturers requires a non-empty manufacturer parameter.");
-            response.avDevType = avDevType;
-            response.success = false;
-            manufacturers = nullptr;
+            response = R"({"success":false})";
             return Core::ERROR_NONE;
         }
 
@@ -610,21 +606,28 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MANUFACTURERS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
-            manufacturers = nullptr;
             return callResult;
         }
 
-        response.avDevType = avDevType;
-        response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        bool success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        if (!success) {
+            response = R"({"success":false})";
+            return Core::ERROR_NONE;
+        }
 
-        std::list<string> mfrs;
+        JsonObject responseObj;
+        responseObj["avDevType"] = enumToString(avDevType);
+        responseObj["success"] = true;
+
+        JsonArray mfrsArray;
         if (result.HasLabel("manufacturers")) {
             auto arr = result["manufacturers"].Array();
             for (uint16_t i = 0; i < arr.Length(); i++) {
-                mfrs.push_back(arr[i].String());
+                mfrsArray.Add(arr[i].String());
             }
         }
-        manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(mfrs);
+        responseObj["manufacturers"] = mfrsArray;
+        responseObj.ToString(response);
 
         return Core::ERROR_NONE;
     }
