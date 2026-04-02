@@ -537,20 +537,20 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers)
+    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, Exchange::AVDevType& avDevTypeOut, bool& success, Exchange::IStringIterator*& manufacturers)
     {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRDBManufacturers requires avDevType.");
-            response.avDevType = avDevType;
-            response.success = false;
+            avDevTypeOut = avDevType;
+            success = false;
             manufacturers = nullptr;
             return Core::ERROR_NONE;
         }
 
         if (manufacturer.empty()) {
             LOGERR("GetIRDBManufacturers requires a non-empty manufacturer parameter.");
-            response.avDevType = avDevType;
-            response.success = false;
+            avDevTypeOut = avDevType;
+            success = false;
             manufacturers = nullptr;
             return Core::ERROR_NONE;
         }
@@ -565,14 +565,14 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MANUFACTURERS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
-            response.avDevType = avDevType;
-            response.success = false;
+            avDevTypeOut = avDevType;
+            success = false;
             manufacturers = nullptr;
             return Core::ERROR_NONE;
         }
 
-        response.avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
-        response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        avDevTypeOut = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
+        success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         std::list<string> mfrsList;
         if (result.HasLabel("manufacturers")) {
