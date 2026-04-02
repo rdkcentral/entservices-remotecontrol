@@ -49,7 +49,7 @@ namespace Plugin {
         Core::hresult StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, bool& success, Exchange::IStringIterator* const macAddressList) override;
         Core::hresult StopPairing(const bool screenBindDisable, const bool scanDisable, bool& success) override;
         Core::hresult GetNetStatus(const uint32_t netType, string& response) override;
-        Core::hresult GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, string& response /* @out */) override;
+        Core::hresult GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, Exchange::GetIRDBManufacturersResponse& response, Exchange::IStringIterator*& manufacturers) override;
         Core::hresult GetIRDBModels(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models) override;
         Core::hresult GetIRCodesByAutoLookup(const uint32_t netType, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
         Core::hresult GetIRCodesByNames(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes) override;
