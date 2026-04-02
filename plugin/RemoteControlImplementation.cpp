@@ -485,7 +485,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_START_PAIRING, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         success = result["success"].Boolean();
@@ -505,18 +505,15 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_STOP_PAIRING, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         success = result["success"].Boolean();
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResponse& response, Exchange::IUint32Iterator*& netTypeSupported, Exchange::IRemoteDataIterator*& remoteData)
+    Core::hresult RemoteControlImplementation::GetNetStatus(const uint32_t netType, string& response)
     {
-        netTypeSupported = nullptr;
-        remoteData = nullptr;
-
         JsonObject params;
         params["netType"] = netType;
 
@@ -526,59 +523,11 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_GET_RCU_STATUS, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
-            return callResult;
+            response = R"({"success":false})";
+            return Core::ERROR_NONE;
         }
 
-        response.netType = result.HasLabel("netType") ? static_cast<uint32_t>(result["netType"].Number()) : netType;
-
-        JsonObject statusObj;
-        if (result.HasLabel("status")) {
-            statusObj = result["status"].Object();
-        }
-        response.pairingState = statusObj.HasLabel("pairingState") ? stringToEnum<Exchange::PairingState>(statusObj["pairingState"].String(), Exchange::PairingState::IDLE) : Exchange::PairingState::IDLE;
-        response.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
-        response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
-
-        // Parse netTypeSupported array
-        std::list<uint32_t> supportedTypes;
-        if (result.HasLabel("netTypeSupported")) {
-            auto arr = result["netTypeSupported"].Array();
-            for (uint16_t i = 0; i < arr.Length(); i++) {
-                supportedTypes.push_back(static_cast<uint32_t>(arr[i].Number()));
-            }
-        }
-        netTypeSupported = Core::Service<RPC::ValueIterator>::Create<Exchange::IUint32Iterator>(supportedTypes);
-
-        // Parse remoteData array
-        std::list<Exchange::RemoteData> remotes;
-        if (result.HasLabel("remoteData")) {
-            auto arr = result["remoteData"].Array();
-            for (uint16_t i = 0; i < arr.Length(); i++) {
-                JsonObject rObj = arr[i].Object();
-                Exchange::RemoteData rd;
-                rd.macAddress = rObj.HasLabel("macAddress") ? rObj["macAddress"].String() : "";
-                rd.connected = rObj.HasLabel("connected") ? rObj["connected"].Boolean() : false;
-                rd.name = rObj.HasLabel("name") ? rObj["name"].String() : "";
-                rd.remoteId = rObj.HasLabel("remoteId") ? static_cast<uint32_t>(rObj["remoteId"].Number()) : 0;
-                rd.deviceId = rObj.HasLabel("deviceId") ? static_cast<uint32_t>(rObj["deviceId"].Number()) : 0;
-                rd.make = rObj.HasLabel("make") ? rObj["make"].String() : "";
-                rd.model = rObj.HasLabel("model") ? rObj["model"].String() : "";
-                rd.hwVersion = rObj.HasLabel("hwVersion") ? rObj["hwVersion"].String() : "";
-                rd.swVersion = rObj.HasLabel("swVersion") ? rObj["swVersion"].String() : "";
-                rd.btlVersion = rObj.HasLabel("btlVersion") ? rObj["btlVersion"].String() : "";
-                rd.serialNumber = rObj.HasLabel("serialNumber") ? rObj["serialNumber"].String() : "";
-                rd.batteryPercent = rObj.HasLabel("batteryPercent") ? static_cast<uint8_t>(rObj["batteryPercent"].Number()) : 0;
-                rd.tvIRCode = rObj.HasLabel("tvIRCode") ? rObj["tvIRCode"].String() : "";
-                rd.ampIRCode = rObj.HasLabel("ampIRCode") ? rObj["ampIRCode"].String() : "";
-                rd.wakeupKeyCode = rObj.HasLabel("wakeupKeyCode") ? static_cast<uint32_t>(rObj["wakeupKeyCode"].Number()) : 0;
-                rd.wakeupConfig = rObj.HasLabel("wakeupConfig") ? stringToEnum<Exchange::WakeupConfig>(rObj["wakeupConfig"].String(), Exchange::WakeupConfig::ALL) : Exchange::WakeupConfig::ALL;
-                rd.wakeupCustomList = rObj.HasLabel("wakeupCustomList") ? rObj["wakeupCustomList"].String() : "";
-                rd.upgradeSessionId = rObj.HasLabel("upgradeSessionId") ? rObj["upgradeSessionId"].String() : "";
-                remotes.push_back(rd);
-            }
-        }
-        remoteData = Core::Service<RPC::IteratorType<Exchange::IRemoteDataIterator>>::Create<Exchange::IRemoteDataIterator>(remotes);
-
+        result.ToString(response);
         return Core::ERROR_NONE;
     }
 
@@ -606,7 +555,8 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MANUFACTURERS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
-            return callResult;
+            response = R"({"success":false})";
+            return Core::ERROR_NONE;
         }
 
         bool success = result.HasLabel("success") ? result["success"].Boolean() : false;
@@ -654,8 +604,9 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MODELS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
+            response.success = false;
             models = nullptr;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         response.avDevType = avDevType;
@@ -688,7 +639,7 @@ namespace Plugin {
             response.success = false;
             tvCodes = nullptr;
             avrCodes = nullptr;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         response.tvManufacturer = result.HasLabel("tvManufacturer") ? result["tvManufacturer"].String() : "";
@@ -743,7 +694,7 @@ namespace Plugin {
         if (callResult != Core::ERROR_NONE) {
             response.success = false;
             codes = nullptr;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         response.avDevType = avDevType;
@@ -784,7 +735,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_SET_CODE, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         success = result["success"].Boolean();
@@ -804,7 +755,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_CLEAR_CODE, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         success = result["success"].Boolean();
@@ -821,7 +772,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_LAST_KEYPRESS_GET, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             response.success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         response.controllerId = result.HasLabel("controllerId") ? static_cast<uint32_t>(result["controllerId"].Number()) : 0;
@@ -857,7 +808,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_WRITE_RCU_WAKEUP_CONFIG, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         success = result["success"].Boolean();
@@ -876,7 +827,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_INITIALIZE, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         success = result["success"].Boolean();
@@ -901,7 +852,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_FIND_MY_REMOTE, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         success = result["success"].Boolean();
@@ -918,7 +869,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_FACTORY_RESET, jsonParams, result, IARM_FACTORY_RESET_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         success = result["success"].Boolean();
@@ -935,7 +886,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_UNPAIR, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         success = result["success"].Boolean();
@@ -959,7 +910,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_START_FIRMWARE_UPDATE, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         success = result.HasLabel("success") ? result["success"].Boolean() : false;
@@ -988,14 +939,14 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_CANCEL_FIRMWARE_UPDATE, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            return callResult;
+            return Core::ERROR_NONE;
         }
 
         success = result["success"].Boolean();
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StatusFirmwareUpdate(const string& sessionId, Exchange::StatusFirmwareUpdateResponse& response)
+    Core::hresult RemoteControlImplementation::StatusFirmwareUpdate(const string& sessionId, string& response)
     {
         JsonObject params;
         params["sessionId"] = sessionId;
@@ -1006,18 +957,11 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_STATUS_FIRMWARE_UPDATE, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
-            response.success = false;
-            return callResult;
+            response = R"({"success":false})";
+            return Core::ERROR_NONE;
         }
 
-        response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
-
-        if (result.HasLabel("status")) {
-            JsonObject statusObj = result["status"].Object();
-            response.result.state = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::FAILED) : Exchange::FirmwareUpdateState::FAILED;
-            response.result.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
-        }
-
+        result.ToString(response);
         return Core::ERROR_NONE;
     }
 
