@@ -49,10 +49,10 @@ namespace Plugin {
         Core::hresult StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, bool& success, Exchange::IStringIterator* const macAddressList) override;
         Core::hresult StopPairing(const bool screenBindDisable, const bool scanDisable, bool& success) override;
         Core::hresult GetNetStatus(const uint32_t netType, string& response) override;
-        Core::hresult GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, Exchange::AVDevType& avDevTypeOut, bool& success, Exchange::IStringIterator*& manufacturers) override;
-        Core::hresult GetIRDBModels(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models) override;
-        Core::hresult GetIRCodesByAutoLookup(const uint32_t netType, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
-        Core::hresult GetIRCodesByNames(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes) override;
+        Core::hresult GetIRDBManufacturers(Exchange::AVDevType& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers) override;
+        Core::hresult GetIRDBModels(Exchange::AVDevType& avDevType, string& manufacturer, const string& model, bool& success, Exchange::IStringIterator*& models) override;
+        Core::hresult GetIRCodesByAutoLookup(const uint32_t netType, string& tvManufacturer, string& tvModel, string& avrManufacturer, string& avrModel, bool& success, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
+        Core::hresult GetIRCodesByNames(Exchange::AVDevType& avDevType, string& manufacturer, string& model, bool& success, Exchange::IStringIterator*& codes) override;
         Core::hresult SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, bool& success) override;
         Core::hresult ClearIRCodes(const uint32_t remoteId, const uint32_t netType, bool& success) override;
         Core::hresult GetLastKeypressSource(Exchange::GetLastKeypressSourceResponse& response) override;

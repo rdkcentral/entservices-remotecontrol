@@ -537,11 +537,10 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, Exchange::AVDevType& avDevTypeOut, bool& success, Exchange::IStringIterator*& manufacturers)
+    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(Exchange::AVDevType& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers)
     {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRDBManufacturers requires avDevType.");
-            avDevTypeOut = avDevType;
             success = false;
             manufacturers = nullptr;
             return Core::ERROR_NONE;
@@ -549,7 +548,6 @@ namespace Plugin {
 
         if (manufacturer.empty()) {
             LOGERR("GetIRDBManufacturers requires a non-empty manufacturer parameter.");
-            avDevTypeOut = avDevType;
             success = false;
             manufacturers = nullptr;
             return Core::ERROR_NONE;
@@ -565,13 +563,12 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MANUFACTURERS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
-            avDevTypeOut = avDevType;
             success = false;
             manufacturers = nullptr;
             return Core::ERROR_NONE;
         }
 
-        avDevTypeOut = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
+        avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
         success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         std::list<string> mfrsList;
@@ -586,13 +583,11 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRDBModels(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRDBModelsResponse& response, Exchange::IStringIterator*& models)
+    Core::hresult RemoteControlImplementation::GetIRDBModels(Exchange::AVDevType& avDevType, string& manufacturer, const string& model, bool& success, Exchange::IStringIterator*& models)
     {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRDBModels requires avDevType.");
-            response.avDevType = avDevType;
-            response.manufacturer = manufacturer;
-            response.success = false;
+            success = false;
             models = nullptr;
             return Core::ERROR_NONE;
         }
@@ -608,14 +603,13 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MODELS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
-            response.success = false;
+            success = false;
             models = nullptr;
             return Core::ERROR_NONE;
         }
 
-        response.avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
-        response.manufacturer = manufacturer;
-        response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
+        success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         std::list<string> mdls;
         if (result.HasLabel("models")) {
@@ -629,7 +623,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRCodesByAutoLookup(const uint32_t netType, Exchange::GetIRCodesByAutoLookupResponse& response, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes)
+    Core::hresult RemoteControlImplementation::GetIRCodesByAutoLookup(const uint32_t netType, string& tvManufacturer, string& tvModel, string& avrManufacturer, string& avrModel, bool& success, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes)
     {
         JsonObject params;
         params["netType"] = netType;
@@ -640,17 +634,17 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_AUTO_LOOKUP, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
-            response.success = false;
+            success = false;
             tvCodes = nullptr;
             avrCodes = nullptr;
             return Core::ERROR_NONE;
         }
 
-        response.tvManufacturer = result.HasLabel("tvManufacturer") ? result["tvManufacturer"].String() : "";
-        response.tvModel = result.HasLabel("tvModel") ? result["tvModel"].String() : "";
-        response.avrManufacturer = result.HasLabel("avrManufacturer") ? result["avrManufacturer"].String() : "";
-        response.avrModel = result.HasLabel("avrModel") ? result["avrModel"].String() : "";
-        response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        tvManufacturer = result.HasLabel("tvManufacturer") ? result["tvManufacturer"].String() : "";
+        tvModel = result.HasLabel("tvModel") ? result["tvModel"].String() : "";
+        avrManufacturer = result.HasLabel("avrManufacturer") ? result["avrManufacturer"].String() : "";
+        avrModel = result.HasLabel("avrModel") ? result["avrModel"].String() : "";
+        success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         std::list<string> tv;
         if (result.HasLabel("tvCodes")) {
@@ -673,14 +667,11 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRCodesByNames(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRCodesByNamesResponse& response, Exchange::IStringIterator*& codes)
+    Core::hresult RemoteControlImplementation::GetIRCodesByNames(Exchange::AVDevType& avDevType, string& manufacturer, string& model, bool& success, Exchange::IStringIterator*& codes)
     {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRCodesByNames requires avDevType.");
-            response.avDevType = avDevType;
-            response.manufacturer = manufacturer;
-            response.model = model;
-            response.success = false;
+            success = false;
             codes = nullptr;
             return Core::ERROR_NONE;
         }
@@ -696,15 +687,13 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_CODES, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
-            response.success = false;
+            success = false;
             codes = nullptr;
             return Core::ERROR_NONE;
         }
 
-        response.avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
-        response.manufacturer = manufacturer;
-        response.model = model;
-        response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
+        success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         std::list<string> codeList;
         if (result.HasLabel("codes")) {
