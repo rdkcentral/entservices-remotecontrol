@@ -54,14 +54,6 @@ namespace Plugin {
             }
         }
 
-        template <>
-        Exchange::WakeupConfig stringToEnum<Exchange::WakeupConfig>(const string& str, Exchange::WakeupConfig defaultValue) {
-            if (str == "all")    return Exchange::WakeupConfig::ALL;
-            if (str == "none")   return Exchange::WakeupConfig::NONE;
-            if (str == "custom") return Exchange::WakeupConfig::CUSTOM;
-            return defaultValue;
-        }
-
         // --- FindMyRemoteLevel: ctrlm expects lowercase "off"/"mid"/"high" ---
         template <>
         const char* enumToString<Exchange::FindMyRemoteLevel>(Exchange::FindMyRemoteLevel value) {
