@@ -77,6 +77,20 @@ namespace Plugin {
             }
         }
 
+        template <>
+        Exchange::AVDevType stringToEnum<Exchange::AVDevType>(const string& str, Exchange::AVDevType defaultValue) {
+            if (str == "TV") {
+                return Exchange::AVDevType::TV;
+            }
+            if (str == "AMP") {
+                return Exchange::AVDevType::AMP;
+            }
+            if (str == "INVALID" || str.empty()) {
+                return Exchange::AVDevType::INVALID;
+            }
+            return defaultValue;
+        }
+
         bool isValidRequestEnum(const Exchange::AVDevType value)
         {
             return value != Exchange::AVDevType::INVALID;
@@ -557,7 +571,7 @@ namespace Plugin {
             return Core::ERROR_NONE;
         }
 
-        response.avDevType = avDevType;
+        response.avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         std::list<string> mfrsList;
@@ -599,7 +613,7 @@ namespace Plugin {
             return Core::ERROR_NONE;
         }
 
-        response.avDevType = avDevType;
+        response.avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
         response.manufacturer = manufacturer;
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
@@ -687,7 +701,7 @@ namespace Plugin {
             return Core::ERROR_NONE;
         }
 
-        response.avDevType = avDevType;
+        response.avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
         response.manufacturer = manufacturer;
         response.model = model;
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
