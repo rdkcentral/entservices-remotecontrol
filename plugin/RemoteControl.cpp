@@ -1079,6 +1079,24 @@ namespace WPEFramework {
 
             params.FromString(eventData->payload);
 
+            if (params.HasLabel("status") && params["status"].Content() == JsonValue::type::OBJECT) {
+                JsonObject status = params["status"].Object();
+
+                std::string pairingState;
+                if (status.HasLabel("pairingState") && status["pairingState"].Content() == JsonValue::type::STRING) {
+                    pairingState = status["pairingState"].String();
+                }
+
+                if (status.HasLabel("remoteData") && status["remoteData"].Content() == JsonValue::type::ARRAY) {
+                    JsonArray remoteData = status["remoteData"].Array();
+
+                    if (pairingState == "COMPLETE" && remoteData.Length() == 0) {
+                        LOGINFO("onStatus: dropping notify (pairingState=COMPLETE and remoteData empty)");
+                        return;
+                    }
+                }
+            }
+
             sendNotify("onStatus", params);
         }
 
