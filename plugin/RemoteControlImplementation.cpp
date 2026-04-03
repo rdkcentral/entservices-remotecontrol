@@ -42,6 +42,11 @@ namespace Plugin {
         template <typename E>
         E stringToEnum(const string& str, E defaultValue);
 
+        string jsonValueToString(const JsonValue& value)
+        {
+            return value.String();
+        }
+
         // --- WakeupConfig: ctrlm expects lowercase "all"/"none"/"custom" ---
         template <>
         const char* enumToString<Exchange::WakeupConfig>(Exchange::WakeupConfig value) {
@@ -518,7 +523,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetNetStatus(const uint32_t netType, string& response)
+    Core::hresult RemoteControlImplementation::GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResponse& response, string& netTypesSupported, string& remoteData)
     {
         JsonObject params;
         params["netType"] = netType;
@@ -529,11 +534,28 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_GET_RCU_STATUS, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
-            response = R"({"success":false})";
+            response.netType = netType;
+            response.pairingState = Exchange::PairingState::IDLE;
+            response.irProgState = Exchange::IRProgState::IDLE;
+            response.success = false;
+            netTypesSupported = "[]";
+            remoteData = "[]";
             return Core::ERROR_NONE;
         }
 
-        result.ToString(response);
+        JsonObject statusObj;
+        if (result.HasLabel("status")) {
+            statusObj = result["status"].Object();
+        }
+
+        response.netType = statusObj.HasLabel("netType") ? static_cast<uint32_t>(statusObj["netType"].Number()) : netType;
+        response.pairingState = statusObj.HasLabel("pairingState") ? stringToEnum<Exchange::PairingState>(statusObj["pairingState"].String(), Exchange::PairingState::IDLE) : Exchange::PairingState::IDLE;
+        response.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
+        response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
+
+        netTypesSupported = statusObj.HasLabel("netTypesSupported") ? jsonValueToString(statusObj["netTypesSupported"]) : "[]";
+        remoteData = statusObj.HasLabel("remoteData") ? jsonValueToString(statusObj["remoteData"]) : "[]";
+
         return Core::ERROR_NONE;
     }
 
@@ -939,7 +961,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StatusFirmwareUpdate(const string& sessionId, string& response)
+    Core::hresult RemoteControlImplementation::StatusFirmwareUpdate(const string& sessionId, Exchange::StatusFirmwareUpdateResponse& response)
     {
         JsonObject params;
         params["sessionId"] = sessionId;
@@ -950,11 +972,28 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_STATUS_FIRMWARE_UPDATE, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
-            response = R"({"success":false})";
+            response.sessionId = sessionId;
+            response.macAddress.clear();
+            response.state = Exchange::FirmwareUpdateState::FAILED;
+            response.percentComplete = 0;
+            response.error.clear();
+            response.success = false;
             return Core::ERROR_NONE;
         }
 
-        result.ToString(response);
+        // ctrlm nests firmware fields under "status"; "success" is at the top level
+        JsonObject statusObj;
+        if (result.HasLabel("status")) {
+            statusObj = result["status"].Object();
+        }
+
+        response.sessionId = statusObj.HasLabel("upgradeSessionId") ? statusObj["upgradeSessionId"].String() : sessionId;
+        response.macAddress = statusObj.HasLabel("macAddress") ? statusObj["macAddress"].String() : "";
+        response.state = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::FAILED) : Exchange::FirmwareUpdateState::FAILED;
+        response.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
+        response.error = statusObj.HasLabel("errorString") ? statusObj["errorString"].String() : "";
+        response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
+
         return Core::ERROR_NONE;
     }
 
