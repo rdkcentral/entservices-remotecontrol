@@ -476,7 +476,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, bool& success, Exchange::IStringIterator* const /* macAddressList */)
+    Core::hresult RemoteControlImplementation::StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, Exchange::SuccessResult& result, Exchange::IStringIterator* const /* macAddressList */)
     {
         JsonObject params;
         params["netType"] = netType;
@@ -487,18 +487,18 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_START_PAIRING, jsonParams, result);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_START_PAIRING, jsonParams, iarmResult);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
-        success = result["success"].Boolean();
+        result.success = iarmResult["success"].Boolean();
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StopPairing(const bool screenBindDisable, const bool scanDisable, bool& success)
+    Core::hresult RemoteControlImplementation::StopPairing(const bool screenBindDisable, const bool scanDisable, Exchange::SuccessResult& result)
     {
         JsonObject params;
         params["screenBindDisable"] = screenBindDisable;
@@ -507,14 +507,14 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_STOP_PAIRING, jsonParams, result);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_STOP_PAIRING, jsonParams, iarmResult);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
-        success = result["success"].Boolean();
+        result.success = iarmResult["success"].Boolean();
         return Core::ERROR_NONE;
     }
 
@@ -707,11 +707,11 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, bool& success)
+    Core::hresult RemoteControlImplementation::SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, Exchange::SuccessResult& result)
     {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("SetIRCode requires avDevType.");
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
@@ -724,18 +724,18 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_SET_CODE, jsonParams, result);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_SET_CODE, jsonParams, iarmResult);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
-        success = result["success"].Boolean();
+        result.success = iarmResult["success"].Boolean();
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::ClearIRCodes(const uint32_t remoteId, const uint32_t netType, bool& success)
+    Core::hresult RemoteControlImplementation::ClearIRCodes(const uint32_t remoteId, const uint32_t netType, Exchange::SuccessResult& result)
     {
         JsonObject params;
         params["remoteId"] = remoteId;
@@ -744,14 +744,14 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_CLEAR_CODE, jsonParams, result);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_CLEAR_CODE, jsonParams, iarmResult);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
-        success = result["success"].Boolean();
+        result.success = iarmResult["success"].Boolean();
         return Core::ERROR_NONE;
     }
 
@@ -780,11 +780,11 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const string& customKeys, bool& success)
+    Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const string& customKeys, Exchange::SuccessResult& result)
     {
         if (isValidRequestEnum(wakeupConfig) == false) {
             LOGERR("ConfigureWakeupKeys requires wakeupConfig.");
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
@@ -797,18 +797,18 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_WRITE_RCU_WAKEUP_CONFIG, jsonParams, result);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_WRITE_RCU_WAKEUP_CONFIG, jsonParams, iarmResult);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
-        success = result["success"].Boolean();
+        result.success = iarmResult["success"].Boolean();
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::InitializeIRDB(const uint32_t netType, bool& success)
+    Core::hresult RemoteControlImplementation::InitializeIRDB(const uint32_t netType, Exchange::SuccessResult& result)
     {
         JsonObject params;
         params["netType"] = netType;
@@ -816,22 +816,22 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_INITIALIZE, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_INITIALIZE, jsonParams, iarmResult, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
-        success = result["success"].Boolean();
+        result.success = iarmResult["success"].Boolean();
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::FindMyRemote(const Exchange::FindMyRemoteLevel level, bool& success)
+    Core::hresult RemoteControlImplementation::FindMyRemote(const Exchange::FindMyRemoteLevel level, Exchange::SuccessResult& result)
     {
         if (isValidRequestEnum(level) == false) {
             LOGERR("FindMyRemote requires level.");
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
@@ -841,48 +841,48 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_FIND_MY_REMOTE, jsonParams, result);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_FIND_MY_REMOTE, jsonParams, iarmResult);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
-        success = result["success"].Boolean();
+        result.success = iarmResult["success"].Boolean();
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::FactoryReset(bool& success)
+    Core::hresult RemoteControlImplementation::FactoryReset(Exchange::SuccessResult& result)
     {
         JsonObject params;
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_FACTORY_RESET, jsonParams, result, IARM_FACTORY_RESET_TIMEOUT);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_FACTORY_RESET, jsonParams, iarmResult, IARM_FACTORY_RESET_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
-        success = result["success"].Boolean();
+        result.success = iarmResult["success"].Boolean();
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::Unpair(bool& success, Exchange::IStringIterator* const /* macAddressList */)
+    Core::hresult RemoteControlImplementation::Unpair(Exchange::SuccessResult& result, Exchange::IStringIterator* const /* macAddressList */)
     {
         JsonObject params;
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_UNPAIR, jsonParams, result);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_UNPAIR, jsonParams, iarmResult);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
-        success = result["success"].Boolean();
+        result.success = iarmResult["success"].Boolean();
         return Core::ERROR_NONE;
     }
 
@@ -920,7 +920,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::CancelFirmwareUpdate(const string& sessionId, bool& success)
+    Core::hresult RemoteControlImplementation::CancelFirmwareUpdate(const string& sessionId, Exchange::SuccessResult& result)
     {
         JsonObject params;
         params["sessionId"] = sessionId;
@@ -928,14 +928,14 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_CANCEL_FIRMWARE_UPDATE, jsonParams, result);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_CANCEL_FIRMWARE_UPDATE, jsonParams, iarmResult);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
+            result.success = false;
             return Core::ERROR_NONE;
         }
 
-        success = result["success"].Boolean();
+        result.success = iarmResult["success"].Boolean();
         return Core::ERROR_NONE;
     }
 

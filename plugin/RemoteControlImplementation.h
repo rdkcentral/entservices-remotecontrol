@@ -46,23 +46,23 @@ namespace Plugin {
 
         // IRemoteControl methods
         Core::hresult GetApiVersionNumber(Exchange::GetApiVersionNumberResponse& response) override;
-        Core::hresult StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, bool& success, Exchange::IStringIterator* const macAddressList) override;
-        Core::hresult StopPairing(const bool screenBindDisable, const bool scanDisable, bool& success) override;
+        Core::hresult StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, Exchange::SuccessResult& result, Exchange::IStringIterator* const macAddressList) override;
+        Core::hresult StopPairing(const bool screenBindDisable, const bool scanDisable, Exchange::SuccessResult& result) override;
         Core::hresult GetNetStatus(const uint32_t netType, string& response) override;
         Core::hresult GetIRDBManufacturers(Exchange::AVDevType& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers) override;
         Core::hresult GetIRDBModels(Exchange::AVDevType& avDevType, string& manufacturer, const string& model, bool& success, Exchange::IStringIterator*& models) override;
         Core::hresult GetIRCodesByAutoLookup(const uint32_t netType, string& tvManufacturer, string& tvModel, string& avrManufacturer, string& avrModel, bool& success, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
         Core::hresult GetIRCodesByNames(Exchange::AVDevType& avDevType, string& manufacturer, string& model, bool& success, Exchange::IStringIterator*& codes) override;
-        Core::hresult SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, bool& success) override;
-        Core::hresult ClearIRCodes(const uint32_t remoteId, const uint32_t netType, bool& success) override;
+        Core::hresult SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, Exchange::SuccessResult& result) override;
+        Core::hresult ClearIRCodes(const uint32_t remoteId, const uint32_t netType, Exchange::SuccessResult& result) override;
         Core::hresult GetLastKeypressSource(Exchange::GetLastKeypressSourceResponse& response) override;
-        Core::hresult ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const string& customKeys, bool& success) override;
-        Core::hresult InitializeIRDB(const uint32_t netType, bool& success) override;
-        Core::hresult FindMyRemote(const Exchange::FindMyRemoteLevel level, bool& success) override;
-        Core::hresult FactoryReset(bool& success) override;
-        Core::hresult Unpair(bool& success, Exchange::IStringIterator* const macAddressList) override;
+        Core::hresult ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const string& customKeys, Exchange::SuccessResult& result) override;
+        Core::hresult InitializeIRDB(const uint32_t netType, Exchange::SuccessResult& result) override;
+        Core::hresult FindMyRemote(const Exchange::FindMyRemoteLevel level, Exchange::SuccessResult& result) override;
+        Core::hresult FactoryReset(Exchange::SuccessResult& result) override;
+        Core::hresult Unpair(Exchange::SuccessResult& result, Exchange::IStringIterator* const macAddressList) override;
         Core::hresult StartFirmwareUpdate(const string& macAddress, const string& fileName, const string& fileType, const uint32_t percentIncrement, bool& success, Exchange::IStringIterator*& sessionIdList) override;
-        Core::hresult CancelFirmwareUpdate(const string& sessionId, bool& success) override;
+        Core::hresult CancelFirmwareUpdate(const string& sessionId, Exchange::SuccessResult& result) override;
         Core::hresult StatusFirmwareUpdate(const string& sessionId, string& response) override;
 
         virtual Core::hresult Register(Exchange::IRemoteControl::INotification* notification) override;
