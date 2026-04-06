@@ -211,6 +211,10 @@ namespace Plugin {
     {
         ASSERT(notification != nullptr);
 
+            if (notification == nullptr) {
+                return Core::ERROR_BAD_REQUEST;
+            }
+
         _adminLock.Lock();
         auto it = std::find(_notifications.begin(), _notifications.end(), notification);
         if (it == _notifications.end()) {
@@ -223,7 +227,9 @@ namespace Plugin {
 
     Core::hresult RemoteControlImplementation::Unregister(const Exchange::IRemoteControl::INotification* notification)
     {
-        ASSERT(notification != nullptr);
+        if (notification == nullptr) {
+            return Core::ERROR_BAD_REQUEST;
+        }
 
         _adminLock.Lock();
         auto it = std::find_if(_notifications.begin(), _notifications.end(), [notification](const Exchange::IRemoteControl::INotification* current) {
