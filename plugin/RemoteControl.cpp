@@ -24,7 +24,8 @@
 #include "UtilsJsonRpc.h"
 #include "UtilsIarm.h"
 #include "UtilsString.h"
-
+#include <stdlib.h>
+#include <stdint.h>
 #include <exception>
 
 #define IARM_FACTORY_RESET_TIMEOUT  (15 * 1000)  // 15 seconds, in milliseconds
@@ -278,6 +279,12 @@ namespace WPEFramework {
                 free(call);
                 returnResponse(bSuccess);
             }
+
+            // Test coverity workflow
+            uint8_t* testBuf;
+            testBuf = (uint8_t*)calloc(16, sizeof(uint8_t));
+            (void)testBuf;
+
 
             JsonObject result;
             result.FromString(call->result);
