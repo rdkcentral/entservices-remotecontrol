@@ -170,8 +170,10 @@ namespace Plugin {
         _notifications.clear();
         _adminLock.Unlock();
 
-        DeinitializeIARM();
+        // Prevent any in-flight or late IARM callback from dispatching to this
+        // object while teardown is in progress.
         _instance = nullptr;
+        DeinitializeIARM();
 
         if (_service != nullptr) {
             _service->Release();
