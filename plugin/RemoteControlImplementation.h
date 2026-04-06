@@ -48,7 +48,7 @@ namespace Plugin {
         Core::hresult GetApiVersionNumber(Exchange::GetApiVersionNumberResponse& response) override;
         Core::hresult StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, Exchange::SuccessResult& result, Exchange::IStringIterator* const macAddressList) override;
         Core::hresult StopPairing(const bool screenBindDisable, const bool scanDisable, Exchange::SuccessResult& result) override;
-        Core::hresult GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResponse& response, string& netTypesSupported, string& remoteData) override;
+        Core::hresult GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResult& result) override;
         Core::hresult GetIRDBManufacturers(Exchange::AVDevType& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers) override;
         Core::hresult GetIRDBModels(Exchange::AVDevType& avDevType, string& manufacturer, const string& model, bool& success, Exchange::IStringIterator*& models) override;
         Core::hresult GetIRCodesByAutoLookup(const uint32_t netType, string& tvManufacturer, string& tvModel, string& avrManufacturer, string& avrModel, bool& success, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;

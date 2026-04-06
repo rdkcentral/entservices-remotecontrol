@@ -523,7 +523,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResponse& response, string& netTypesSupported, string& remoteData)
+    Core::hresult RemoteControlImplementation::GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResult& result)
     {
         JsonObject params;
         params["netType"] = netType;
@@ -531,30 +531,29 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_GET_RCU_STATUS, jsonParams, result);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_GET_RCU_STATUS, jsonParams, iarmResult);
         if (callResult != Core::ERROR_NONE) {
-            response.netType = netType;
-            response.pairingState = Exchange::PairingState::IDLE;
-            response.irProgState = Exchange::IRProgState::IDLE;
-            response.success = false;
-            netTypesSupported = "[]";
-            remoteData = "[]";
+            result.success = false;
+            result.status.netType = netType;
+            result.status.pairingState = Exchange::PairingState::IDLE;
+            result.status.irProgState = Exchange::IRProgState::IDLE;
+            result.status.netTypesSupported = "[]";
+            result.status.remoteData = "[]";
             return Core::ERROR_NONE;
         }
 
         JsonObject statusObj;
-        if (result.HasLabel("status")) {
-            statusObj = result["status"].Object();
+        if (iarmResult.HasLabel("status")) {
+            statusObj = iarmResult["status"].Object();
         }
 
-        response.netType = statusObj.HasLabel("netType") ? static_cast<uint32_t>(statusObj["netType"].Number()) : netType;
-        response.pairingState = statusObj.HasLabel("pairingState") ? stringToEnum<Exchange::PairingState>(statusObj["pairingState"].String(), Exchange::PairingState::IDLE) : Exchange::PairingState::IDLE;
-        response.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
-        response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
-
-        netTypesSupported = statusObj.HasLabel("netTypesSupported") ? jsonValueToString(statusObj["netTypesSupported"]) : "[]";
-        remoteData = statusObj.HasLabel("remoteData") ? jsonValueToString(statusObj["remoteData"]) : "[]";
+        result.success = iarmResult.HasLabel("success") ? iarmResult["success"].Boolean() : false;
+        result.status.netType = statusObj.HasLabel("netType") ? static_cast<uint32_t>(statusObj["netType"].Number()) : netType;
+        result.status.pairingState = statusObj.HasLabel("pairingState") ? stringToEnum<Exchange::PairingState>(statusObj["pairingState"].String(), Exchange::PairingState::IDLE) : Exchange::PairingState::IDLE;
+        result.status.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
+        result.status.netTypesSupported = statusObj.HasLabel("netTypesSupported") ? jsonValueToString(statusObj["netTypesSupported"]) : "[]";
+        result.status.remoteData = statusObj.HasLabel("remoteData") ? jsonValueToString(statusObj["remoteData"]) : "[]";
 
         return Core::ERROR_NONE;
     }
