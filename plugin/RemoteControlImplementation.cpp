@@ -796,7 +796,7 @@ namespace Plugin {
         response.sourceName = result.HasLabel("sourceName") ? result["sourceName"].String() : "";
         response.sourceType = result.HasLabel("sourceType") ? result["sourceType"].String() : "";
         response.sourceKeyCode = result.HasLabel("sourceKeyCode") ? static_cast<uint32_t>(result["sourceKeyCode"].Number()) : 0;
-        response.isScreenBindMode = result.HasLabel("isScreenBindMode") ? result["isScreenBindMode"].Boolean() : false;
+        response.bIsScreenBindMode = result.HasLabel("bIsScreenBindMode") ? result["bIsScreenBindMode"].Boolean() : false;
         response.remoteKeypadConfig = result.HasLabel("remoteKeypadConfig") ? static_cast<uint32_t>(result["remoteKeypadConfig"].Number()) : 0;
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
