@@ -156,7 +156,7 @@ namespace WPEFramework {
             if (strcmp(owner, CTRLM_MAIN_IARM_BUS_NAME))
             {
                 LOGERR("ERROR - unexpected event: owner %s, eventId: %d, data: %p, size: %zu.",
-                       owner, (int)eventId, data, len);
+                       owner, data, len);
                 return;
             }
 
