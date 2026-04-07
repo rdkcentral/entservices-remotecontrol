@@ -238,7 +238,7 @@ namespace WPEFramework {
             free(call);
 
             if (bSuccess)
-                LOGINFO("START PAIRING call SUCCESS!");
+                LOGINFO("START PAIRING call SUCCESS! %s");
             else
                 LOGERR("ERROR - CTRLM_MAIN_IARM_CALL_START_PAIRING returned FAILURE!");
 
