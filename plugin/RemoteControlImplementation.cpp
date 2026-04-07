@@ -482,14 +482,14 @@ namespace Plugin {
     // Each method below converts its typed struct parameters into JSON, calls IARM, and
     // then parses the JSON result back into the typed response.
 
-    Core::hresult RemoteControlImplementation::GetApiVersionNumber(Exchange::GetApiVersionNumberResponse& response)
+    Core::hresult RemoteControlImplementation::GetApiVersionNumber(Exchange::RemoteControlGetApiVersionNumberResponse& response)
     {
         response.version = API_VERSION_NUMBER_MAJOR;
         response.success = true;
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, Exchange::SuccessResult& result, Exchange::IStringIterator* const /* macAddressList */)
+    Core::hresult RemoteControlImplementation::StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const /* macAddressList */)
     {
         JsonObject params;
         params["netType"] = netType;
@@ -511,7 +511,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StopPairing(const bool screenBindDisable, const bool scanDisable, Exchange::SuccessResult& result)
+    Core::hresult RemoteControlImplementation::StopPairing(const bool screenBindDisable, const bool scanDisable, Exchange::RemoteControlSuccessResult& result)
     {
         JsonObject params;
         params["screenBindDisable"] = screenBindDisable;
@@ -736,7 +736,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, Exchange::SuccessResult& result)
+    Core::hresult RemoteControlImplementation::SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, Exchange::RemoteControlSuccessResult& result)
     {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("SetIRCode requires avDevType.");
@@ -764,7 +764,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::ClearIRCodes(const uint32_t remoteId, const uint32_t netType, Exchange::SuccessResult& result)
+    Core::hresult RemoteControlImplementation::ClearIRCodes(const uint32_t remoteId, const uint32_t netType, Exchange::RemoteControlSuccessResult& result)
     {
         JsonObject params;
         params["remoteId"] = remoteId;
@@ -809,7 +809,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const string& customKeys, Exchange::SuccessResult& result)
+    Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const string& customKeys, Exchange::RemoteControlSuccessResult& result)
     {
         if (isValidRequestEnum(wakeupConfig) == false) {
             LOGERR("ConfigureWakeupKeys requires wakeupConfig.");
@@ -837,7 +837,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::InitializeIRDB(const uint32_t netType, Exchange::SuccessResult& result)
+    Core::hresult RemoteControlImplementation::InitializeIRDB(const uint32_t netType, Exchange::RemoteControlSuccessResult& result)
     {
         JsonObject params;
         params["netType"] = netType;
@@ -856,7 +856,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::FindMyRemote(const Exchange::FindMyRemoteLevel level, Exchange::SuccessResult& result)
+    Core::hresult RemoteControlImplementation::FindMyRemote(const Exchange::FindMyRemoteLevel level, Exchange::RemoteControlSuccessResult& result)
     {
         if (isValidRequestEnum(level) == false) {
             LOGERR("FindMyRemote requires level.");
@@ -881,7 +881,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::FactoryReset(Exchange::SuccessResult& result)
+    Core::hresult RemoteControlImplementation::FactoryReset(Exchange::RemoteControlSuccessResult& result)
     {
         JsonObject params;
         string jsonParams;
@@ -898,7 +898,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::Unpair(Exchange::SuccessResult& result, Exchange::IStringIterator* const /* macAddressList */)
+    Core::hresult RemoteControlImplementation::Unpair(Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const /* macAddressList */)
     {
         JsonObject params;
         string jsonParams;
@@ -949,7 +949,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::CancelFirmwareUpdate(const string& sessionId, Exchange::SuccessResult& result)
+    Core::hresult RemoteControlImplementation::CancelFirmwareUpdate(const string& sessionId, Exchange::RemoteControlSuccessResult& result)
     {
         JsonObject params;
         params["sessionId"] = sessionId;
