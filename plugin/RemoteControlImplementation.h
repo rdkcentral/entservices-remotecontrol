@@ -93,6 +93,7 @@ namespace Plugin {
         bool _hasOwnProcess;
         uint8_t _handlersRegistered;
 
+        static Core::CriticalSection _instanceLock;
         static RemoteControlImplementation* _instance;
     };
 

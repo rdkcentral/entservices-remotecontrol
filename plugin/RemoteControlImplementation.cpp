@@ -146,6 +146,7 @@ namespace Plugin {
 
     SERVICE_REGISTRATION(RemoteControlImplementation, API_VERSION_NUMBER_MAJOR, API_VERSION_NUMBER_MINOR, API_VERSION_NUMBER_PATCH);
 
+    Core::CriticalSection RemoteControlImplementation::_instanceLock;
     RemoteControlImplementation* RemoteControlImplementation::_instance = nullptr;
 
     RemoteControlImplementation::RemoteControlImplementation()
@@ -155,11 +156,19 @@ namespace Plugin {
         , _hasOwnProcess(false)
         , _handlersRegistered(0)
     {
+        _instanceLock.Lock();
         _instance = this;
+        _instanceLock.Unlock();
     }
 
     RemoteControlImplementation::~RemoteControlImplementation()
     {
+        _instanceLock.Lock();
+        _instance = nullptr;
+        _instanceLock.Unlock();
+
+        DeinitializeIARM();
+
         // Release any still-registered notification observers.
         _adminLock.Lock();
         for (auto* notification : _notifications) {
@@ -169,11 +178,6 @@ namespace Plugin {
         }
         _notifications.clear();
         _adminLock.Unlock();
-
-        // Prevent any in-flight or late IARM callback from dispatching to this
-        // object while teardown is in progress.
-        _instance = nullptr;
-        DeinitializeIARM();
 
         if (_service != nullptr) {
             _service->Release();
@@ -303,11 +307,14 @@ namespace Plugin {
 
     void RemoteControlImplementation::remoteEventHandler(const char* owner, IARM_EventId_t eventId, void* data, size_t len)
     {
-        if (_instance != nullptr) {
-            _instance->iarmEventHandler(owner, eventId, data, len);
+        _instanceLock.Lock();
+        RemoteControlImplementation* instance = _instance;
+        if (instance != nullptr) {
+            instance->iarmEventHandler(owner, eventId, data, len);
         } else {
             LOGWARN("WARNING - cannot handle btremote IARM events without a RemoteControlImplementation instance!");
         }
+        _instanceLock.Unlock();
     }
 
     void RemoteControlImplementation::iarmEventHandler(const char* owner, IARM_EventId_t eventId, void* data, size_t len)
