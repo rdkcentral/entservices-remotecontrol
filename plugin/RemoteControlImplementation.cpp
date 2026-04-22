@@ -496,13 +496,22 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const /* macAddressList */)
+    Core::hresult RemoteControlImplementation::StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const macAddressList)
     {
         JsonObject params;
         params["netType"] = netType;
         params["timeout"] = timeout;
         params["screenBindEnable"] = screenBindEnable;
         params["scanEnable"] = scanEnable;
+
+        if (macAddressList != nullptr) {
+            JsonArray macArray;
+            string mac;
+            while (macAddressList->Next(mac)) {
+                macArray.Add(Core::JSON::Variant(mac));
+            }
+            params["macAddressList"] = macArray;
+        }
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -905,9 +914,19 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::Unpair(Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const /* macAddressList */)
+    Core::hresult RemoteControlImplementation::Unpair(Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const macAddressList)
     {
         JsonObject params;
+
+        if (macAddressList != nullptr) {
+            JsonArray macArray;
+            string mac;
+            while (macAddressList->Next(mac)) {
+                macArray.Add(Core::JSON::Variant(mac));
+            }
+            params["macAddressList"] = macArray;
+        }
+
         string jsonParams;
         params.ToString(jsonParams);
 
