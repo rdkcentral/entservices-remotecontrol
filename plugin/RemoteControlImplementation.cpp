@@ -796,7 +796,7 @@ namespace Plugin {
         params["remoteId"] = remoteId;
         params["netType"] = netType;
         params["avDevType"] = enumToString(avDevType);
-        params["code"] = code;
+        if (!code.empty()) params["code"] = code;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -990,10 +990,10 @@ namespace Plugin {
         sessionIdList = nullptr;
 
         JsonObject params;
-        params["macAddress"] = macAddress;
-        params["fileName"] = fileName;
-        params["fileType"] = fileType;
-        params["percentIncrement"] = percentIncrement;
+        if (!macAddress.empty()) params["macAddress"] = macAddress;
+        if (!fileName.empty()) params["fileName"] = fileName;
+        if (!fileType.empty()) params["fileType"] = fileType;
+        if (percentIncrement != 0) params["percentIncrement"] = percentIncrement;
 
         string jsonParams;
         params.ToString(jsonParams);
