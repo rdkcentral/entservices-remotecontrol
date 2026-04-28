@@ -430,13 +430,17 @@ namespace Plugin {
 
         if (params.HasLabel("status")) {
             JsonObject statusObj = params["status"].Object();
-            progress.sessionId = statusObj.HasLabel("upgradeSessionId") ? statusObj["upgradeSessionId"].String() : "";
-            progress.status.state = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::FAILED) : Exchange::FirmwareUpdateState::FAILED;
+            progress.status.upgradeSessionId = statusObj.HasLabel("upgradeSessionId") ? statusObj["upgradeSessionId"].String() : "";
+            progress.status.macAddress = statusObj.HasLabel("macAddress") ? statusObj["macAddress"].String() : "";
+            progress.status.upgradeState = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::FAILED) : Exchange::FirmwareUpdateState::FAILED;
             progress.status.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
+            progress.status.errorString = statusObj.HasLabel("errorString") ? statusObj["errorString"].String() : "";
         } else {
-            progress.sessionId = "";
-            progress.status.state = Exchange::FirmwareUpdateState::FAILED;
+            progress.status.upgradeSessionId = "";
+            progress.status.macAddress = "";
+            progress.status.upgradeState = Exchange::FirmwareUpdateState::FAILED;
             progress.status.percentComplete = 0;
+            progress.status.errorString = "";
         }
 
         auto observers = ObserverSnapshot();
@@ -1044,11 +1048,11 @@ namespace Plugin {
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_STATUS_FIRMWARE_UPDATE, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
-            response.sessionId = sessionId;
-            response.macAddress.clear();
-            response.state = Exchange::FirmwareUpdateState::FAILED;
-            response.percentComplete = 0;
-            response.error.clear();
+            response.status.upgradeSessionId = sessionId;
+            response.status.macAddress.clear();
+            response.status.upgradeState = Exchange::FirmwareUpdateState::FAILED;
+            response.status.percentComplete = 0;
+            response.status.errorString.clear();
             response.success = false;
             return Core::ERROR_NONE;
         }
@@ -1059,11 +1063,11 @@ namespace Plugin {
             statusObj = result["status"].Object();
         }
 
-        response.sessionId = statusObj.HasLabel("upgradeSessionId") ? statusObj["upgradeSessionId"].String() : sessionId;
-        response.macAddress = statusObj.HasLabel("macAddress") ? statusObj["macAddress"].String() : "";
-        response.state = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::FAILED) : Exchange::FirmwareUpdateState::FAILED;
-        response.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
-        response.error = statusObj.HasLabel("errorString") ? statusObj["errorString"].String() : "";
+        response.status.upgradeSessionId = statusObj.HasLabel("upgradeSessionId") ? statusObj["upgradeSessionId"].String() : sessionId;
+        response.status.macAddress = statusObj.HasLabel("macAddress") ? statusObj["macAddress"].String() : "";
+        response.status.upgradeState = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::FAILED) : Exchange::FirmwareUpdateState::FAILED;
+        response.status.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
+        response.status.errorString = statusObj.HasLabel("errorString") ? statusObj["errorString"].String() : "";
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         return Core::ERROR_NONE;
