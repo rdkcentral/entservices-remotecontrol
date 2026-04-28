@@ -176,7 +176,7 @@ namespace Plugin {
         _adminLock.Lock();
         for (auto* notification : _notifications) {
             if (notification != nullptr) {
-                 notification->Release();
+                notification->Release();
             }
         }
         _notifications.clear();
@@ -197,10 +197,10 @@ namespace Plugin {
         _service->AddRef();
 
         if (InitializeIARM() == false) {
-             LOGERR("Failed to initialize IARM for RemoteControlImplementation, configuration will fail");
-             _service->Release();
-             _service = nullptr;
-             return Core::ERROR_GENERAL;
+            LOGERR("Failed to initialize IARM for RemoteControlImplementation, configuration will fail");
+            _service->Release();
+            _service = nullptr;
+            return Core::ERROR_GENERAL;
         }
         if (Utils::IARM::isConnected() == false) {
             LOGERR("Failed to initialize IARM for RemoteControlImplementation, configuration will fail");
@@ -208,7 +208,7 @@ namespace Plugin {
             _service->Release();
             _service = nullptr;
             return Core::ERROR_GENERAL;
-         }
+        }
         return Core::ERROR_NONE;
     }
 
@@ -218,12 +218,12 @@ namespace Plugin {
     {
         ASSERT(notification != nullptr);
 
-            if (notification == nullptr) {
-                return Core::ERROR_BAD_REQUEST;
-            }
+        if (notification == nullptr) {
+            return Core::ERROR_BAD_REQUEST;
+        }
 
         _adminLock.Lock();
-        auto it = std::find(_notifications.begin(), _notifications.end(), notification);
+        const auto it = std::find(_notifications.begin(), _notifications.end(), notification);
         if (it == _notifications.end()) {
             notification->AddRef();
             _notifications.push_back(notification);
@@ -239,7 +239,7 @@ namespace Plugin {
         }
 
         _adminLock.Lock();
-        auto it = std::find_if(_notifications.begin(), _notifications.end(), [notification](const Exchange::IRemoteControl::INotification* current) {
+        const auto it = std::find_if(_notifications.begin(), _notifications.end(), [notification](const Exchange::IRemoteControl::INotification* current) {
             return current == notification;
         });
         if (it != _notifications.end()) {
@@ -254,7 +254,7 @@ namespace Plugin {
 
     bool RemoteControlImplementation::InitializeIARM()
     {
-        bool alreadyConnected = Utils::IARM::isConnected();
+        const bool alreadyConnected = Utils::IARM::isConnected();
         if (Utils::IARM::init()) {
             _hasOwnProcess = !alreadyConnected;
             IARM_Result_t res;
@@ -460,7 +460,7 @@ namespace Plugin {
     // Returns Core::ERROR_NONE on success, Core::ERROR_GENERAL for allocation failure, or Core::ERROR_RPC_CALL_FAILED if the IARM call itself fails
     Core::hresult RemoteControlImplementation::IARMBusCall(const string& method, const string& jsonParams, JsonObject& result, int timeoutMs)
     {
-        size_t totalsize = sizeof(ctrlm_main_iarm_call_json_t) + jsonParams.size() + 1;
+        const size_t totalsize = sizeof(ctrlm_main_iarm_call_json_t) + jsonParams.size() + 1;
         ctrlm_main_iarm_call_json_t* call = (ctrlm_main_iarm_call_json_t*)calloc(1, totalsize);
 
         if (call == nullptr) {
@@ -469,7 +469,7 @@ namespace Plugin {
         }
 
         call->api_revision = CTRLM_MAIN_IARM_BUS_API_REVISION;
-        size_t len = jsonParams.copy(call->payload, jsonParams.size());
+        const size_t len = jsonParams.copy(call->payload, jsonParams.size());
         call->payload[len] = '\0';
 
         IARM_Result_t res;
