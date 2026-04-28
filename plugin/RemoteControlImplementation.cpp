@@ -133,13 +133,16 @@ namespace Plugin {
             return defaultValue;
         }
 
-        // --- FirmwareUpdateState: ctrlm sends strings like "SUCCESS"/"IDLE"/"ERROR" etc. ---
-        // Maps ctrlm's richer set of states to our three-value enum.
+        // --- FirmwareUpdateState: 1:1 mapping to ctrlm's ctrlm_rcu_upgrade_state_t strings ---
         template <>
         Exchange::FirmwareUpdateState stringToEnum<Exchange::FirmwareUpdateState>(const string& str, Exchange::FirmwareUpdateState defaultValue) {
-            if (str == "DOWNLOADING" || str == "PENDING" || str == "RETRYING") return Exchange::FirmwareUpdateState::DOWNLOADING;
-            if (str == "COMPLETE" || str == "SUCCESS")                         return Exchange::FirmwareUpdateState::COMPLETE;
-            if (str == "FAILED" || str == "ERROR" || str == "CANCELED" || str == "INVALID") return Exchange::FirmwareUpdateState::FAILED;
+            if (str == "SUCCESS")  return Exchange::FirmwareUpdateState::SUCCESS;
+            if (str == "IDLE")     return Exchange::FirmwareUpdateState::IDLE;
+            if (str == "PENDING")  return Exchange::FirmwareUpdateState::PENDING;
+            if (str == "CANCELED") return Exchange::FirmwareUpdateState::CANCELED;
+            if (str == "RETRYING") return Exchange::FirmwareUpdateState::RETRYING;
+            if (str == "ERROR")    return Exchange::FirmwareUpdateState::ERROR;
+            if (str == "INVALID")  return Exchange::FirmwareUpdateState::INVALID;
             return defaultValue;
         }
     } // anonymous namespace
@@ -432,13 +435,13 @@ namespace Plugin {
             JsonObject statusObj = params["status"].Object();
             progress.status.upgradeSessionId = statusObj.HasLabel("upgradeSessionId") ? statusObj["upgradeSessionId"].String() : "";
             progress.status.macAddress = statusObj.HasLabel("macAddress") ? statusObj["macAddress"].String() : "";
-            progress.status.upgradeState = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::FAILED) : Exchange::FirmwareUpdateState::FAILED;
+            progress.status.upgradeState = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::INVALID) : Exchange::FirmwareUpdateState::INVALID;
             progress.status.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
             progress.status.errorString = statusObj.HasLabel("errorString") ? statusObj["errorString"].String() : "";
         } else {
             progress.status.upgradeSessionId = "";
             progress.status.macAddress = "";
-            progress.status.upgradeState = Exchange::FirmwareUpdateState::FAILED;
+            progress.status.upgradeState = Exchange::FirmwareUpdateState::INVALID;
             progress.status.percentComplete = 0;
             progress.status.errorString = "";
         }
@@ -603,14 +606,14 @@ namespace Plugin {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRDBManufacturers requires avDevType.");
             success = false;
-            manufacturers = nullptr;
+            manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
         if (manufacturer.empty()) {
             LOGERR("GetIRDBManufacturers requires a non-empty manufacturer parameter.");
             success = false;
-            manufacturers = nullptr;
+            manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
@@ -625,7 +628,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MANUFACTURERS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            manufacturers = nullptr;
+            manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
@@ -653,7 +656,7 @@ namespace Plugin {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRDBModels requires avDevType.");
             success = false;
-            models = nullptr;
+            models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
@@ -669,7 +672,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MODELS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            models = nullptr;
+            models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
@@ -701,8 +704,8 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_AUTO_LOOKUP, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            tvCodes = nullptr;
-            avrCodes = nullptr;
+            tvCodes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
+            avrCodes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
@@ -742,7 +745,7 @@ namespace Plugin {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRCodesByNames requires avDevType.");
             success = false;
-            codes = nullptr;
+            codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
@@ -758,7 +761,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_CODES, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            codes = nullptr;
+            codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
@@ -1050,7 +1053,7 @@ namespace Plugin {
         if (callResult != Core::ERROR_NONE) {
             response.status.upgradeSessionId = sessionId;
             response.status.macAddress.clear();
-            response.status.upgradeState = Exchange::FirmwareUpdateState::FAILED;
+            response.status.upgradeState = Exchange::FirmwareUpdateState::INVALID;
             response.status.percentComplete = 0;
             response.status.errorString.clear();
             response.success = false;
@@ -1065,7 +1068,7 @@ namespace Plugin {
 
         response.status.upgradeSessionId = statusObj.HasLabel("upgradeSessionId") ? statusObj["upgradeSessionId"].String() : sessionId;
         response.status.macAddress = statusObj.HasLabel("macAddress") ? statusObj["macAddress"].String() : "";
-        response.status.upgradeState = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::FAILED) : Exchange::FirmwareUpdateState::FAILED;
+        response.status.upgradeState = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::INVALID) : Exchange::FirmwareUpdateState::INVALID;
         response.status.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
         response.status.errorString = statusObj.HasLabel("errorString") ? statusObj["errorString"].String() : "";
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
