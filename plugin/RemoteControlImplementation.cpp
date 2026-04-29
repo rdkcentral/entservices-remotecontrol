@@ -216,8 +216,6 @@ namespace Plugin {
 
     Core::hresult RemoteControlImplementation::Register(Exchange::IRemoteControl::INotification* notification)
     {
-        ASSERT(notification != nullptr);
-
         if (notification == nullptr) {
             return Core::ERROR_BAD_REQUEST;
         }
@@ -312,12 +310,13 @@ namespace Plugin {
     {
         _instanceLock.Lock();
         RemoteControlImplementation* instance = _instance;
+        _instanceLock.Unlock();
+
         if (instance != nullptr) {
             instance->iarmEventHandler(owner, eventId, data, len);
         } else {
             LOGWARN("WARNING - cannot handle btremote IARM events without a RemoteControlImplementation instance!");
         }
-        _instanceLock.Unlock();
     }
 
     void RemoteControlImplementation::iarmEventHandler(const char* owner, IARM_EventId_t eventId, void* data, size_t len)
