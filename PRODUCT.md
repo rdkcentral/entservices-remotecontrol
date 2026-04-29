@@ -31,6 +31,14 @@ The RemoteControl service is a comprehensive remote control management solution 
 - **Voice Control Integration**: Support for voice-enabled remotes
 
 ### 5. Factory Reset and Maintenance
+### 5. Firmware Update Management
+- **Start Firmware Update**: Initiate an OTA firmware update session for a specific remote by MAC address; returns a session ID list for tracking
+- **Cancel Firmware Update**: Abort an in-progress firmware update session by session ID
+- **Status Firmware Update**: Query the current state of a firmware update session; returns a nested `status` object with `upgradeSessionId`, `macAddress`, `upgradeState`, `percentComplete`, and optionally `errorString`
+- **Update States**: `SUCCESS`, `IDLE`, `PENDING`, `CANCELED`, `RETRYING`, `ERROR`, `INVALID`
+- **Progress Events**: `onFirmwareUpdateProgress` event emitted as state changes occur, carrying the same nested `status` shape
+
+### 6. Factory Reset and Maintenance
 - **Factory Reset**: Complete remote control configuration reset
 - **Diagnostic Information**: Comprehensive remote status and diagnostic data
 - **Maintenance Operations**: Regular maintenance and optimization tasks
