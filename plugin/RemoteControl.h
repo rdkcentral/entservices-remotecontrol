@@ -83,8 +83,8 @@ namespace Plugin {
             void OnValidation(const Exchange::ValidationStatusObject& status) override {
                 Exchange::JRemoteControl::Event::OnValidation(_parent, status);
             }
-            void OnFirmwareUpdateProgress(const Exchange::FirmwareUpdateProgressEvent& progress) override {
-                Exchange::JRemoteControl::Event::OnFirmwareUpdateProgress(_parent, progress);
+            void OnFirmwareUpdateProgress(const Exchange::FirmwareUpdateStatusData& status) override {
+                Exchange::JRemoteControl::Event::OnFirmwareUpdateProgress(_parent, status);
             }
 
             BEGIN_INTERFACE_MAP(Notification)

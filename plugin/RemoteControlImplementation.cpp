@@ -136,13 +136,13 @@ namespace Plugin {
         // --- FirmwareUpdateState: 1:1 mapping to ctrlm's ctrlm_rcu_upgrade_state_t strings ---
         template <>
         Exchange::FirmwareUpdateState stringToEnum<Exchange::FirmwareUpdateState>(const string& str, Exchange::FirmwareUpdateState defaultValue) {
-            if (str == "SUCCESS")  return Exchange::FirmwareUpdateState::SUCCESS;
-            if (str == "IDLE")     return Exchange::FirmwareUpdateState::IDLE;
-            if (str == "PENDING")  return Exchange::FirmwareUpdateState::PENDING;
-            if (str == "CANCELED") return Exchange::FirmwareUpdateState::CANCELED;
-            if (str == "RETRYING") return Exchange::FirmwareUpdateState::RETRYING;
-            if (str == "ERROR")    return Exchange::FirmwareUpdateState::ERROR;
-            if (str == "INVALID")  return Exchange::FirmwareUpdateState::INVALID;
+            if (str == "success")  return Exchange::FirmwareUpdateState::SUCCESS;
+            if (str == "idle")     return Exchange::FirmwareUpdateState::IDLE;
+            if (str == "pending")  return Exchange::FirmwareUpdateState::PENDING;
+            if (str == "canceled") return Exchange::FirmwareUpdateState::CANCELED;
+            if (str == "retrying") return Exchange::FirmwareUpdateState::RETRYING;
+            if (str == "error")    return Exchange::FirmwareUpdateState::ERROR;
+            if (str == "invalid")  return Exchange::FirmwareUpdateState::INVALID;
             return defaultValue;
         }
     } // anonymous namespace
@@ -176,7 +176,7 @@ namespace Plugin {
         _adminLock.Lock();
         for (auto* notification : _notifications) {
             if (notification != nullptr) {
-                notification->Release();
+                 notification->Release();
             }
         }
         _notifications.clear();
@@ -428,27 +428,27 @@ namespace Plugin {
         JsonObject params;
         params.FromString(eventData->payload);
 
-        Exchange::FirmwareUpdateProgressEvent progress;
+        Exchange::FirmwareUpdateStatusData status;
 
         if (params.HasLabel("status")) {
             JsonObject statusObj = params["status"].Object();
-            progress.status.upgradeSessionId = statusObj.HasLabel("upgradeSessionId") ? statusObj["upgradeSessionId"].String() : "";
-            progress.status.macAddress = statusObj.HasLabel("macAddress") ? statusObj["macAddress"].String() : "";
-            progress.status.upgradeState = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::INVALID) : Exchange::FirmwareUpdateState::INVALID;
-            progress.status.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
-            progress.status.errorString = statusObj.HasLabel("errorString") ? statusObj["errorString"].String() : "";
+            status.upgradeSessionId = statusObj.HasLabel("upgradeSessionId") ? statusObj["upgradeSessionId"].String() : "";
+            status.macAddress = statusObj.HasLabel("macAddress") ? statusObj["macAddress"].String() : "";
+            status.upgradeState = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::INVALID) : Exchange::FirmwareUpdateState::INVALID;
+            status.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
+            status.errorString = statusObj.HasLabel("errorString") ? statusObj["errorString"].String() : "";
         } else {
-            progress.status.upgradeSessionId = "";
-            progress.status.macAddress = "";
-            progress.status.upgradeState = Exchange::FirmwareUpdateState::INVALID;
-            progress.status.percentComplete = 0;
-            progress.status.errorString = "";
+            status.upgradeSessionId = "";
+            status.macAddress = "";
+            status.upgradeState = Exchange::FirmwareUpdateState::INVALID;
+            status.percentComplete = 0;
+            status.errorString = "";
         }
 
         auto observers = ObserverSnapshot();
 
         for (auto* notification : observers) {
-            notification->OnFirmwareUpdateProgress(progress);
+            notification->OnFirmwareUpdateProgress(status);
         }
 
         ReleaseObserverSnapshot(observers);
