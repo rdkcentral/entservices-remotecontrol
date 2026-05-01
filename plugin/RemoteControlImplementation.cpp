@@ -384,15 +384,17 @@ namespace Plugin {
         params.FromString(eventData->payload);
 
         Exchange::StatusEventData status;
-        status.netType = params.HasLabel("netType") ? static_cast<uint32_t>(params["netType"].Number()) : 0;
-        status.netTypeSupported = params.HasLabel("netTypeSupported") ? params["netTypeSupported"].Boolean() : false;
 
         JsonObject statusObj;
         if (params.HasLabel("status")) {
             statusObj = params["status"].Object();
         }
+
+        status.netType = statusObj.HasLabel("netType") ? static_cast<uint32_t>(statusObj["netType"].Number()) : (params.HasLabel("netType") ? static_cast<uint32_t>(params["netType"].Number()) : 0);
         status.pairingState = statusObj.HasLabel("pairingState") ? stringToEnum<Exchange::PairingState>(statusObj["pairingState"].String(), Exchange::PairingState::IDLE) : Exchange::PairingState::IDLE;
         status.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
+        status.netTypesSupported = statusObj.HasLabel("netTypesSupported") ? jsonValueToString(statusObj["netTypesSupported"]) : "[]";
+        status.remoteData = statusObj.HasLabel("remoteData") ? jsonValueToString(statusObj["remoteData"]) : "[]";
 
         auto observers = ObserverSnapshot();
 
