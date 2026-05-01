@@ -383,7 +383,7 @@ namespace Plugin {
         JsonObject params;
         params.FromString(eventData->payload);
 
-        Exchange::StatusEventData status;
+        Exchange::NetStatusData status;
 
         JsonObject statusObj;
         if (params.HasLabel("status")) {

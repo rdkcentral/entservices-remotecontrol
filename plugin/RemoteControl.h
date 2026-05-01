@@ -77,7 +77,7 @@ namespace Plugin {
             explicit Notification(RemoteControl* parent) : _parent(*parent) {}
             ~Notification() override = default;
 
-            void OnStatus(const Exchange::StatusEventData& status) override {
+            void OnStatus(const Exchange::NetStatusData& status) override {
                 Exchange::JRemoteControl::Event::OnStatus(_parent, status);
             }
             void OnValidation(const Exchange::ValidationStatusObject& status) override {
