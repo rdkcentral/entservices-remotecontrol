@@ -47,6 +47,18 @@ namespace Plugin {
             return value.String();
         }
 
+        // Logs an error if 'value' exceeds the COM-RPC @restrict limit for 
+        // 'fieldName'. The limit must match the @restrict annotation on the
+        // corresponding parameter in IRemoteControl.h so that the generated proxy
+        // stub's SetText<T> cast never silently discards bytes.
+        void checkRestrictLimit(string& value, size_t limit, const char* fieldName)
+        {
+            if (value.size() > limit) {
+                LOGERR("COM-RPC field '%s' exceeds @restrict limit: %zu > %zu bytes — truncating", fieldName, value.size(), limit);
+                value.resize(limit);
+            }
+        }
+
         // --- WakeupConfig: ctrlm expects lowercase "all"/"none"/"custom" ---
         template <>
         const char* enumToString<Exchange::WakeupConfig>(Exchange::WakeupConfig value) {
@@ -396,6 +408,11 @@ namespace Plugin {
         status.netTypesSupported = statusObj.HasLabel("netTypesSupported") ? jsonValueToString(statusObj["netTypesSupported"]) : "[]";
         status.remoteData = statusObj.HasLabel("remoteData") ? jsonValueToString(statusObj["remoteData"]) : "[]";
 
+        // NetStatusData.netTypesSupported and .remoteData are @opaque with no @restrict —
+        // default uint16_t SetText limit is 65535 bytes.
+        checkRestrictLimit(status.netTypesSupported, 65535, "NetStatusData.netTypesSupported");
+        checkRestrictLimit(status.remoteData,        65535, "NetStatusData.remoteData");
+
         auto observers = ObserverSnapshot();
 
         for (auto* notification : observers) {
@@ -595,6 +612,11 @@ namespace Plugin {
         result.status.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
         result.status.netTypesSupported = statusObj.HasLabel("netTypesSupported") ? jsonValueToString(statusObj["netTypesSupported"]) : "[]";
         result.status.remoteData = statusObj.HasLabel("remoteData") ? jsonValueToString(statusObj["remoteData"]) : "[]";
+
+        // NetStatusData.netTypesSupported and .remoteData are @opaque with no @restrict —
+        // default uint16_t SetText limit is 65535 bytes.
+        checkRestrictLimit(result.status.netTypesSupported, 65535, "NetStatusData.netTypesSupported");
+        checkRestrictLimit(result.status.remoteData,        65535, "NetStatusData.remoteData");
 
         return Core::ERROR_NONE;
     }
