@@ -521,19 +521,17 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartPairing(const uint32_t netType, const uint32_t timeout, const bool screenBindEnable, const bool scanEnable, Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const macAddressList)
+    Core::hresult RemoteControlImplementation::StartPairing(const string& payload, Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const macAddressList)
     {
-        LOGINFO("params: netType=%u, timeout=%u, screenBindEnable=%s, scanEnable=%s, macAddressList=%s",
-                netType, timeout,
-                screenBindEnable ? "true" : "false",
-                scanEnable ? "true" : "false",
+        LOGINFO("params: payload=%s, macAddressList=%s",
+                payload.empty() ? "{}" : payload.c_str(),
                 (macAddressList != nullptr) ? "<provided>" : "<not set>");
-        JsonObject params;
-        params["netType"] = netType;
-        params["timeout"] = timeout;
-        params["screenBindEnable"] = screenBindEnable;
-        params["scanEnable"] = scanEnable;
 
+        // Pass the caller's JSON through unchanged — all fields (including netType, timeout) must be present in payload.
+        JsonObject params;
+        if (!payload.empty()) {
+            params.FromString(payload);
+        }
         if (macAddressList != nullptr) {
             JsonArray macArray;
             string mac;
@@ -553,21 +551,15 @@ namespace Plugin {
             return Core::ERROR_NONE;
         }
 
-        result.success = iarmResult["success"].Boolean();
+        result.success = iarmResult.HasLabel("success") ? iarmResult["success"].Boolean() : false;
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StopPairing(const bool screenBindDisable, const bool scanDisable, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::StopPairing(const string& payload, Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: screenBindDisable=%s, scanDisable=%s",
-                screenBindDisable ? "true" : "false",
-                scanDisable ? "true" : "false");
-        JsonObject params;
-        params["screenBindDisable"] = screenBindDisable;
-        params["scanDisable"] = scanDisable;
-
-        string jsonParams;
-        params.ToString(jsonParams);
+        LOGINFO("params: payload=%s", payload.empty() ? "{}" : payload.c_str());
+        // Pass the caller's JSON through unchanged — preserves all optional fields exactly as provided.
+        const string& jsonParams = payload.empty() ? string("{}") : payload;
 
         JsonObject iarmResult;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_STOP_PAIRING, jsonParams, iarmResult);
@@ -576,7 +568,7 @@ namespace Plugin {
             return Core::ERROR_NONE;
         }
 
-        result.success = iarmResult["success"].Boolean();
+        result.success = iarmResult.HasLabel("success") ? iarmResult["success"].Boolean() : false;
         return Core::ERROR_NONE;
     }
 
@@ -788,7 +780,10 @@ namespace Plugin {
             return Core::ERROR_NONE;
         }
 
+        // Always set all mandatory output parameters
         avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
+        manufacturer = result.HasLabel("manufacturer") ? result["manufacturer"].String() : manufacturer;
+        model = result.HasLabel("model") ? result["model"].String() : model;
         success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         std::list<string> codeList;
