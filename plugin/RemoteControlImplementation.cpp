@@ -789,9 +789,11 @@ namespace Plugin {
 
         std::list<string> codeList;
         if (result.HasLabel("codes")) {
+            LOGINFO("Parsed %zu codes from IARM response", codeList.size());
             auto arr = result["codes"].Array();
             for (uint16_t i = 0; i < arr.Length(); i++) {
                 codeList.push_back(arr[i].String());
+                LOGINFO("IR code: %s", arr[i].String().c_str());
             }
         }
         codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(codeList);
