@@ -774,7 +774,9 @@ namespace Plugin {
 
         JsonObject result;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_CODES, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
-        LOGINFO("IARM response for GetIRCodesByNames: %s", result.ToString().c_str());
+        string resultStr;
+        result.ToString(resultStr);
+        LOGINFO("IARM response for GetIRCodesByNames: %s", resultStr.c_str());
         if (callResult != Core::ERROR_NONE) {
             success = false;
             codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
