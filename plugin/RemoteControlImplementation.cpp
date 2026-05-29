@@ -751,7 +751,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRCodesByNames(Exchange::AVDevType& avDevType, string& manufacturer, string& model, bool& success, Exchange::IStringIterator*& codes)
+    Core::hresult RemoteControlImplementation::GetIRCodesByNames(Exchange::AVDevType& avDevType, string& manufacturer, string& model, bool& success, string& codes)
     {
         LOGINFO("params: avDevType=%s, manufacturer=%s, model=%s",
                 enumToString(avDevType),
@@ -760,7 +760,7 @@ namespace Plugin {
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRCodesByNames requires avDevType.");
             success = false;
-            codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
+            codes = "[]";
             return Core::ERROR_NONE;
         }
 
@@ -779,7 +779,7 @@ namespace Plugin {
         LOGINFO("IARM response for GetIRCodesByNames: %s", resultStr.c_str());
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
+            codes = "[]";
             return Core::ERROR_NONE;
         }
 
@@ -789,16 +789,15 @@ namespace Plugin {
         model = result.HasLabel("model") ? result["model"].String() : model;
         success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
-        std::list<string> codeList;
+        JsonArray codesArray;
         if (result.HasLabel("codes")) {
-            LOGINFO("Parsed %zu codes from the IARM response", codeList.size());
             auto arr = result["codes"].Array();
             for (uint16_t i = 0; i < arr.Length(); i++) {
-                codeList.push_back(arr[i].String());
+                codesArray.Add(Core::JSON::Variant(arr[i].String()));
                 LOGINFO("IR code: %s", arr[i].String().c_str());
             }
         }
-        codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(codeList);
+        codesArray.ToString(codes);
 
         return Core::ERROR_NONE;
     }
