@@ -52,7 +52,7 @@ namespace Plugin {
         Core::hresult GetIRDBManufacturers(Exchange::AVDevType& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers) override;
         Core::hresult GetIRDBModels(Exchange::AVDevType& avDevType, string& manufacturer, const string& model, bool& success, Exchange::IStringIterator*& models) override;
         Core::hresult GetIRCodesByAutoLookup(const uint32_t netType, string& tvManufacturer, string& tvModel, string& avrManufacturer, string& avrModel, bool& success, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
-        Core::hresult GetIRCodesByNames(Exchange::AVDevType& avDevType, string& manufacturer, string& model, bool& success, Exchange::IStringIterator*& codes) override;
+        Core::hresult GetIRCodesByNames(Exchange::AVDevType& avDevType, string& manufacturer, string& model, bool& success, string& codes) override;
         Core::hresult SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult ClearIRCodes(const uint32_t remoteId, const uint32_t netType, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult GetLastKeypressSource(Exchange::GetLastKeypressSourceResponse& response) override;
