@@ -64,9 +64,8 @@ curl --header "Content-Type: application/json" --request POST --data '{"jsonrpc"
 # Get network status
 curl -d '{"jsonrpc":"2.0","id":"5","method":"org.rdk.RemoteControl.1.getNetStatus"}' http://127.0.0.1:9998/jsonrpc
 
-# Get IR database manufacturers
-# Get IR database manufacturers (netType, avDevType, and manufacturer are required)
-curl -d '{"jsonrpc":"2.0","id":"6","method":"org.rdk.RemoteControl.1.getIRDBManufacturers","params":{"netType":1,"avDevType":"TV","manufacturer":"Sam"}}' http://127.0.0.1:9998/jsonrpc
+# Get IR database manufacturers (avDevType and manufacturer are required)
+curl -d '{"jsonrpc":"2.0","id":"6","method":"org.rdk.RemoteControl.1.getIRDBManufacturers","params":{"avDevType":"TV","manufacturer":"Sam"}}' http://127.0.0.1:9998/jsonrpc
 ```
 
 ### Test Client
