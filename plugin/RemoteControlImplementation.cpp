@@ -719,6 +719,10 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_AUTO_LOOKUP, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
             success = false;
+            tvManufacturer.clear();
+            tvModel.clear();
+            avrManufacturer.clear();
+            avrModel.clear();
             tvCodes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             avrCodes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
