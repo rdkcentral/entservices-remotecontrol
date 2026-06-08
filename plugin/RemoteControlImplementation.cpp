@@ -1024,6 +1024,7 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_START_FIRMWARE_UPDATE, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             success = false;
+            sessionIdList = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
