@@ -107,7 +107,7 @@ The RemoteControl plugin uses WPE Framework's out-of-process COM-RPC architectur
 4. **Hardware Interaction**: ctrlm interfaces with remote control hardware.
 5. **Response**: Result returned through COM-RPC back to the plugin and formatted as a JSON-RPC response.
 
-For events (e.g. `onFirmwareUpdateProgress`, `onControl`):
+For events (e.g. `onStatus`, `onValidation`, `onFirmwareUpdateProgress`):
 1. ctrlm broadcasts an IARM event.
 2. `RemoteControlImplementation` receives it and calls `Notify*` on each COM-RPC `INotification` observer.
 3. The `Notification` inner class in `RemoteControl.h` calls `Exchange::JRemoteControl::Event::On*`.
