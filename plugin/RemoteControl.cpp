@@ -101,11 +101,11 @@ namespace Plugin {
                      _configure = nullptr;
                  }
                  RPC::IRemoteConnection* connection = service->RemoteConnection(_connectionId);
-                 VARIABLE_IS_NOT_USED uint32_t result = _implementation->Release();
+                 const uint32_t refCount = _implementation->Release();
                  _implementation = nullptr;
-                 if (result != Core::ERROR_DESTRUCTION_SUCCEEDED)
+                 if (refCount != 0)
                  {
-                     LOGWARN("RemoteControl implementation release returned %u during initialization rollback; proceeding with remote connection termination.", result);
+                     LOGWARN("RemoteControl implementation refCount after Release is %u during initialization rollback (expected 0); proceeding with remote connection termination.", refCount);
                  }
                  if (connection != nullptr) {
                      connection->Terminate();
@@ -138,11 +138,11 @@ namespace Plugin {
             }
 
             RPC::IRemoteConnection* connection = service->RemoteConnection(_connectionId);
-            VARIABLE_IS_NOT_USED uint32_t result = _implementation->Release();
+            const uint32_t refCount = _implementation->Release();
             _implementation = nullptr;
-            if (result != Core::ERROR_DESTRUCTION_SUCCEEDED)
+            if (refCount != 0)
             {
-                LOGWARN("RemoteControl implementation release returned %u during shutdown; proceeding with remote connection termination.", result);
+                LOGWARN("RemoteControl implementation refCount after Release is %u during shutdown (expected 0); proceeding with remote connection termination.", refCount);
             }
 
             if (connection != nullptr)
