@@ -1,13 +1,12 @@
+# This workflow is disabled for now
 name: update changelog and api version
 
 on:
   push:
-    branches: [ main, 'release/**' ]
-    paths-ignore: ['docs/**', 'Tests/**', 'Tools/**', '.github/**']
+    branches-ignore: ['**']
 
   pull_request:
-    branches: [ main, 'release/**' ]
-    paths-ignore: ['docs/**', 'Tests/**', 'Tools/**', '.github/**']
+    branches-ignore: ['**']
 
 
 jobs:
