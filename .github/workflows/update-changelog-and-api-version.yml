@@ -2,11 +2,7 @@
 name: update changelog and api version
 
 on:
-  push:
-    branches-ignore: ['**']
-
-  pull_request:
-    branches-ignore: ['**']
+  workflow_dispatch:
 
 
 jobs:
