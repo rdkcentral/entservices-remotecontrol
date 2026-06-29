@@ -239,7 +239,9 @@ namespace Plugin {
             response["success"] = result.success;
         }
 
-        LOGINFO("startPairing result: hr=%u success=%s", hr, (hr == Core::ERROR_NONE && result.success) ? "true" : "false");
+        string responseStr;
+        response.ToString(responseStr);
+        LOGINFO("startPairing result: hr=%u response=%s", hr, responseStr.c_str());
 
         return hr;
     }
@@ -279,7 +281,9 @@ namespace Plugin {
             response["success"] = result.success;
         }
 
-        LOGINFO("stopPairing result: hr=%u success=%s", hr, (hr == Core::ERROR_NONE && result.success) ? "true" : "false");
+        string responseStr;
+        response.ToString(responseStr);
+        LOGINFO("stopPairing result: hr=%u response=%s", hr, responseStr.c_str());
 
         return hr;
     }
