@@ -89,6 +89,11 @@ namespace Plugin {
                     // COM-RPC backend still receives the internal opaque payload string.
                     Unregister("startPairing");
                     Register("startPairing", &RemoteControl::StartPairingCompat, this);
+
+                    // Override generated stopPairing marshalling for the same reason:
+                    // keep payload internal and accept only top-level JSON-RPC params.
+                    Unregister("stopPairing");
+                    Register("stopPairing", &RemoteControl::StopPairingCompat, this);
                 }
             }
         }
@@ -187,6 +192,11 @@ namespace Plugin {
             return Core::ERROR_UNAVAILABLE;
         }
 
+        if (parameters.HasLabel("payload")) {
+            LOGERR("startPairing does not accept 'payload'; provide fields at top-level params.");
+            return Core::ERROR_BAD_REQUEST;
+        }
+
         JsonObject payloadObj;
 
         // Preserve optionality by copying only labels that are actually present in
@@ -194,7 +204,7 @@ namespace Plugin {
         JsonObject::Iterator it = parameters.Variants();
         while (it.Next()) {
             const string label = it.Label();
-            if (label != "macAddressList") {
+            if ((label != "macAddressList") && (label != "payload")) {
                 payloadObj[label] = it.Current();
             }
         }
@@ -218,6 +228,40 @@ namespace Plugin {
         if (macIter != nullptr) {
             macIter->Release();
         }
+
+        if (hr == Core::ERROR_NONE) {
+            response["success"] = result.success;
+        }
+
+        return hr;
+    }
+
+    uint32_t RemoteControl::StopPairingCompat(const JsonObject& parameters, JsonObject& response)
+    {
+        if (_implementation == nullptr) {
+            return Core::ERROR_UNAVAILABLE;
+        }
+
+        if (parameters.HasLabel("payload")) {
+            LOGERR("stopPairing does not accept 'payload'; provide fields at top-level params.");
+            return Core::ERROR_BAD_REQUEST;
+        }
+
+        JsonObject payloadObj;
+
+        JsonObject::Iterator it = parameters.Variants();
+        while (it.Next()) {
+            const string label = it.Label();
+            if (label != "payload") {
+                payloadObj[label] = it.Current();
+            }
+        }
+
+        string payload;
+        payloadObj.ToString(payload);
+
+        Exchange::RemoteControlSuccessResult result{};
+        const uint32_t hr = _implementation->StopPairing(payload, result);
 
         if (hr == Core::ERROR_NONE) {
             response["success"] = result.success;
