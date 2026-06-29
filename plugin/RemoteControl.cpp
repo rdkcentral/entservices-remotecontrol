@@ -21,6 +21,8 @@
 #include "PluginVersion.h"
 #include "UtilsLogging.h"
 
+#include <list>
+
 namespace WPEFramework {
 
     namespace {
@@ -82,6 +84,11 @@ namespace Plugin {
                 else
                 {
                     Exchange::JRemoteControl::Register(*this, _implementation);
+                    // Override generated startPairing marshalling so JSON-RPC callers can
+                    // provide top-level optional fields (for example timeout) while the
+                    // COM-RPC backend still receives the internal opaque payload string.
+                    Unregister("startPairing");
+                    Register("startPairing", &RemoteControl::StartPairingCompat, this);
                 }
             }
         }
@@ -172,6 +179,51 @@ namespace Plugin {
                 _service->Release();
             }
         }
+    }
+
+    uint32_t RemoteControl::StartPairingCompat(const JsonObject& parameters, JsonObject& response)
+    {
+        if (_implementation == nullptr) {
+            return Core::ERROR_UNAVAILABLE;
+        }
+
+        JsonObject payloadObj;
+
+        // Preserve optionality by copying only labels that are actually present in
+        // the JSON-RPC request. Keep macAddressList separate as iterator transport.
+        JsonObject::Iterator it = parameters.Variants();
+        while (it.Next()) {
+            const string label = it.Label();
+            if (label != "macAddressList") {
+                payloadObj[label] = it.Current();
+            }
+        }
+
+        string payload;
+        payloadObj.ToString(payload);
+
+        Exchange::IStringIterator* macIter = nullptr;
+        std::list<string> macList;
+        if (parameters.HasLabel("macAddressList")) {
+            auto arr = parameters["macAddressList"].Array();
+            for (uint16_t i = 0; i < arr.Length(); i++) {
+                macList.push_back(arr[i].String());
+            }
+            macIter = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(macList);
+        }
+
+        Exchange::RemoteControlSuccessResult result{};
+        const uint32_t hr = _implementation->StartPairing(payload, result, macIter);
+
+        if (macIter != nullptr) {
+            macIter->Release();
+        }
+
+        if (hr == Core::ERROR_NONE) {
+            response["success"] = result.success;
+        }
+
+        return hr;
     }
 
 } // namespace Plugin
