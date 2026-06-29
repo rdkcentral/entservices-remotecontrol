@@ -143,6 +143,8 @@ namespace Plugin {
         {
             _implementation->Unregister(&_notification);
             Exchange::JRemoteControl::Unregister(*this);
+            Unregister("startPairing");
+            Unregister("stopPairing");
 
             if (_configure != nullptr) {
                 _configure->Release();
@@ -192,6 +194,10 @@ namespace Plugin {
             return Core::ERROR_UNAVAILABLE;
         }
 
+        string paramsStr;
+        parameters.ToString(paramsStr);
+        LOGINFO("startPairing params=%s", paramsStr.c_str());
+
         if (parameters.HasLabel("payload")) {
             LOGERR("startPairing does not accept 'payload'; provide fields at top-level params.");
             return Core::ERROR_BAD_REQUEST;
@@ -233,6 +239,8 @@ namespace Plugin {
             response["success"] = result.success;
         }
 
+        LOGINFO("startPairing result: hr=%u success=%s", hr, (hr == Core::ERROR_NONE && result.success) ? "true" : "false");
+
         return hr;
     }
 
@@ -241,6 +249,10 @@ namespace Plugin {
         if (_implementation == nullptr) {
             return Core::ERROR_UNAVAILABLE;
         }
+
+        string paramsStr;
+        parameters.ToString(paramsStr);
+        LOGINFO("stopPairing params=%s", paramsStr.c_str());
 
         if (parameters.HasLabel("payload")) {
             LOGERR("stopPairing does not accept 'payload'; provide fields at top-level params.");
@@ -266,6 +278,8 @@ namespace Plugin {
         if (hr == Core::ERROR_NONE) {
             response["success"] = result.success;
         }
+
+        LOGINFO("stopPairing result: hr=%u success=%s", hr, (hr == Core::ERROR_NONE && result.success) ? "true" : "false");
 
         return hr;
     }
