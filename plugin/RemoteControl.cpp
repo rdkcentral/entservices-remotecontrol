@@ -205,7 +205,7 @@ namespace Plugin {
         while (it.Next()) {
             const string label = it.Label();
             if ((label != "macAddressList") && (label != "payload")) {
-                payloadObj[label] = it.Current();
+                payloadObj[label.c_str()] = it.Current();
             }
         }
 
@@ -253,7 +253,7 @@ namespace Plugin {
         while (it.Next()) {
             const string label = it.Label();
             if (label != "payload") {
-                payloadObj[label] = it.Current();
+                payloadObj[label.c_str()] = it.Current();
             }
         }
 
