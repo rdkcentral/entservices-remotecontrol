@@ -198,11 +198,6 @@ namespace Plugin {
         parameters.ToString(paramsStr);
         LOGINFO("startPairing params=%s", paramsStr.c_str());
 
-        if (parameters.HasLabel("payload")) {
-            LOGERR("startPairing does not accept 'payload'; provide fields at top-level params.");
-            return Core::ERROR_BAD_REQUEST;
-        }
-
         JsonObject payloadObj;
 
         // Preserve optionality by copying only labels that are actually present in
@@ -210,7 +205,7 @@ namespace Plugin {
         JsonObject::Iterator it = parameters.Variants();
         while (it.Next()) {
             const string label = it.Label();
-            if ((label != "macAddressList") && (label != "payload")) {
+            if (label != "macAddressList") {
                 payloadObj[label.c_str()] = it.Current();
             }
         }
@@ -256,19 +251,12 @@ namespace Plugin {
         parameters.ToString(paramsStr);
         LOGINFO("stopPairing params=%s", paramsStr.c_str());
 
-        if (parameters.HasLabel("payload")) {
-            LOGERR("stopPairing does not accept 'payload'; provide fields at top-level params.");
-            return Core::ERROR_BAD_REQUEST;
-        }
-
         JsonObject payloadObj;
 
         JsonObject::Iterator it = parameters.Variants();
         while (it.Next()) {
             const string label = it.Label();
-            if (label != "payload") {
-                payloadObj[label.c_str()] = it.Current();
-            }
+            payloadObj[label.c_str()] = it.Current();
         }
 
         string payload;
