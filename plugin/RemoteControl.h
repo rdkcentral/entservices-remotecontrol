@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Module.h"
+#include "UtilsLogging.h"
 #include <interfaces/IRemoteControl.h>
 #include <interfaces/json/JRemoteControl.h>
 #include <interfaces/IConfiguration.h>
