@@ -251,17 +251,8 @@ namespace Plugin {
         parameters.ToString(paramsStr);
         LOGINFO("stopPairing params=%s", paramsStr.c_str());
 
-        JsonObject payloadObj;
-
-        JsonObject::Iterator it = parameters.Variants();
-        while (it.Next()) {
-            const string label = it.Label();
-            payloadObj[label.c_str()] = it.Current();
-        }
-
         string payload;
-        payloadObj.ToString(payload);
-
+        parameters.ToString(payload);
         Exchange::RemoteControlSuccessResult result{};
         const uint32_t hr = _implementation->StopPairing(payload, result);
 
