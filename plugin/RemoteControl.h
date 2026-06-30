@@ -55,9 +55,6 @@ namespace Plugin {
         string Information() const override { return {}; }
 
     private:
-        uint32_t StartPairingCompat(const JsonObject& parameters, JsonObject& response);
-        uint32_t StopPairingCompat(const JsonObject& parameters, JsonObject& response);
-
         class ConnectionNotification : public RPC::IRemoteConnection::INotification {
         public:
             explicit ConnectionNotification(RemoteControl* parent) : _parent(*parent) {}

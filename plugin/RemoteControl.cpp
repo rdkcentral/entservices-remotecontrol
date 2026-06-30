@@ -87,12 +87,87 @@ namespace Plugin {
                     // provide top-level optional fields (for example timeout) while the
                     // COM-RPC backend still receives the internal opaque payload string.
                     Unregister("startPairing");
-                    Register("startPairing", &RemoteControl::StartPairingCompat, this);
+                    Register<JsonObject, JsonObject>("startPairing",
+                        [this](const JsonObject& parameters, JsonObject& response) -> uint32_t {
+                            if (_implementation == nullptr) {
+                                return Core::ERROR_UNAVAILABLE;
+                            }
+
+                            string paramsStr;
+                            parameters.ToString(paramsStr);
+                            LOGINFO("startPairing params=%s", paramsStr.c_str());
+
+                            JsonObject payloadObj;
+
+                            // Preserve optionality by copying only labels that are actually present in
+                            // the JSON-RPC request. Keep macAddressList separate as iterator transport.
+                            JsonObject::Iterator it = parameters.Variants();
+                            while (it.Next()) {
+                                const string label = it.Label();
+                                if (label != "macAddressList") {
+                                    payloadObj[label.c_str()] = it.Current();
+                                }
+                            }
+
+                            string payload;
+                            payloadObj.ToString(payload);
+
+                            Exchange::IStringIterator* macIter = nullptr;
+                            std::list<string> macList;
+                            if (parameters.HasLabel("macAddressList")) {
+                                auto arr = parameters["macAddressList"].Array();
+                                for (uint16_t i = 0; i < arr.Length(); i++) {
+                                    macList.push_back(arr[i].String());
+                                }
+                                macIter = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(macList);
+                            }
+
+                            Exchange::RemoteControlSuccessResult result{};
+                            const uint32_t hr = _implementation->StartPairing(payload, result, macIter);
+
+                            if (macIter != nullptr) {
+                                macIter->Release();
+                            }
+
+                            if (hr == Core::ERROR_NONE) {
+                                response["success"] = result.success;
+                            }
+
+                            string responseStr;
+                            response.ToString(responseStr);
+                            LOGINFO("startPairing result: hr=%u response=%s", hr, responseStr.c_str());
+
+                            return hr;
+                        });
 
                     // Override generated stopPairing marshalling for the same reason:
                     // keep payload internal and accept only top-level JSON-RPC params.
                     Unregister("stopPairing");
-                    Register("stopPairing", &RemoteControl::StopPairingCompat, this);
+                    Register<JsonObject, JsonObject>("stopPairing",
+                        [this](const JsonObject& parameters, JsonObject& response) -> uint32_t {
+                            if (_implementation == nullptr) {
+                                return Core::ERROR_UNAVAILABLE;
+                            }
+
+                            string paramsStr;
+                            parameters.ToString(paramsStr);
+                            LOGINFO("stopPairing params=%s", paramsStr.c_str());
+
+                            string payload;
+                            parameters.ToString(payload);
+                            Exchange::RemoteControlSuccessResult result{};
+                            const uint32_t hr = _implementation->StopPairing(payload, result);
+
+                            if (hr == Core::ERROR_NONE) {
+                                response["success"] = result.success;
+                            }
+
+                            string responseStr;
+                            response.ToString(responseStr);
+                            LOGINFO("stopPairing result: hr=%u response=%s", hr, responseStr.c_str());
+
+                            return hr;
+                        });
                 }
             }
         }
@@ -185,85 +260,6 @@ namespace Plugin {
                 _service->Release();
             }
         }
-    }
-
-    uint32_t RemoteControl::StartPairingCompat(const JsonObject& parameters, JsonObject& response)
-    {
-        if (_implementation == nullptr) {
-            return Core::ERROR_UNAVAILABLE;
-        }
-
-        string paramsStr;
-        parameters.ToString(paramsStr);
-        LOGINFO("startPairing params=%s", paramsStr.c_str());
-
-        JsonObject payloadObj;
-
-        // Preserve optionality by copying only labels that are actually present in
-        // the JSON-RPC request. Keep macAddressList separate as iterator transport.
-        JsonObject::Iterator it = parameters.Variants();
-        while (it.Next()) {
-            const string label = it.Label();
-            if (label != "macAddressList") {
-                payloadObj[label.c_str()] = it.Current();
-            }
-        }
-
-        string payload;
-        payloadObj.ToString(payload);
-
-        Exchange::IStringIterator* macIter = nullptr;
-        std::list<string> macList;
-        if (parameters.HasLabel("macAddressList")) {
-            auto arr = parameters["macAddressList"].Array();
-            for (uint16_t i = 0; i < arr.Length(); i++) {
-                macList.push_back(arr[i].String());
-            }
-            macIter = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(macList);
-        }
-
-        Exchange::RemoteControlSuccessResult result{};
-        const uint32_t hr = _implementation->StartPairing(payload, result, macIter);
-
-        if (macIter != nullptr) {
-            macIter->Release();
-        }
-
-        if (hr == Core::ERROR_NONE) {
-            response["success"] = result.success;
-        }
-
-        string responseStr;
-        response.ToString(responseStr);
-        LOGINFO("startPairing result: hr=%u response=%s", hr, responseStr.c_str());
-
-        return hr;
-    }
-
-    uint32_t RemoteControl::StopPairingCompat(const JsonObject& parameters, JsonObject& response)
-    {
-        if (_implementation == nullptr) {
-            return Core::ERROR_UNAVAILABLE;
-        }
-
-        string paramsStr;
-        parameters.ToString(paramsStr);
-        LOGINFO("stopPairing params=%s", paramsStr.c_str());
-
-        string payload;
-        parameters.ToString(payload);
-        Exchange::RemoteControlSuccessResult result{};
-        const uint32_t hr = _implementation->StopPairing(payload, result);
-
-        if (hr == Core::ERROR_NONE) {
-            response["success"] = result.success;
-        }
-
-        string responseStr;
-        response.ToString(responseStr);
-        LOGINFO("stopPairing result: hr=%u response=%s", hr, responseStr.c_str());
-
-        return hr;
     }
 
 } // namespace Plugin
