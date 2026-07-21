@@ -43,12 +43,23 @@ git clone --depth 1 --branch feature/RDKEMW-21327 https://github.com/rdkcentral/
 
 git clone --depth 1 --branch $CTRLM_TAG https://github.com/rdkcentral/control.git
 
+git clone --depth 1 https://github.com/rdkcentral/meta-rdk-video.git
+
 git clone --depth 1 https://github.com/rdkcentral/entservices-testframework.git
 
 ############################
 # Build Thunder-Tools
 echo "======================================================================================"
 echo "building thunderTools"
+
+cd ThunderTools
+patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0001-Change-MODULE-PATH.patch
+patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0002-Change-namespace-Proxystub-Json-Generator.patch
+patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0003-Callsign-not-generated-Json-Generator.patch
+patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0004-Add-support-for-project-dir.patch
+patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0005-jsongenerator_fallback_length_validation_fix.patch
+patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0006-Autostart-startmode-deactivated.patch
+cd -
 
 
 cmake -G Ninja -S ThunderTools -B build/ThunderTools \
