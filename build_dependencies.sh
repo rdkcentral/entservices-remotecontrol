@@ -75,6 +75,11 @@ cmake --build build/ThunderTools --target install
 echo "======================================================================================"
 echo "building thunder"
 
+cd Thunder
+patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework/0001-Backward-compatibility-cmake-function-thunder-r4.patch
+patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework/0002-PersistentPath-thunder-r5.patch
+cd -
+
 cmake -G Ninja -S Thunder -B build/Thunder \
     -DMESSAGING=ON \
     -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/usr" \
