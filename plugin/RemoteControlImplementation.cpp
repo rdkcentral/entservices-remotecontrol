@@ -504,6 +504,7 @@ namespace Plugin {
         }
 
         result.FromString(call->result);
+        LOGINFO("%s Bus Call SUCCESS response=%s", method.c_str(), call->result);
         free(call);
         return Core::ERROR_NONE;
     }
@@ -518,6 +519,7 @@ namespace Plugin {
     {
         response.version = API_VERSION_NUMBER_MAJOR;
         response.success = true;
+        LOGINFO("response: version=%u, success=%s", response.version, response.success ? "true" : "false");
         return Core::ERROR_NONE;
     }
 
@@ -527,22 +529,28 @@ namespace Plugin {
                 payload.empty() ? "{}" : payload.c_str(),
                 (macAddressList != nullptr) ? "<provided>" : "<not set>");
 
-        // Pass the caller's JSON through unchanged — all fields (including netType, timeout) must be present in payload.
-        JsonObject params;
-        if (!payload.empty()) {
-            params.FromString(payload);
-        }
+        string jsonParams;
+        JsonArray macArray;
         if (macAddressList != nullptr) {
-            JsonArray macArray;
             string mac;
             while (macAddressList->Next(mac)) {
                 macArray.Add(Core::JSON::Variant(mac));
             }
-            params["macAddressList"] = macArray;
         }
 
-        string jsonParams;
-        params.ToString(jsonParams);
+        // Preserve the caller payload exactly when there are no MAC entries to merge.
+        // This avoids accidentally changing payload shape (for example by forcing an
+        // empty macAddressList array into the request).
+        if (macArray.Length() == 0) {
+            jsonParams = payload.empty() ? string("{}") : payload;
+        } else {
+            JsonObject params;
+            if (!payload.empty()) {
+                params.FromString(payload);
+            }
+            params["macAddressList"] = macArray;
+            params.ToString(jsonParams);
+        }
 
         JsonObject iarmResult;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_START_PAIRING, jsonParams, iarmResult);
