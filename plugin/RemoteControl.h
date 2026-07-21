@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Module.h"
+#include "UtilsLogging.h"
 #include <interfaces/IRemoteControl.h>
 #include <interfaces/json/JRemoteControl.h>
 #include <interfaces/IConfiguration.h>
@@ -78,12 +79,29 @@ namespace Plugin {
             ~Notification() override = default;
 
             void OnStatus(const Exchange::NetStatusData& status) override {
+                LOGINFO("Notify onStatus netType=%u pairingState=%u irProgState=%u netTypesSupported=%s remoteData=%s",
+                    status.netType,
+                    static_cast<unsigned>(status.pairingState),
+                    static_cast<unsigned>(status.irProgState),
+                    status.netTypesSupported.c_str(),
+                    status.remoteData.c_str());
                 Exchange::JRemoteControl::Event::OnStatus(_parent, status);
             }
             void OnValidation(const Exchange::ValidationStatusObject& status) override {
+                LOGINFO("Notify onValidation netType=%u validationDigit1=%u validationDigit2=%u validationDigit3=%u",
+                    status.netType,
+                    status.validationDigit1,
+                    status.validationDigit2,
+                    status.validationDigit3);
                 Exchange::JRemoteControl::Event::OnValidation(_parent, status);
             }
             void OnFirmwareUpdateProgress(const Exchange::FirmwareUpdateStatusData& status) override {
+                LOGINFO("Notify onFirmwareUpdateProgress upgradeSessionId=%s macAddress=%s upgradeState=%u percentComplete=%u errorString=%s",
+                    status.upgradeSessionId.c_str(),
+                    status.macAddress.c_str(),
+                    static_cast<unsigned>(status.upgradeState),
+                    status.percentComplete,
+                    status.errorString.c_str());
                 Exchange::JRemoteControl::Event::OnFirmwareUpdateProgress(_parent, status);
             }
 
