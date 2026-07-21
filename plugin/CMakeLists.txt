@@ -30,11 +30,6 @@ find_package(${NAMESPACE}Core REQUIRED)
 find_package(CTRLM REQUIRED)
 find_package(IARMBus)
 
-if ((NAMESPACE STREQUAL "Thunder") AND EXISTS "${CMAKE_INSTALL_PREFIX}/include/WPEFramework/interfaces/json")
-        # Backward-compatible include fallback for generated J*.h headers.
-        include_directories(SYSTEM "${CMAKE_INSTALL_PREFIX}/include/WPEFramework")
-endif()
-
 if (USE_THUNDER_R4)
     find_package(${NAMESPACE}COM REQUIRED)
     find_package(${NAMESPACE}WebSocket REQUIRED)
