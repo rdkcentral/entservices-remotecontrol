@@ -103,6 +103,9 @@ find apis -mindepth 1 -maxdepth 1 \
     ! -name Ids_comcast.h \
     ! -name entservices_errorcodes.h \
     -exec rm -rf {} +
+find apis/DisplayInfo -mindepth 1 -maxdepth 1 \
+    ! -name IConfiguration.h \
+    -exec rm -rf {} +
 cd ..
 
 cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
