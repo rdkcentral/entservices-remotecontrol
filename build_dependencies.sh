@@ -53,7 +53,6 @@ echo "==========================================================================
 echo "building thunderTools"
 
 cd ThunderTools
-patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0001-Change-MODULE-PATH.patch
 patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0002-Change-namespace-Proxystub-Json-Generator.patch
 patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0003-Callsign-not-generated-Json-Generator.patch
 patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0004-Add-support-for-project-dir.patch
