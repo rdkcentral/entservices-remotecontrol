@@ -93,6 +93,16 @@ echo "==========================================================================
 echo "buliding entservices-apis"
 cd entservices-apis
 rm -rf jsonrpc/DTV.json
+find apis -mindepth 1 -maxdepth 1 \
+    ! -name RemoteControl \
+    ! -name VoiceControl \
+    ! -name DisplayInfo \
+    ! -name Module.cpp \
+    ! -name Module.h \
+    ! -name Ids.h \
+    ! -name Ids_comcast.h \
+    ! -name entservices_errorcodes.h \
+    -exec rm -rf {} +
 cd ..
 
 cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
