@@ -53,7 +53,6 @@ echo "==========================================================================
 echo "building thunderTools"
 
 cd ThunderTools
-patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0002-Change-namespace-Proxystub-Json-Generator.patch
 patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0003-Callsign-not-generated-Json-Generator.patch
 patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0004-Add-support-for-project-dir.patch
 patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0005-jsongenerator_fallback_length_validation_fix.patch
@@ -102,6 +101,7 @@ find apis -mindepth 1 -maxdepth 1 \
     ! -name Ids.h \
     ! -name Ids_comcast.h \
     ! -name entservices_errorcodes.h \
+    ! -name common.json \
     -exec rm -rf {} +
 find apis/DisplayInfo -mindepth 1 -maxdepth 1 \
     ! -name IConfiguration.h \
