@@ -85,12 +85,13 @@ cd entservices-apis
 rm -rf jsonrpc/DTV.json
 
 # Keep only the interface directories needed by RC/VC plugins.
+# DisplayInfo is required because it provides IConfiguration.h used by RC.
 # This avoids Thunder 5.3 migration failures in unrelated interfaces.
 echo "Pruning unneeded interface directories from entservices-apis..."
 cd apis
 for dir in */; do
     case "$dir" in
-        RemoteControl/|VoiceControl/) ;;  # keep
+        RemoteControl/|VoiceControl/|DisplayInfo/) ;;  # keep
         */) rm -rf "$dir" ;;               # remove
     esac
 done
