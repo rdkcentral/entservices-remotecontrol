@@ -115,6 +115,11 @@ cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
 
 cmake --build build/entservices-apis --target install
 
+echo "======================================================================================"
+echo "Verifying generated/install JSON headers"
+find build/entservices-apis -type f \( -name "JRemoteControl.h" -o -name "JIRemoteControl.h" -o -name "JVoiceControl.h" -o -name "JIVoiceControl.h" \) || true
+find install/usr/include -type f \( -path "*/interfaces/json/JRemoteControl.h" -o -path "*/interfaces/json/JIRemoteControl.h" -o -path "*/interfaces/json/JVoiceControl.h" -o -path "*/interfaces/json/JIVoiceControl.h" \) || true
+
 ############################
 # generating external headers
 cd $GITHUB_WORKSPACE
