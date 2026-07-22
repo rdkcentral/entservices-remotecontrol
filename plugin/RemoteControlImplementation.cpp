@@ -523,34 +523,38 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartPairing(const string& payload, Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const macAddressList)
+    Core::hresult RemoteControlImplementation::StartPairing(const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, Exchange::IStringIterator* const macAddressList, Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: payload=%s, macAddressList=%s",
-                payload.empty() ? "{}" : payload.c_str(),
+        LOGINFO("params: timeout=%s%u, screenBindEnable=%s%s, scanEnable=%s%s, macAddressList=%s",
+                timeout.IsSet() ? "" : "<default>", timeout.IsSet() ? timeout.Value() : 0,
+                screenBindEnable.IsSet() ? "" : "<default>", screenBindEnable.IsSet() ? (screenBindEnable.Value() ? "true" : "false") : "",
+                scanEnable.IsSet() ? "" : "<default>", scanEnable.IsSet() ? (scanEnable.Value() ? "true" : "false") : "",
                 (macAddressList != nullptr) ? "<provided>" : "<not set>");
 
-        string jsonParams;
+        JsonObject params;
+        if (timeout.IsSet()) {
+            params["timeout"] = timeout.Value();
+        }
+        if (screenBindEnable.IsSet()) {
+            params["screenBindEnable"] = screenBindEnable.Value();
+        }
+        if (scanEnable.IsSet()) {
+            params["scanEnable"] = scanEnable.Value();
+        }
+
         JsonArray macArray;
         if (macAddressList != nullptr) {
             string mac;
             while (macAddressList->Next(mac)) {
                 macArray.Add(Core::JSON::Variant(mac));
             }
+            if (macArray.Length() > 0) {
+                params["macAddressList"] = macArray;
+            }
         }
 
-        // Preserve the caller payload exactly when there are no MAC entries to merge.
-        // This avoids accidentally changing payload shape (for example by forcing an
-        // empty macAddressList array into the request).
-        if (macArray.Length() == 0) {
-            jsonParams = payload.empty() ? string("{}") : payload;
-        } else {
-            JsonObject params;
-            if (!payload.empty()) {
-                params.FromString(payload);
-            }
-            params["macAddressList"] = macArray;
-            params.ToString(jsonParams);
-        }
+        string jsonParams;
+        params.ToString(jsonParams);
 
         JsonObject iarmResult;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_START_PAIRING, jsonParams, iarmResult);
@@ -563,11 +567,22 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StopPairing(const string& payload, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::StopPairing(const Core::OptionalType<bool>& screenBindDisable, const Core::OptionalType<bool>& scanDisable, Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: payload=%s", payload.empty() ? "{}" : payload.c_str());
-        // Pass the caller's JSON through unchanged — preserves all optional fields exactly as provided.
-        const string& jsonParams = payload.empty() ? string("{}") : payload;
+        LOGINFO("params: screenBindDisable=%s%s, scanDisable=%s%s",
+                screenBindDisable.IsSet() ? "" : "<default>", screenBindDisable.IsSet() ? (screenBindDisable.Value() ? "true" : "false") : "",
+                scanDisable.IsSet() ? "" : "<default>", scanDisable.IsSet() ? (scanDisable.Value() ? "true" : "false") : "");
+
+        JsonObject params;
+        if (screenBindDisable.IsSet()) {
+            params["screenBindDisable"] = screenBindDisable.Value();
+        }
+        if (scanDisable.IsSet()) {
+            params["scanDisable"] = scanDisable.Value();
+        }
+
+        string jsonParams;
+        params.ToString(jsonParams);
 
         JsonObject iarmResult;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_STOP_PAIRING, jsonParams, iarmResult);
@@ -893,11 +908,11 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const string& customKeys, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const Core::OptionalType<string>& customKeys, Exchange::RemoteControlSuccessResult& result)
     {
         LOGINFO("params: wakeupConfig=%s, customKeys=%s",
                 enumToString(wakeupConfig),
-                customKeys.empty() ? "<not set>" : customKeys.c_str());
+                customKeys.IsSet() ? customKeys.Value().c_str() : "<not set>");
         if (isValidRequestEnum(wakeupConfig) == false) {
             LOGERR("ConfigureWakeupKeys requires wakeupConfig.");
             result.success = false;
@@ -906,8 +921,8 @@ namespace Plugin {
 
         JsonObject params;
         params["wakeupConfig"] = enumToString(wakeupConfig);
-        if (!customKeys.empty()) {
-            params["customKeys"] = customKeys;
+        if (customKeys.IsSet()) {
+            params["customKeys"] = customKeys.Value();
         }
 
         string jsonParams;
