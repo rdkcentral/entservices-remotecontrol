@@ -95,6 +95,11 @@ for dir in */; do
         */) rm -rf "$dir" ;;               # remove
     esac
 done
+
+# Thunder 5.3 JsonGenerator crashes on DisplayInfo/IDisplayInfo.h EDID buffer
+# annotations in this reduced native CI flow. Keep IConfiguration.h only.
+rm -f DisplayInfo/IDisplayInfo.h
+
 cd ../..
 
 cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
