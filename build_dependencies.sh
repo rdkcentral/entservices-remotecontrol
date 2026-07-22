@@ -120,6 +120,32 @@ echo "Verifying generated/install JSON headers"
 find build/entservices-apis -type f \( -name "JRemoteControl.h" -o -name "JIRemoteControl.h" -o -name "JVoiceControl.h" -o -name "JIVoiceControl.h" \) || true
 find install/usr/include -type f \( -path "*/interfaces/json/JRemoteControl.h" -o -path "*/interfaces/json/JIRemoteControl.h" -o -path "*/interfaces/json/JVoiceControl.h" -o -path "*/interfaces/json/JIVoiceControl.h" \) || true
 
+echo "======================================================================================"
+echo "Forcing RC/VC JSON header generation for Thunder 5.3 native CI"
+JSON_GENERATOR="$GITHUB_WORKSPACE/install/usr/include/Thunder/JsonGenerator/JsonGenerator.py"
+JSON_OUT_DIR="$GITHUB_WORKSPACE/install/usr/include/Thunder/interfaces/json"
+mkdir -p "$JSON_OUT_DIR"
+
+python3 "$JSON_GENERATOR" --code --output "$JSON_OUT_DIR" \
+    -I "$GITHUB_WORKSPACE/install/usr/include/Thunder" \
+    -j "$GITHUB_WORKSPACE/entservices-apis/apis" \
+    "$GITHUB_WORKSPACE/entservices-apis/apis/RemoteControl/IRemoteControl.h"
+
+python3 "$JSON_GENERATOR" --code --output "$JSON_OUT_DIR" \
+    -I "$GITHUB_WORKSPACE/install/usr/include/Thunder" \
+    -j "$GITHUB_WORKSPACE/entservices-apis/apis" \
+    "$GITHUB_WORKSPACE/entservices-apis/apis/VoiceControl/IVoiceControl.h"
+
+# Compatibility aliases: some generator paths emit JI*.h names from I*.h inputs.
+if [ -f "$JSON_OUT_DIR/JIRemoteControl.h" ] && [ ! -f "$JSON_OUT_DIR/JRemoteControl.h" ]; then
+    ln -sf JIRemoteControl.h "$JSON_OUT_DIR/JRemoteControl.h"
+fi
+if [ -f "$JSON_OUT_DIR/JIVoiceControl.h" ] && [ ! -f "$JSON_OUT_DIR/JVoiceControl.h" ]; then
+    ln -sf JIVoiceControl.h "$JSON_OUT_DIR/JVoiceControl.h"
+fi
+
+find "$JSON_OUT_DIR" -maxdepth 1 -type f \( -name "JRemoteControl.h" -o -name "JIRemoteControl.h" -o -name "JVoiceControl.h" -o -name "JIVoiceControl.h" -o -name "json_*" \) || true
+
 ############################
 # generating external headers
 cd $GITHUB_WORKSPACE
