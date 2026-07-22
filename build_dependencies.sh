@@ -96,9 +96,10 @@ for dir in */; do
     esac
 done
 
-# Thunder 5.3 JsonGenerator crashes on DisplayInfo/IDisplayInfo.h EDID buffer
-# annotations in this reduced native CI flow. Keep IConfiguration.h only.
+# Thunder 5.3 JsonGenerator crashes on DisplayInfo interface generation in this
+# reduced native CI flow. Keep IConfiguration.h only.
 rm -f DisplayInfo/IDisplayInfo.h
+rm -f DisplayInfo/DisplayInfo.json
 
 cd ../..
 
