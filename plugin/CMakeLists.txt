@@ -56,6 +56,7 @@ set_target_properties(${MODULE_NAME} PROPERTIES
         CXX_STANDARD_REQUIRED YES)
 
 target_include_directories(${MODULE_NAME} PRIVATE ../helpers)
+target_compile_options(${MODULE_NAME} PRIVATE -fpermissive)
 target_link_libraries(${MODULE_NAME} PRIVATE
         ${NAMESPACE}Plugins::${NAMESPACE}Plugins
         ${NAMESPACE}Definitions::${NAMESPACE}Definitions)
@@ -69,6 +70,7 @@ set_target_properties(${PLUGIN_IMPLEMENTATION} PROPERTIES
         CXX_STANDARD_REQUIRED YES)
 
 target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ../helpers)
+target_compile_options(${PLUGIN_IMPLEMENTATION} PRIVATE -fpermissive)
 
 target_compile_definitions(${PLUGIN_IMPLEMENTATION} PRIVATE CTRLM_FOUND)
 target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ${CTRLM_INCLUDE_DIRS})
