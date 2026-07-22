@@ -39,11 +39,9 @@ git clone --depth 1 --branch  R5.3.0 https://github.com/rdkcentral/ThunderTools.
 
 git clone --depth 1 --branch R5.3.0 https://github.com/rdkcentral/Thunder.git
 
-git clone --depth 1 --branch feature/RDKEMW-21327 https://github.com/rdkcentral/entservices-apis.git
+git clone --depth 1 --branch develop https://github.com/rdkcentral/entservices-apis.git
 
 git clone --depth 1 --branch $CTRLM_TAG https://github.com/rdkcentral/control.git
-
-git clone --depth 1 https://github.com/rdkcentral/meta-rdk-video.git
 
 git clone --depth 1 https://github.com/rdkcentral/entservices-testframework.git
 
@@ -51,13 +49,6 @@ git clone --depth 1 https://github.com/rdkcentral/entservices-testframework.git
 # Build Thunder-Tools
 echo "======================================================================================"
 echo "building thunderTools"
-
-cd ThunderTools
-patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0003-Callsign-not-generated-Json-Generator.patch
-patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0004-Add-support-for-project-dir.patch
-patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0005-jsongenerator_fallback_length_validation_fix.patch
-patch -p1 < $GITHUB_WORKSPACE/meta-rdk-video/recipes-thunder/thunder/wpeframework-tools/0006-Autostart-startmode-deactivated.patch
-cd -
 
 
 cmake -G Ninja -S ThunderTools -B build/ThunderTools \
@@ -92,20 +83,6 @@ echo "==========================================================================
 echo "buliding entservices-apis"
 cd entservices-apis
 rm -rf jsonrpc/DTV.json
-find apis -mindepth 1 -maxdepth 1 \
-    ! -name RemoteControl \
-    ! -name VoiceControl \
-    ! -name DisplayInfo \
-    ! -name Module.cpp \
-    ! -name Module.h \
-    ! -name Ids.h \
-    ! -name Ids_comcast.h \
-    ! -name entservices_errorcodes.h \
-    ! -name common.json \
-    -exec rm -rf {} +
-find apis/DisplayInfo -mindepth 1 -maxdepth 1 \
-    ! -name IConfiguration.h \
-    -exec rm -rf {} +
 cd ..
 
 cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
@@ -114,42 +91,6 @@ cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
     -DCMAKE_MODULE_PATH="$GITHUB_WORKSPACE/install/tools/cmake" \
 
 cmake --build build/entservices-apis --target install
-
-echo "======================================================================================"
-echo "Verifying generated/install JSON headers"
-find build/entservices-apis -type f \( -name "JRemoteControl.h" -o -name "JIRemoteControl.h" -o -name "JVoiceControl.h" -o -name "JIVoiceControl.h" \) || true
-find install/usr/include -type f \( -path "*/interfaces/json/JRemoteControl.h" -o -path "*/interfaces/json/JIRemoteControl.h" -o -path "*/interfaces/json/JVoiceControl.h" -o -path "*/interfaces/json/JIVoiceControl.h" \) || true
-
-echo "======================================================================================"
-echo "Forcing RC/VC JSON header generation for Thunder 5.3 native CI"
-JSON_GENERATOR="$GITHUB_WORKSPACE/install/usr/include/Thunder/JsonGenerator/JsonGenerator.py"
-JSON_OUT_DIR="$GITHUB_WORKSPACE/install/usr/include/Thunder/interfaces/json"
-mkdir -p "$JSON_OUT_DIR"
-
-python3 "$JSON_GENERATOR" --code --output "$JSON_OUT_DIR" \
-    -I "$GITHUB_WORKSPACE/install/usr/include/Thunder" \
-    -j "$GITHUB_WORKSPACE/entservices-apis/apis" \
-    "$GITHUB_WORKSPACE/entservices-apis/tools/md_generator/json/RemoteControl/RemoteControl.json" || true
-
-python3 "$JSON_GENERATOR" --code --output "$JSON_OUT_DIR" \
-    -I "$GITHUB_WORKSPACE/install/usr/include/Thunder" \
-    -j "$GITHUB_WORKSPACE/entservices-apis/apis" \
-    "$GITHUB_WORKSPACE/entservices-apis/tools/md_generator/json/VoiceControl/VoiceControl.json" || true
-
-# Compatibility aliases: some generator paths emit JI*.h names from I*.h inputs.
-if [ -f "$JSON_OUT_DIR/JIRemoteControl.h" ] && [ ! -f "$JSON_OUT_DIR/JRemoteControl.h" ]; then
-    ln -sf JIRemoteControl.h "$JSON_OUT_DIR/JRemoteControl.h"
-fi
-if [ -f "$JSON_OUT_DIR/JIVoiceControl.h" ] && [ ! -f "$JSON_OUT_DIR/JVoiceControl.h" ]; then
-    ln -sf JIVoiceControl.h "$JSON_OUT_DIR/JVoiceControl.h"
-fi
-
-find "$JSON_OUT_DIR" -maxdepth 1 -type f \( -name "JRemoteControl.h" -o -name "JIRemoteControl.h" -o -name "JVoiceControl.h" -o -name "JIVoiceControl.h" -o -name "json_*" \) || true
-
-if [ ! -f "$JSON_OUT_DIR/JRemoteControl.h" ] || [ ! -f "$JSON_OUT_DIR/JVoiceControl.h" ]; then
-    echo "ERROR: Required JSON interface headers were not generated in $JSON_OUT_DIR"
-    exit 1
-fi
 
 ############################
 # generating external headers
