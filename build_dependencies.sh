@@ -83,7 +83,18 @@ echo "==========================================================================
 echo "buliding entservices-apis"
 cd entservices-apis
 rm -rf jsonrpc/DTV.json
-cd ..
+
+# Keep only the interface directories needed by RC/VC plugins.
+# This avoids Thunder 5.3 migration failures in unrelated interfaces.
+echo "Pruning unneeded interface directories from entservices-apis..."
+cd apis
+for dir in */; do
+    case "$dir" in
+        RemoteControl/|VoiceControl/) ;;  # keep
+        */) rm -rf "$dir" ;;               # remove
+    esac
+done
+cd ../..
 
 cmake -G Ninja -S entservices-apis  -B build/entservices-apis \
     -DEXCEPTIONS_ENABLE=ON \
