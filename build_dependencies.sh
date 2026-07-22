@@ -129,12 +129,12 @@ mkdir -p "$JSON_OUT_DIR"
 python3 "$JSON_GENERATOR" --code --output "$JSON_OUT_DIR" \
     -I "$GITHUB_WORKSPACE/install/usr/include/Thunder" \
     -j "$GITHUB_WORKSPACE/entservices-apis/apis" \
-    "$GITHUB_WORKSPACE/entservices-apis/apis/RemoteControl/IRemoteControl.h"
+    "$GITHUB_WORKSPACE/entservices-apis/tools/md_generator/json/RemoteControl/RemoteControl.json" || true
 
 python3 "$JSON_GENERATOR" --code --output "$JSON_OUT_DIR" \
     -I "$GITHUB_WORKSPACE/install/usr/include/Thunder" \
     -j "$GITHUB_WORKSPACE/entservices-apis/apis" \
-    "$GITHUB_WORKSPACE/entservices-apis/apis/VoiceControl/IVoiceControl.h"
+    "$GITHUB_WORKSPACE/entservices-apis/tools/md_generator/json/VoiceControl/VoiceControl.json" || true
 
 # Compatibility aliases: some generator paths emit JI*.h names from I*.h inputs.
 if [ -f "$JSON_OUT_DIR/JIRemoteControl.h" ] && [ ! -f "$JSON_OUT_DIR/JRemoteControl.h" ]; then
@@ -145,6 +145,11 @@ if [ -f "$JSON_OUT_DIR/JIVoiceControl.h" ] && [ ! -f "$JSON_OUT_DIR/JVoiceContro
 fi
 
 find "$JSON_OUT_DIR" -maxdepth 1 -type f \( -name "JRemoteControl.h" -o -name "JIRemoteControl.h" -o -name "JVoiceControl.h" -o -name "JIVoiceControl.h" -o -name "json_*" \) || true
+
+if [ ! -f "$JSON_OUT_DIR/JRemoteControl.h" ] || [ ! -f "$JSON_OUT_DIR/JVoiceControl.h" ]; then
+    echo "ERROR: Required JSON interface headers were not generated in $JSON_OUT_DIR"
+    exit 1
+fi
 
 ############################
 # generating external headers
