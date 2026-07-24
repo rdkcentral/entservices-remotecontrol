@@ -35,22 +35,22 @@ cd ..
 # Clone the required repositories
 
 
-git clone --depth 1 --branch  R4.4.3 https://github.com/rdkcentral/ThunderTools.git
+git clone --depth 1 --branch  R4.4.6 https://github.com/rdkcentral/ThunderTools.git
 
-git clone --depth 1 --branch R4.4.1 https://github.com/rdkcentral/Thunder.git
+git clone --depth 1 --branch R4.4.6 https://github.com/rdkcentral/Thunder.git
 
 git clone --depth 1 --branch develop https://github.com/rdkcentral/entservices-apis.git
 
 git clone --depth 1 --branch $CTRLM_TAG https://github.com/rdkcentral/control.git
 
-git clone --depth 1 https://github.com/rdkcentral/entservices-testframework.git
+git clone --depth 1 --branch feature/RDKEMW-22169 https://github.com/rdkcentral/entservices-testframework.git
 
 ############################
 # Build Thunder-Tools
 echo "======================================================================================"
 echo "building thunderTools"
 cd ThunderTools
-patch -p1 < $GITHUB_WORKSPACE/entservices-testframework/patches/00010-R4.4-Add-support-for-project-dir.patch
+patch -p1 < $GITHUB_WORKSPACE/entservices-testframework/patches/00010-R4.4.6-Add-support-for-project-dir.patch
 cd -
 
 
@@ -69,10 +69,9 @@ echo "==========================================================================
 echo "building thunder"
 
 cd Thunder
-patch -p1 < $GITHUB_WORKSPACE/entservices-testframework/patches/Use_Legact_Alt_Based_On_ThunderTools_R4.4.3.patch
-patch -p1 < $GITHUB_WORKSPACE/entservices-testframework/patches/error_code_R4_4.patch
-patch -p1 < $GITHUB_WORKSPACE/entservices-testframework/patches/1004-Add-support-for-project-dir.patch
-patch -p1 < $GITHUB_WORKSPACE/entservices-testframework/patches/RDKEMW-733-Add-ENTOS-IDS.patch
+patch -p1 < $GITHUB_WORKSPACE/entservices-testframework/patches/error_code_R4_4_6.patch
+patch -p1 < $GITHUB_WORKSPACE/entservices-testframework/patches/1004-R4.4.6-Add-support-for-project-dir.patch
+patch -p1 < $GITHUB_WORKSPACE/entservices-testframework/patches/Jsonrpc_dynamic_error_handling_R4.4.6.patch
 cd -
 
 cmake -G Ninja -S Thunder -B build/Thunder \
