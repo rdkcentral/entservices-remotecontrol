@@ -101,7 +101,7 @@ namespace Plugin {
                     status.macAddress.c_str(),
                     static_cast<unsigned>(status.upgradeState),
                     status.percentComplete,
-                    status.errorString.c_str());
+                    status.errorString.IsSet() ? status.errorString.Value().c_str() : "");
                 Exchange::JRemoteControl::Event::OnFirmwareUpdateProgress(_parent, status);
             }
 

@@ -523,34 +523,38 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartPairing(const string& payload, Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const macAddressList)
+    Core::hresult RemoteControlImplementation::StartPairing(const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, Exchange::IStringIterator* const macAddressList, Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: payload=%s, macAddressList=%s",
-                payload.empty() ? "{}" : payload.c_str(),
+        LOGINFO("params: timeout=%s%u, screenBindEnable=%s%s, scanEnable=%s%s, macAddressList=%s",
+                timeout.IsSet() ? "" : "<default>", timeout.IsSet() ? timeout.Value() : 0,
+                screenBindEnable.IsSet() ? "" : "<default>", screenBindEnable.IsSet() ? (screenBindEnable.Value() ? "true" : "false") : "",
+                scanEnable.IsSet() ? "" : "<default>", scanEnable.IsSet() ? (scanEnable.Value() ? "true" : "false") : "",
                 (macAddressList != nullptr) ? "<provided>" : "<not set>");
 
-        string jsonParams;
+        JsonObject params;
+        if (timeout.IsSet()) {
+            params["timeout"] = timeout.Value();
+        }
+        if (screenBindEnable.IsSet()) {
+            params["screenBindEnable"] = screenBindEnable.Value();
+        }
+        if (scanEnable.IsSet()) {
+            params["scanEnable"] = scanEnable.Value();
+        }
+
         JsonArray macArray;
         if (macAddressList != nullptr) {
             string mac;
             while (macAddressList->Next(mac)) {
                 macArray.Add(Core::JSON::Variant(mac));
             }
+            if (macArray.Length() > 0) {
+                params["macAddressList"] = macArray;
+            }
         }
 
-        // Preserve the caller payload exactly when there are no MAC entries to merge.
-        // This avoids accidentally changing payload shape (for example by forcing an
-        // empty macAddressList array into the request).
-        if (macArray.Length() == 0) {
-            jsonParams = payload.empty() ? string("{}") : payload;
-        } else {
-            JsonObject params;
-            if (!payload.empty()) {
-                params.FromString(payload);
-            }
-            params["macAddressList"] = macArray;
-            params.ToString(jsonParams);
-        }
+        string jsonParams;
+        params.ToString(jsonParams);
 
         JsonObject iarmResult;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_START_PAIRING, jsonParams, iarmResult);
@@ -563,11 +567,22 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StopPairing(const string& payload, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::StopPairing(const Core::OptionalType<bool>& screenBindDisable, const Core::OptionalType<bool>& scanDisable, Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: payload=%s", payload.empty() ? "{}" : payload.c_str());
-        // Pass the caller's JSON through unchanged — preserves all optional fields exactly as provided.
-        const string& jsonParams = payload.empty() ? string("{}") : payload;
+        LOGINFO("params: screenBindDisable=%s%s, scanDisable=%s%s",
+                screenBindDisable.IsSet() ? "" : "<default>", screenBindDisable.IsSet() ? (screenBindDisable.Value() ? "true" : "false") : "",
+                scanDisable.IsSet() ? "" : "<default>", scanDisable.IsSet() ? (scanDisable.Value() ? "true" : "false") : "");
+
+        JsonObject params;
+        if (screenBindDisable.IsSet()) {
+            params["screenBindDisable"] = screenBindDisable.Value();
+        }
+        if (scanDisable.IsSet()) {
+            params["scanDisable"] = scanDisable.Value();
+        }
+
+        string jsonParams;
+        params.ToString(jsonParams);
 
         JsonObject iarmResult;
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_STOP_PAIRING, jsonParams, iarmResult);
@@ -621,14 +636,15 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(Exchange::AVDevType& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers)
+    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(Core::OptionalType<Exchange::AVDevType>& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers)
     {
         LOGINFO("params: avDevType=%s, manufacturer=%s",
-                enumToString(avDevType),
+                avDevType.IsSet() ? enumToString(avDevType.Value()) : "<not set>",
                 manufacturer.empty() ? "<empty>" : manufacturer.c_str());
-        if (isValidRequestEnum(avDevType) == false) {
+        if (!avDevType.IsSet() || !isValidRequestEnum(avDevType.Value())) {
             LOGERR("GetIRDBManufacturers requires avDevType.");
             success = false;
+            avDevType.Clear();
             manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
@@ -636,31 +652,37 @@ namespace Plugin {
         if (manufacturer.empty()) {
             LOGERR("GetIRDBManufacturers requires a non-empty manufacturer parameter.");
             success = false;
+            avDevType.Clear();
             manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
         JsonObject params;
-        params["avDevType"] = enumToString(avDevType);
+        params["avDevType"] = enumToString(avDevType.Value());
         params["manufacturer"] = manufacturer;
 
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MANUFACTURERS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MANUFACTURERS, jsonParams, iarmResult, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
             success = false;
+            avDevType.Clear();
             manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
-        avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
-        success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        if (iarmResult.HasLabel("avDevType")) {
+            avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String(), Exchange::AVDevType::INVALID);
+        } else {
+            avDevType.Clear();
+        }
+        success = iarmResult.HasLabel("success") ? iarmResult["success"].Boolean() : false;
 
         std::list<string> mfrsList;
-        if (result.HasLabel("manufacturers")) {
-            auto arr = result["manufacturers"].Array();
+        if (iarmResult.HasLabel("manufacturers")) {
+            auto arr = iarmResult["manufacturers"].Array();
             for (uint16_t i = 0; i < arr.Length(); i++) {
                 mfrsList.push_back(arr[i].String());
             }
@@ -670,41 +692,54 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRDBModels(Exchange::AVDevType& avDevType, string& manufacturer, const string& model, bool& success, Exchange::IStringIterator*& models)
+    Core::hresult RemoteControlImplementation::GetIRDBModels(Core::OptionalType<Exchange::AVDevType>& avDevType, Core::OptionalType<string>& manufacturer, const string& model, bool& success, Exchange::IStringIterator*& models)
     {
         LOGINFO("params: avDevType=%s, manufacturer=%s, model=%s",
-                enumToString(avDevType),
-                manufacturer.empty() ? "<empty>" : manufacturer.c_str(),
+                avDevType.IsSet() ? enumToString(avDevType.Value()) : "<not set>",
+                (manufacturer.IsSet() && !manufacturer.Value().empty()) ? manufacturer.Value().c_str() : "<empty>",
                 model.empty() ? "<empty>" : model.c_str());
-        if (isValidRequestEnum(avDevType) == false) {
+        if (!avDevType.IsSet() || !isValidRequestEnum(avDevType.Value())) {
             LOGERR("GetIRDBModels requires avDevType.");
             success = false;
+            avDevType.Clear();
+            manufacturer.Clear();
             models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
         JsonObject params;
-        params["avDevType"] = enumToString(avDevType);
-        params["manufacturer"] = manufacturer;
+        params["avDevType"] = enumToString(avDevType.Value());
+        params["manufacturer"] = manufacturer.IsSet() ? manufacturer.Value() : "";
         params["model"] = model;
 
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MODELS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MODELS, jsonParams, iarmResult, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
             success = false;
+            avDevType.Clear();
+            manufacturer.Clear();
             models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
-        avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
-        success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        if (iarmResult.HasLabel("avDevType")) {
+            avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String(), Exchange::AVDevType::INVALID);
+        } else {
+            avDevType.Clear();
+        }
+        if (iarmResult.HasLabel("manufacturer")) {
+            manufacturer = iarmResult["manufacturer"].String();
+        } else {
+            manufacturer.Clear();
+        }
+        success = iarmResult.HasLabel("success") ? iarmResult["success"].Boolean() : false;
 
         std::list<string> mdls;
-        if (result.HasLabel("models")) {
-            auto arr = result["models"].Array();
+        if (iarmResult.HasLabel("models")) {
+            auto arr = iarmResult["models"].Array();
             for (uint16_t i = 0; i < arr.Length(); i++) {
                 mdls.push_back(arr[i].String());
             }
@@ -763,53 +798,70 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRCodesByNames(Exchange::AVDevType& avDevType, string& manufacturer, string& model, bool& success, string& codes)
+    Core::hresult RemoteControlImplementation::GetIRCodesByNames(Core::OptionalType<Exchange::AVDevType>& avDevType, Core::OptionalType<string>& manufacturer, Core::OptionalType<string>& model, bool& success, Exchange::IStringIterator*& codes)
     {
         LOGINFO("params: avDevType=%s, manufacturer=%s, model=%s",
-                enumToString(avDevType),
-                manufacturer.empty() ? "<empty>" : manufacturer.c_str(),
-                model.empty() ? "<empty>" : model.c_str());
-        if (isValidRequestEnum(avDevType) == false) {
+                avDevType.IsSet() ? enumToString(avDevType.Value()) : "<not set>",
+                (manufacturer.IsSet() && !manufacturer.Value().empty()) ? manufacturer.Value().c_str() : "<empty>",
+                (model.IsSet() && !model.Value().empty()) ? model.Value().c_str() : "<empty>");
+        if (!avDevType.IsSet() || !isValidRequestEnum(avDevType.Value())) {
             LOGERR("GetIRCodesByNames requires avDevType.");
             success = false;
-            codes = "[]";
+            avDevType.Clear();
+            manufacturer.Clear();
+            model.Clear();
+            codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
         JsonObject params;
-        params["avDevType"] = enumToString(avDevType);
-        params["manufacturer"] = manufacturer;
-        params["model"] = model;
+        params["avDevType"] = enumToString(avDevType.Value());
+        params["manufacturer"] = manufacturer.IsSet() ? manufacturer.Value() : "";
+        params["model"] = model.IsSet() ? model.Value() : "";
 
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_CODES, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_CODES, jsonParams, iarmResult, IARM_IRDB_CALLS_TIMEOUT);
         string resultStr;
-        result.ToString(resultStr);
+        iarmResult.ToString(resultStr);
         LOGINFO("IARM response for GetIRCodesByNames: %s", resultStr.c_str());
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            codes = "[]";
+            avDevType.Clear();
+            manufacturer.Clear();
+            model.Clear();
+            codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
-        // Always set all mandatory output parameters
-        avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
-        manufacturer = result.HasLabel("manufacturer") ? result["manufacturer"].String() : manufacturer;
-        model = result.HasLabel("model") ? result["model"].String() : model;
-        success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        if (iarmResult.HasLabel("avDevType")) {
+            avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String(), Exchange::AVDevType::INVALID);
+        } else {
+            avDevType.Clear();
+        }
+        if (iarmResult.HasLabel("manufacturer")) {
+            manufacturer = iarmResult["manufacturer"].String();
+        } else {
+            manufacturer.Clear();
+        }
+        if (iarmResult.HasLabel("model")) {
+            model = iarmResult["model"].String();
+        } else {
+            model.Clear();
+        }
+        success = iarmResult.HasLabel("success") ? iarmResult["success"].Boolean() : false;
 
-        JsonArray codesArray;
-        if (result.HasLabel("codes")) {
-            auto arr = result["codes"].Array();
+        std::list<string> codesList;
+        if (iarmResult.HasLabel("codes")) {
+            auto arr = iarmResult["codes"].Array();
             for (uint16_t i = 0; i < arr.Length(); i++) {
-                codesArray.Add(Core::JSON::Variant(arr[i].String()));
+                codesList.push_back(arr[i].String());
                 LOGINFO("IR code: %s", arr[i].String().c_str());
             }
         }
-        codesArray.ToString(codes);
+        codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(codesList);
 
         return Core::ERROR_NONE;
     }
@@ -893,11 +945,11 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const string& customKeys, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const Core::OptionalType<string>& customKeys, Exchange::RemoteControlSuccessResult& result)
     {
         LOGINFO("params: wakeupConfig=%s, customKeys=%s",
                 enumToString(wakeupConfig),
-                customKeys.empty() ? "<not set>" : customKeys.c_str());
+                customKeys.IsSet() ? customKeys.Value().c_str() : "<not set>");
         if (isValidRequestEnum(wakeupConfig) == false) {
             LOGERR("ConfigureWakeupKeys requires wakeupConfig.");
             result.success = false;
@@ -906,8 +958,8 @@ namespace Plugin {
 
         JsonObject params;
         params["wakeupConfig"] = enumToString(wakeupConfig);
-        if (!customKeys.empty()) {
-            params["customKeys"] = customKeys;
+        if (customKeys.IsSet()) {
+            params["customKeys"] = customKeys.Value();
         }
 
         string jsonParams;
@@ -1090,7 +1142,7 @@ namespace Plugin {
             response.status.macAddress.clear();
             response.status.upgradeState = Exchange::FirmwareUpdateState::INVALID;
             response.status.percentComplete = 0;
-            response.status.errorString.clear();
+            response.status.errorString.Clear();
             response.success = false;
             return Core::ERROR_NONE;
         }
