@@ -28,7 +28,7 @@
 #include "ctrlm_ipc_rcu.h"
 #include "ctrlm_ipc_ble.h"
 
-namespace WPEFramework {
+namespace Thunder {
 namespace Plugin {
 
     class RemoteControlImplementation : public Exchange::IRemoteControl, public Exchange::IConfiguration {
@@ -98,4 +98,4 @@ namespace Plugin {
     };
 
 } // namespace Plugin
-} // namespace WPEFramework
+} // namespace Thunder

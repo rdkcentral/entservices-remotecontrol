@@ -25,7 +25,7 @@
 #include <interfaces/json/JRemoteControl.h>
 #include <interfaces/IConfiguration.h>
 
-namespace WPEFramework {
+namespace Thunder {
 namespace Plugin {
 
     class RemoteControl : public PluginHost::IPlugin, public PluginHost::JSONRPC {
@@ -101,7 +101,7 @@ namespace Plugin {
                     status.macAddress.c_str(),
                     static_cast<unsigned>(status.upgradeState),
                     status.percentComplete,
-                    status.errorString.c_str());
+                    status.errorString.IsSet() ? status.errorString.Value().c_str() : "");
                 Exchange::JRemoteControl::Event::OnFirmwareUpdateProgress(_parent, status);
             }
 
@@ -124,4 +124,4 @@ namespace Plugin {
     };
 
 } // namespace Plugin
-} // namespace WPEFramework
+} // namespace Thunder
