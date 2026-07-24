@@ -636,22 +636,22 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(Exchange::AVDevType& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers)
+    Core::hresult RemoteControlImplementation::GetIRDBManufacturers(const Exchange::AVDevType avDevType, const string& manufacturer, Exchange::GetIRDBManufacturersResult& result)
     {
         LOGINFO("params: avDevType=%s, manufacturer=%s",
                 enumToString(avDevType),
                 manufacturer.empty() ? "<empty>" : manufacturer.c_str());
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRDBManufacturers requires avDevType.");
-            success = false;
-            manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
+            result.success = false;
+            result.manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
         if (manufacturer.empty()) {
             LOGERR("GetIRDBManufacturers requires a non-empty manufacturer parameter.");
-            success = false;
-            manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
+            result.success = false;
+            result.manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
@@ -662,30 +662,32 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MANUFACTURERS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MANUFACTURERS, jsonParams, iarmResult, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
-            manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
+            result.success = false;
+            result.manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
-        avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
-        success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        if (iarmResult.HasLabel("avDevType")) {
+            result.avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String(), Exchange::AVDevType::INVALID);
+        }
+        result.success = iarmResult.HasLabel("success") ? iarmResult["success"].Boolean() : false;
 
         std::list<string> mfrsList;
-        if (result.HasLabel("manufacturers")) {
-            auto arr = result["manufacturers"].Array();
+        if (iarmResult.HasLabel("manufacturers")) {
+            auto arr = iarmResult["manufacturers"].Array();
             for (uint16_t i = 0; i < arr.Length(); i++) {
                 mfrsList.push_back(arr[i].String());
             }
         }
-        manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(mfrsList);
+        result.manufacturers = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(mfrsList);
 
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRDBModels(Exchange::AVDevType& avDevType, string& manufacturer, const string& model, bool& success, Exchange::IStringIterator*& models)
+    Core::hresult RemoteControlImplementation::GetIRDBModels(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRDBModelsResult& result)
     {
         LOGINFO("params: avDevType=%s, manufacturer=%s, model=%s",
                 enumToString(avDevType),
@@ -693,8 +695,8 @@ namespace Plugin {
                 model.empty() ? "<empty>" : model.c_str());
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRDBModels requires avDevType.");
-            success = false;
-            models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
+            result.success = false;
+            result.models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
@@ -706,25 +708,30 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MODELS, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_MODELS, jsonParams, iarmResult, IARM_IRDB_CALLS_TIMEOUT);
         if (callResult != Core::ERROR_NONE) {
-            success = false;
-            models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
+            result.success = false;
+            result.models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
-        avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
-        success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        if (iarmResult.HasLabel("avDevType")) {
+            result.avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String(), Exchange::AVDevType::INVALID);
+        }
+        if (iarmResult.HasLabel("manufacturer")) {
+            result.manufacturer = iarmResult["manufacturer"].String();
+        }
+        result.success = iarmResult.HasLabel("success") ? iarmResult["success"].Boolean() : false;
 
         std::list<string> mdls;
-        if (result.HasLabel("models")) {
-            auto arr = result["models"].Array();
+        if (iarmResult.HasLabel("models")) {
+            auto arr = iarmResult["models"].Array();
             for (uint16_t i = 0; i < arr.Length(); i++) {
                 mdls.push_back(arr[i].String());
             }
         }
-        models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(mdls);
+        result.models = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(mdls);
 
         return Core::ERROR_NONE;
     }
@@ -778,7 +785,7 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRCodesByNames(Exchange::AVDevType& avDevType, string& manufacturer, string& model, bool& success, string& codes)
+    Core::hresult RemoteControlImplementation::GetIRCodesByNames(const Exchange::AVDevType avDevType, const string& manufacturer, const string& model, Exchange::GetIRCodesByNamesResult& result)
     {
         LOGINFO("params: avDevType=%s, manufacturer=%s, model=%s",
                 enumToString(avDevType),
@@ -786,8 +793,8 @@ namespace Plugin {
                 model.empty() ? "<empty>" : model.c_str());
         if (isValidRequestEnum(avDevType) == false) {
             LOGERR("GetIRCodesByNames requires avDevType.");
-            success = false;
-            codes = "[]";
+            result.success = false;
+            result.codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
@@ -799,32 +806,37 @@ namespace Plugin {
         string jsonParams;
         params.ToString(jsonParams);
 
-        JsonObject result;
-        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_CODES, jsonParams, result, IARM_IRDB_CALLS_TIMEOUT);
+        JsonObject iarmResult;
+        Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_IR_CODES, jsonParams, iarmResult, IARM_IRDB_CALLS_TIMEOUT);
         string resultStr;
-        result.ToString(resultStr);
+        iarmResult.ToString(resultStr);
         LOGINFO("IARM response for GetIRCodesByNames: %s", resultStr.c_str());
         if (callResult != Core::ERROR_NONE) {
-            success = false;
-            codes = "[]";
+            result.success = false;
+            result.codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
-        // Always set all mandatory output parameters
-        avDevType = result.HasLabel("avDevType") ? stringToEnum<Exchange::AVDevType>(result["avDevType"].String(), avDevType) : avDevType;
-        manufacturer = result.HasLabel("manufacturer") ? result["manufacturer"].String() : manufacturer;
-        model = result.HasLabel("model") ? result["model"].String() : model;
-        success = result.HasLabel("success") ? result["success"].Boolean() : false;
+        if (iarmResult.HasLabel("avDevType")) {
+            result.avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String(), Exchange::AVDevType::INVALID);
+        }
+        if (iarmResult.HasLabel("manufacturer")) {
+            result.manufacturer = iarmResult["manufacturer"].String();
+        }
+        if (iarmResult.HasLabel("model")) {
+            result.model = iarmResult["model"].String();
+        }
+        result.success = iarmResult.HasLabel("success") ? iarmResult["success"].Boolean() : false;
 
-        JsonArray codesArray;
-        if (result.HasLabel("codes")) {
-            auto arr = result["codes"].Array();
+        std::list<string> codesList;
+        if (iarmResult.HasLabel("codes")) {
+            auto arr = iarmResult["codes"].Array();
             for (uint16_t i = 0; i < arr.Length(); i++) {
-                codesArray.Add(Core::JSON::Variant(arr[i].String()));
+                codesList.push_back(arr[i].String());
                 LOGINFO("IR code: %s", arr[i].String().c_str());
             }
         }
-        codesArray.ToString(codes);
+        result.codes = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(codesList);
 
         return Core::ERROR_NONE;
     }
