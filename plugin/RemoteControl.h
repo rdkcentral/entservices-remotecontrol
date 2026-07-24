@@ -25,7 +25,7 @@
 #include <interfaces/json/JRemoteControl.h>
 #include <interfaces/IConfiguration.h>
 
-namespace Thunder {
+namespace WPEFramework {
 namespace Plugin {
 
     class RemoteControl : public PluginHost::IPlugin, public PluginHost::JSONRPC {
@@ -124,4 +124,4 @@ namespace Plugin {
     };
 
 } // namespace Plugin
-} // namespace Thunder
+} // namespace WPEFramework

@@ -28,7 +28,7 @@
 #define IARM_FACTORY_RESET_TIMEOUT  (15 * 1000)  // 15 seconds, in milliseconds
 #define IARM_IRDB_CALLS_TIMEOUT     (10 * 1000)  // 10 seconds, in milliseconds
 
-namespace Thunder {
+namespace WPEFramework {
 namespace Plugin {
 
     namespace {
@@ -1164,4 +1164,4 @@ namespace Plugin {
     }
 
 } // namespace Plugin
-} // namespace Thunder
+} // namespace WPEFramework

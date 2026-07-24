@@ -35,7 +35,7 @@
 #define INVOKE_TIMEOUT  (5000)
 
 using namespace std;
-using namespace Thunder;
+using namespace WPEFramework;
 // Global data used to for arguments to pass to the plugin methods
 int deviceID = 1;
 

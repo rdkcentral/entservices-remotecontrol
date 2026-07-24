@@ -21,7 +21,7 @@
 #include "PluginVersion.h"
 #include <list>
 
-namespace Thunder {
+namespace WPEFramework {
 
     namespace {
         static Plugin::Metadata<Plugin::RemoteControl> metadata(
@@ -175,4 +175,4 @@ namespace Plugin {
     }
 
 } // namespace Plugin
-} // namespace Thunder
+} // namespace WPEFramework
