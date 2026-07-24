@@ -1142,7 +1142,7 @@ namespace Plugin {
             response.status.macAddress.clear();
             response.status.upgradeState = Exchange::FirmwareUpdateState::INVALID;
             response.status.percentComplete = 0;
-            response.status.errorString = {};
+            response.status.errorString.Clear();
             response.success = false;
             return Core::ERROR_NONE;
         }
