@@ -85,14 +85,6 @@ echo "buliding entservices-apis"
 cd entservices-apis
 rm -rf jsonrpc/DTV.json
 
-# Thunder 5.3's JsonGenerator defaults to looking for interface classes under
-# the ::Thunder namespace, but these interface headers still declare
-# interfaces under the legacy ::WPEFramework namespace (aliased to Thunder).
-# JsonGenerator does not resolve that alias, so it silently finds zero
-# interfaces to generate code for, leaving ThunderDefinitions with no
-# sources. Point it at the namespace these headers actually use.
-sed -i 's/set(JSONGEN_EXTRA_ARGS LEGACY_ALT)/set(JSONGEN_EXTRA_ARGS LEGACY_ALT FRAMEWORK_NAMESPACE WPEFramework)/' build/CMakeLists.txt
-
 # Keep only the interface directories needed by RC/VC plugins.
 # DisplayInfo is required because it provides IConfiguration.h used by RC.
 # This avoids Thunder 5.3 migration failures in unrelated interfaces.
