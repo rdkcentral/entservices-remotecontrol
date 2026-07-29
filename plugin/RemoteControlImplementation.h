@@ -46,17 +46,17 @@ namespace Plugin {
 
         // IRemoteControl methods
         Core::hresult GetApiVersionNumber(Exchange::RemoteControlGetApiVersionNumberResponse& response) override;
-        Core::hresult StartPairing(const string& payload, Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const macAddressList) override;
-        Core::hresult StopPairing(const string& payload, Exchange::RemoteControlSuccessResult& result) override;
+        Core::hresult StartPairing(const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, Exchange::IStringIterator* const macAddressList, Exchange::RemoteControlSuccessResult& result) override;
+        Core::hresult StopPairing(const Core::OptionalType<bool>& screenBindDisable, const Core::OptionalType<bool>& scanDisable, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResult& result) override;
-        Core::hresult GetIRDBManufacturers(Exchange::AVDevType& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers) override;
-        Core::hresult GetIRDBModels(Exchange::AVDevType& avDevType, string& manufacturer, const string& model, bool& success, Exchange::IStringIterator*& models) override;
+        Core::hresult GetIRDBManufacturers(Core::OptionalType<Exchange::AVDevType>& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers) override;
+        Core::hresult GetIRDBModels(Core::OptionalType<Exchange::AVDevType>& avDevType, Core::OptionalType<string>& manufacturer, const string& model, bool& success, Exchange::IStringIterator*& models) override;
         Core::hresult GetIRCodesByAutoLookup(const uint32_t netType, string& tvManufacturer, string& tvModel, string& avrManufacturer, string& avrModel, bool& success, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
-        Core::hresult GetIRCodesByNames(Exchange::AVDevType& avDevType, string& manufacturer, string& model, bool& success, string& codes) override;
+        Core::hresult GetIRCodesByNames(Core::OptionalType<Exchange::AVDevType>& avDevType, Core::OptionalType<string>& manufacturer, Core::OptionalType<string>& model, bool& success, Exchange::IStringIterator*& codes) override;
         Core::hresult SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult ClearIRCodes(const uint32_t remoteId, const uint32_t netType, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult GetLastKeypressSource(Exchange::GetLastKeypressSourceResponse& response) override;
-        Core::hresult ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const string& customKeys, Exchange::RemoteControlSuccessResult& result) override;
+        Core::hresult ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const Core::OptionalType<string>& customKeys, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult InitializeIRDB(const uint32_t netType, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult FindMyRemote(const Exchange::FindMyRemoteLevel level, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult FactoryReset(Exchange::RemoteControlSuccessResult& result) override;
