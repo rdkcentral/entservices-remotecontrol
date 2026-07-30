@@ -63,7 +63,6 @@ namespace Plugin {
         template <>
         const char* enumToString<Exchange::WakeupConfig>(Exchange::WakeupConfig value) {
             switch (value) {
-                case Exchange::WakeupConfig::INVALID: return "";
                 case Exchange::WakeupConfig::ALL:    return "all";
                 case Exchange::WakeupConfig::NONE:   return "none";
                 case Exchange::WakeupConfig::CUSTOM: return "custom";
@@ -87,35 +86,22 @@ namespace Plugin {
         template <>
         const char* enumToString<Exchange::AVDevType>(Exchange::AVDevType value) {
             switch (value) {
-                case Exchange::AVDevType::INVALID: return "";
                 case Exchange::AVDevType::TV:  return "TV";
                 case Exchange::AVDevType::AMP: return "AMP";
                 default:                       return "";
             }
         }
 
-        template <>
-        Exchange::AVDevType stringToEnum<Exchange::AVDevType>(const string& str, Exchange::AVDevType defaultValue) {
+        // AVDevType has no INVALID sentinel, so there's no sensible default to fall back to;
+        // an unrecognized or empty string means "not provided" rather than a fabricated value.
+        Core::OptionalType<Exchange::AVDevType> stringToEnum(const string& str) {
             if (str == "TV") {
                 return Exchange::AVDevType::TV;
             }
             if (str == "AMP") {
                 return Exchange::AVDevType::AMP;
             }
-            if (str == "INVALID" || str.empty()) {
-                return Exchange::AVDevType::INVALID;
-            }
-            return defaultValue;
-        }
-
-        bool isValidRequestEnum(const Exchange::AVDevType value)
-        {
-            return value != Exchange::AVDevType::INVALID;
-        }
-
-        bool isValidRequestEnum(const Exchange::WakeupConfig value)
-        {
-            return value != Exchange::WakeupConfig::INVALID;
+            return Core::OptionalType<Exchange::AVDevType>();
         }
 
         bool isValidRequestEnum(const Exchange::FindMyRemoteLevel value)
@@ -642,7 +628,7 @@ namespace Plugin {
         LOGINFO("params: avDevType=%s, manufacturer=%s",
                 avDevType.IsSet() ? enumToString(avDevType.Value()) : "<not set>",
                 manufacturer.empty() ? "<empty>" : manufacturer.c_str());
-        if (!avDevType.IsSet() || !isValidRequestEnum(avDevType.Value())) {
+        if (!avDevType.IsSet()) {
             LOGERR("GetIRDBManufacturers requires avDevType.");
             success = false;
             avDevType.Clear();
@@ -675,7 +661,7 @@ namespace Plugin {
         }
 
         if (iarmResult.HasLabel("avDevType")) {
-            avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String(), Exchange::AVDevType::INVALID);
+            avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String());
         } else {
             avDevType.Clear();
         }
@@ -699,7 +685,7 @@ namespace Plugin {
                 avDevType.IsSet() ? enumToString(avDevType.Value()) : "<not set>",
                 (manufacturer.IsSet() && !manufacturer.Value().empty()) ? manufacturer.Value().c_str() : "<empty>",
                 model.empty() ? "<empty>" : model.c_str());
-        if (!avDevType.IsSet() || !isValidRequestEnum(avDevType.Value())) {
+        if (!avDevType.IsSet()) {
             LOGERR("GetIRDBModels requires avDevType.");
             success = false;
             avDevType.Clear();
@@ -727,7 +713,7 @@ namespace Plugin {
         }
 
         if (iarmResult.HasLabel("avDevType")) {
-            avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String(), Exchange::AVDevType::INVALID);
+            avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String());
         } else {
             avDevType.Clear();
         }
@@ -805,7 +791,7 @@ namespace Plugin {
                 avDevType.IsSet() ? enumToString(avDevType.Value()) : "<not set>",
                 (manufacturer.IsSet() && !manufacturer.Value().empty()) ? manufacturer.Value().c_str() : "<empty>",
                 (model.IsSet() && !model.Value().empty()) ? model.Value().c_str() : "<empty>");
-        if (!avDevType.IsSet() || !isValidRequestEnum(avDevType.Value())) {
+        if (!avDevType.IsSet()) {
             LOGERR("GetIRCodesByNames requires avDevType.");
             success = false;
             avDevType.Clear();
@@ -838,7 +824,7 @@ namespace Plugin {
         }
 
         if (iarmResult.HasLabel("avDevType")) {
-            avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String(), Exchange::AVDevType::INVALID);
+            avDevType = stringToEnum(iarmResult["avDevType"].String());
         } else {
             avDevType.Clear();
         }
@@ -873,11 +859,6 @@ namespace Plugin {
                 remoteId, netType,
                 enumToString(avDevType),
                 code.c_str());
-        if (isValidRequestEnum(avDevType) == false) {
-            LOGERR("SetIRCode requires avDevType.");
-            result.success = false;
-            return Core::ERROR_NONE;
-        }
 
         JsonObject params;
         params["remoteId"] = remoteId;
@@ -951,11 +932,6 @@ namespace Plugin {
         LOGINFO("params: wakeupConfig=%s, customKeys=%s",
                 enumToString(wakeupConfig),
                 customKeys.IsSet() ? customKeys.Value().c_str() : "<not set>");
-        if (isValidRequestEnum(wakeupConfig) == false) {
-            LOGERR("ConfigureWakeupKeys requires wakeupConfig.");
-            result.success = false;
-            return Core::ERROR_NONE;
-        }
 
         JsonObject params;
         params["wakeupConfig"] = enumToString(wakeupConfig);
