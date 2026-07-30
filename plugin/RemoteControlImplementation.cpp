@@ -455,13 +455,14 @@ namespace Plugin {
             status.macAddress = statusObj.HasLabel("macAddress") ? statusObj["macAddress"].String() : "";
             status.upgradeState = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::INVALID) : Exchange::FirmwareUpdateState::INVALID;
             status.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
-            status.errorString = statusObj.HasLabel("errorString") ? statusObj["errorString"].String() : "";
+            if (statusObj.HasLabel("errorString")) {
+                status.errorString = statusObj["errorString"].String();
+            }
         } else {
             status.upgradeSessionId = "";
             status.macAddress = "";
             status.upgradeState = Exchange::FirmwareUpdateState::INVALID;
             status.percentComplete = 0;
-            status.errorString = "";
         }
 
         auto observers = ObserverSnapshot();
@@ -1157,7 +1158,11 @@ namespace Plugin {
         response.status.macAddress = statusObj.HasLabel("macAddress") ? statusObj["macAddress"].String() : "";
         response.status.upgradeState = statusObj.HasLabel("upgradeState") ? stringToEnum<Exchange::FirmwareUpdateState>(statusObj["upgradeState"].String(), Exchange::FirmwareUpdateState::INVALID) : Exchange::FirmwareUpdateState::INVALID;
         response.status.percentComplete = statusObj.HasLabel("percentComplete") ? static_cast<uint32_t>(statusObj["percentComplete"].Number()) : 0;
-        response.status.errorString = statusObj.HasLabel("errorString") ? statusObj["errorString"].String() : "";
+        if (statusObj.HasLabel("errorString")) {
+            response.status.errorString = statusObj["errorString"].String();
+        } else {
+            response.status.errorString.Clear();
+        }
         response.success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
         return Core::ERROR_NONE;
