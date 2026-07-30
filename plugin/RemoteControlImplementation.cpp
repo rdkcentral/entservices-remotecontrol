@@ -661,7 +661,7 @@ namespace Plugin {
         }
 
         if (iarmResult.HasLabel("avDevType")) {
-            avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String());
+            avDevType = stringToEnum(iarmResult["avDevType"].String());
         } else {
             avDevType.Clear();
         }
@@ -713,7 +713,7 @@ namespace Plugin {
         }
 
         if (iarmResult.HasLabel("avDevType")) {
-            avDevType = stringToEnum<Exchange::AVDevType>(iarmResult["avDevType"].String());
+            avDevType = stringToEnum(iarmResult["avDevType"].String());
         } else {
             avDevType.Clear();
         }
