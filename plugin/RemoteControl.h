@@ -79,12 +79,12 @@ namespace Plugin {
             ~Notification() override = default;
 
             void OnStatus(const Exchange::NetStatusData& status) override {
-                LOGINFO("Notify onStatus netType=%u pairingState=%u irProgState=%u netTypesSupported=%s remoteData=%s",
+                LOGINFO("Notify onStatus netType=%u pairingState=%u irProgState=%u netTypesSupportedCount=%zu remoteDataCount=%zu",
                     status.netType,
                     static_cast<unsigned>(status.pairingState),
                     static_cast<unsigned>(status.irProgState),
-                    status.netTypesSupported.c_str(),
-                    status.remoteData.c_str());
+                    status.netTypesSupported.size(),
+                    status.remoteData.size());
                 Exchange::JRemoteControl::Event::OnStatus(_parent, status);
             }
             void OnValidation(const Exchange::ValidationStatusObject& status) override {
