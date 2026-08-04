@@ -642,6 +642,8 @@ namespace Plugin {
             result.status.netType = netType;
             result.status.pairingState = Exchange::PairingState::IDLE;
             result.status.irProgState = Exchange::IRProgState::IDLE;
+            result.status.netTypesSupported.clear();
+            result.status.remoteData.clear();
             return Core::ERROR_NONE;
         }
 
