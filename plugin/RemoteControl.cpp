@@ -52,11 +52,9 @@ namespace Plugin {
         _service = service;
         _service->AddRef();
         _service->Register(&_connectionNotification);
-        LOGINFO("Initialize: service=%p registered connection notification", _service);
 
         // Instantiate the out-of-process implementation (e.g. RemoteControlImplementation)
         _implementation = _service->Root<Exchange::IRemoteControl>(_connectionId, 2000, _T("RemoteControlImplementation"));
-        LOGINFO("Initialize: Root<IRemoteControl> implementation=%p connectionId=%u", _implementation, _connectionId);
 
         if (_implementation != nullptr)
         {
@@ -64,7 +62,6 @@ namespace Plugin {
             if (_configure != nullptr)
             {
                 uint32_t result = _configure->Configure(_service);
-                LOGINFO("Initialize: IConfiguration=%p Configure result=%u", _configure, result);
                 if (result != Core::ERROR_NONE)
                 {
                     message = _T("RemoteControl could not be configured");
@@ -78,7 +75,6 @@ namespace Plugin {
             if (message.empty())
             {
                 const uint32_t registerResult = _implementation->Register(&_notification);
-                LOGINFO("Initialize: implementation Register(notification=%p) result=%u", &_notification, registerResult);
                 if (registerResult != Core::ERROR_NONE)
                 {
                     message = _T("RemoteControl failed to register notification handler");
@@ -86,7 +82,6 @@ namespace Plugin {
                 else
                 {
                     Exchange::JRemoteControl::Register(*this, _implementation);
-                    LOGINFO("Initialize: JRemoteControl::Register completed for implementation=%p", _implementation);
                 }
             }
         }
@@ -113,7 +108,6 @@ namespace Plugin {
                      LOGWARN("RemoteControl implementation refCount after Release is %u during initialization rollback (expected 0); proceeding with remote connection termination.", refCount);
                  }
                  if (connection != nullptr) {
-                     LOGINFO("Initialize rollback: terminating remote connection id=%u", _connectionId);
                      connection->Terminate();
                      connection->Release();
                  }
@@ -130,19 +124,15 @@ namespace Plugin {
     void RemoteControl::Deinitialize(PluginHost::IShell* service)
     {
         ASSERT(_service == service);
-        LOGINFO("Deinitialize: service=%p implementation=%p connectionId=%u", _service, _implementation, _connectionId);
 
         _service->Unregister(&_connectionNotification);
 
         if (_implementation != nullptr)
         {
-            const uint32_t unregisterResult = _implementation->Unregister(&_notification);
-            LOGINFO("Deinitialize: implementation Unregister(notification=%p) result=%u", &_notification, unregisterResult);
+            _implementation->Unregister(&_notification);
             Exchange::JRemoteControl::Unregister(*this);
-            LOGINFO("Deinitialize: JRemoteControl::Unregister completed for implementation=%p", _implementation);
 
             if (_configure != nullptr) {
-                LOGINFO("Deinitialize: releasing IConfiguration=%p", _configure);
                 _configure->Release();
                 _configure = nullptr;
             }
@@ -150,7 +140,6 @@ namespace Plugin {
             RPC::IRemoteConnection* connection = service->RemoteConnection(_connectionId);
             const uint32_t refCount = _implementation->Release();
             _implementation = nullptr;
-            LOGINFO("Deinitialize: implementation Release returned refCount=%u", refCount);
             if (refCount != 0)
             {
                 LOGWARN("RemoteControl implementation refCount after Release is %u during shutdown (expected 0); proceeding with remote connection termination.", refCount);
@@ -158,7 +147,6 @@ namespace Plugin {
 
             if (connection != nullptr)
             {
-                LOGINFO("Deinitialize: terminating remote connection id=%u", _connectionId);
                 connection->Terminate();
                 connection->Release();
             }
@@ -172,7 +160,6 @@ namespace Plugin {
     void RemoteControl::Deactivated(RPC::IRemoteConnection* connection)
     {
         ASSERT(connection != nullptr);
-        LOGINFO("ConnectionNotification::Deactivated connectionId=%u expectedConnectionId=%u", connection->Id(), _connectionId);
 
         if ((connection->Id() == _connectionId))
         {
