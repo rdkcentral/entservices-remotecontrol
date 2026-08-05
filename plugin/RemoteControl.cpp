@@ -123,7 +123,11 @@ namespace Plugin {
 
     void RemoteControl::Deinitialize(PluginHost::IShell* service)
     {
-        ASSERT(_service == service);
+        if (_service != service)
+        {
+            LOGWARN("RemoteControl::Deinitialize called with no matching active service (service=%p, _service=%p); skipping teardown.", service, _service);
+            return;
+        }
 
         _service->Unregister(&_connectionNotification);
 
