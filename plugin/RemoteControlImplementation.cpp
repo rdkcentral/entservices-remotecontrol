@@ -221,6 +221,7 @@ namespace Plugin {
 
         // Release any still-registered notification observers.
         _adminLock.Lock();
+        LOGINFO("~RemoteControlImplementation: releasing %zu registered observers", _notifications.size());
         for (auto* notification : _notifications) {
             if (notification != nullptr) {
                  notification->Release();
@@ -268,10 +269,14 @@ namespace Plugin {
         }
 
         _adminLock.Lock();
+        const size_t before = _notifications.size();
         const auto it = std::find(_notifications.begin(), _notifications.end(), notification);
         if (it == _notifications.end()) {
             notification->AddRef();
             _notifications.push_back(notification);
+            LOGINFO("Register: observer=%p added size %zu -> %zu", notification, before, _notifications.size());
+        } else {
+            LOGINFO("Register: observer=%p already registered size=%zu", notification, before);
         }
         _adminLock.Unlock();
         return Core::ERROR_NONE;
@@ -284,12 +289,16 @@ namespace Plugin {
         }
 
         _adminLock.Lock();
+        const size_t before = _notifications.size();
         const auto it = std::find_if(_notifications.begin(), _notifications.end(), [notification](const Exchange::IRemoteControl::INotification* current) {
             return current == notification;
         });
         if (it != _notifications.end()) {
             (*it)->Release();
             _notifications.erase(it);
+            LOGINFO("Unregister: observer=%p removed size %zu -> %zu", notification, before, _notifications.size());
+        } else {
+            LOGWARN("Unregister: observer=%p not found size=%zu", notification, before);
         }
         _adminLock.Unlock();
         return Core::ERROR_NONE;
