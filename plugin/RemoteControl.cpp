@@ -208,13 +208,21 @@ namespace Plugin {
 
     void RemoteControl::Deinitialize(PluginHost::IShell* service)
     {
-        if (_service != service)
+        PluginHost::IShell* shell = _service;
+
+        if (shell == nullptr)
         {
-            LOGWARN("RemoteControl::Deinitialize called with no matching active service (service=%p, _service=%p); skipping teardown.", service, _service);
+            LOGWARN("RemoteControl::Deinitialize called with no active service (service=%p, _service=%p); skipping teardown.",
+                static_cast<const void*>(service), static_cast<const void*>(_service));
             return;
         }
+        if (shell != service)
+        {
+            LOGWARN("RemoteControl::Deinitialize called with mismatched service (service=%p, _service=%p); proceeding with active service.",
+                static_cast<const void*>(service), static_cast<const void*>(shell));
+        }
 
-        _service->Unregister(&_connectionNotification);
+        shell->Unregister(&_connectionNotification);
 
         if (_implementation != nullptr)
         {
@@ -228,7 +236,7 @@ namespace Plugin {
                 _configure = nullptr;
             }
 
-            RPC::IRemoteConnection* connection = service->RemoteConnection(_connectionId);
+            RPC::IRemoteConnection* connection = shell->RemoteConnection(_connectionId);
             const uint32_t refCount = _implementation->Release();
             _implementation = nullptr;
             if (refCount != 0)
@@ -244,7 +252,7 @@ namespace Plugin {
         }
 
         _connectionId = 0;
-        _service->Release();
+        shell->Release();
         _service = nullptr;
     }
 
