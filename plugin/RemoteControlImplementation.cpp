@@ -659,6 +659,14 @@ namespace Plugin {
         result.status.netTypesSupported = statusObj.HasLabel("netTypesSupported") ? ParseUint32Array(statusObj["netTypesSupported"], 8, "NetStatusData.netTypesSupported") : std::vector<uint32_t>();
         result.status.remoteData = statusObj.HasLabel("remoteData") ? ParseRemoteDataArray(statusObj["remoteData"], 32) : std::vector<Exchange::PairedRemoteInfo>();
 
+        LOGINFO("COMRPC-DIAG-A GetNetStatus pre-return: success=%d netType=%u pairingState=%u irProgState=%u "
+                "netTypesSupported.size=%zu netTypesSupported[0]=%u remoteData.size=%zu",
+                result.success, result.status.netType,
+                static_cast<unsigned>(result.status.pairingState), static_cast<unsigned>(result.status.irProgState),
+                result.status.netTypesSupported.size(),
+                result.status.netTypesSupported.empty() ? 0u : result.status.netTypesSupported[0],
+                result.status.remoteData.size());
+
         return Core::ERROR_NONE;
     }
 
