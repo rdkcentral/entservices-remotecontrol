@@ -42,23 +42,6 @@ namespace Plugin {
         template <typename E>
         E stringToEnum(const string& str, E defaultValue);
 
-        string jsonValueToString(const JsonValue& value)
-        {
-            return value.String();
-        }
-
-        // Logs an error if 'value' exceeds the COM-RPC @restrict limit for
-        // 'fieldName'. The limit must match the @restrict annotation on the
-        // corresponding parameter in IRemoteControl.h so that the generated proxy
-        // stub's SetText<T> cast never silently discards bytes.
-        void checkRestrictLimit(string& value, size_t limit, const char* fieldName)
-        {
-            if (value.size() > limit) {
-                LOGERR("COM-RPC field '%s' exceeds @restrict limit: %zu > %zu bytes — truncating", fieldName, value.size(), limit);
-                value.resize(limit);
-            }
-        }
-
         // --- WakeupConfig: ctrlm expects lowercase "all"/"none"/"custom" ---
         template <>
         const char* enumToString<Exchange::WakeupConfig>(Exchange::WakeupConfig value) {
@@ -144,6 +127,71 @@ namespace Plugin {
             return defaultValue;
         }
 
+        // --- WakeupConfig: ctrlm sends lowercase "all"/"none"/"custom" ---
+        template <>
+        Exchange::WakeupConfig stringToEnum<Exchange::WakeupConfig>(const string& str, Exchange::WakeupConfig defaultValue) {
+            if (str == "all")    return Exchange::WakeupConfig::ALL;
+            if (str == "none")   return Exchange::WakeupConfig::NONE;
+            if (str == "custom") return Exchange::WakeupConfig::CUSTOM;
+            return defaultValue;
+        }
+
+        // Parses a JSON array of numbers into a vector, capping it at the COM-RPC
+        // @restrict element count on the corresponding field in IRemoteControl.h so
+        // the generated proxy stub's uint8_t size prefix never silently wraps.
+        std::vector<uint32_t> ParseUint32Array(const JsonValue& value, size_t limit, const char* fieldName)
+        {
+            std::vector<uint32_t> result;
+            auto elements = value.Array().Elements();
+            while (elements.Next()) {
+                result.push_back(static_cast<uint32_t>(elements.Current().Number()));
+            }
+            if (result.size() > limit) {
+                LOGERR("COM-RPC field '%s' exceeds @restrict limit: %zu > %zu elements — truncating", fieldName, result.size(), limit);
+                result.resize(limit);
+            }
+            return result;
+        }
+
+        Exchange::PairedRemoteInfo ParseRemoteInfo(const JsonObject& obj)
+        {
+            Exchange::PairedRemoteInfo info;
+            info.macAddress = obj.HasLabel("macAddress") ? obj["macAddress"].String() : "";
+            info.connected = obj.HasLabel("connected") ? obj["connected"].Boolean() : false;
+            info.name = obj.HasLabel("name") ? obj["name"].String() : "";
+            info.remoteId = obj.HasLabel("remoteId") ? static_cast<uint32_t>(obj["remoteId"].Number()) : 0;
+            info.deviceId = obj.HasLabel("deviceId") ? static_cast<uint32_t>(obj["deviceId"].Number()) : 0;
+            info.make = obj.HasLabel("make") ? obj["make"].String() : "";
+            info.model = obj.HasLabel("model") ? obj["model"].String() : "";
+            info.hwVersion = obj.HasLabel("hwVersion") ? obj["hwVersion"].String() : "";
+            info.swVersion = obj.HasLabel("swVersion") ? obj["swVersion"].String() : "";
+            info.btlVersion = obj.HasLabel("btlVersion") ? obj["btlVersion"].String() : "";
+            info.serialNumber = obj.HasLabel("serialNumber") ? obj["serialNumber"].String() : "";
+            info.batteryPercent = obj.HasLabel("batteryPercent") ? static_cast<uint32_t>(obj["batteryPercent"].Number()) : 0;
+            info.tvIRCode = obj.HasLabel("tvIRCode") ? obj["tvIRCode"].String() : "0";
+            info.ampIRCode = obj.HasLabel("ampIRCode") ? obj["ampIRCode"].String() : "0";
+            info.wakeupKeyCode = obj.HasLabel("wakeupKeyCode") ? static_cast<uint32_t>(obj["wakeupKeyCode"].Number()) : 0;
+            info.upgradeSessionId = obj.HasLabel("upgradeSessionId") ? obj["upgradeSessionId"].String() : "";
+            info.wakeupConfig = obj.HasLabel("wakeupConfig") ? stringToEnum<Exchange::WakeupConfig>(obj["wakeupConfig"].String(), Exchange::WakeupConfig::NONE) : Exchange::WakeupConfig::NONE;
+            if (obj.HasLabel("wakeupCustomList")) {
+                info.wakeupCustomList = ParseUint32Array(obj["wakeupCustomList"], 32, "PairedRemoteInfo.wakeupCustomList");
+            }
+            return info;
+        }
+
+        std::vector<Exchange::PairedRemoteInfo> ParseRemoteDataArray(const JsonValue& value, size_t limit)
+        {
+            std::vector<Exchange::PairedRemoteInfo> result;
+            auto elements = value.Array().Elements();
+            while (elements.Next()) {
+                result.push_back(ParseRemoteInfo(elements.Current().Object()));
+            }
+            if (result.size() > limit) {
+                LOGERR("COM-RPC field 'NetStatusData.remoteData' exceeds @restrict limit: %zu > %zu elements — truncating", result.size(), limit);
+                result.resize(limit);
+            }
+            return result;
+        }
     } // anonymous namespace
 
     SERVICE_REGISTRATION(RemoteControlImplementation, API_VERSION_NUMBER_MAJOR, API_VERSION_NUMBER_MINOR, API_VERSION_NUMBER_PATCH);
@@ -392,13 +440,8 @@ namespace Plugin {
         status.netType = statusObj.HasLabel("netType") ? static_cast<uint32_t>(statusObj["netType"].Number()) : (params.HasLabel("netType") ? static_cast<uint32_t>(params["netType"].Number()) : 0);
         status.pairingState = statusObj.HasLabel("pairingState") ? stringToEnum<Exchange::PairingState>(statusObj["pairingState"].String(), Exchange::PairingState::IDLE) : Exchange::PairingState::IDLE;
         status.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
-        status.netTypesSupported = statusObj.HasLabel("netTypesSupported") ? jsonValueToString(statusObj["netTypesSupported"]) : "[]";
-        status.remoteData = statusObj.HasLabel("remoteData") ? jsonValueToString(statusObj["remoteData"]) : "[]";
-
-        // NetStatusData.netTypesSupported and .remoteData are @opaque with no @restrict —
-        // default uint16_t SetText limit is 65535 bytes.
-        checkRestrictLimit(status.netTypesSupported, 65535, "NetStatusData.netTypesSupported");
-        checkRestrictLimit(status.remoteData,        65535, "NetStatusData.remoteData");
+        status.netTypesSupported = statusObj.HasLabel("netTypesSupported") ? ParseUint32Array(statusObj["netTypesSupported"], 8, "NetStatusData.netTypesSupported") : std::vector<uint32_t>();
+        status.remoteData = statusObj.HasLabel("remoteData") ? ParseRemoteDataArray(statusObj["remoteData"], 32) : std::vector<Exchange::PairedRemoteInfo>();
 
         auto observers = ObserverSnapshot();
 
@@ -599,8 +642,8 @@ namespace Plugin {
             result.status.netType = netType;
             result.status.pairingState = Exchange::PairingState::IDLE;
             result.status.irProgState = Exchange::IRProgState::IDLE;
-            result.status.netTypesSupported = "[]";
-            result.status.remoteData = "[]";
+            result.status.netTypesSupported.clear();
+            result.status.remoteData.clear();
             return Core::ERROR_NONE;
         }
 
@@ -613,13 +656,8 @@ namespace Plugin {
         result.status.netType = statusObj.HasLabel("netType") ? static_cast<uint32_t>(statusObj["netType"].Number()) : netType;
         result.status.pairingState = statusObj.HasLabel("pairingState") ? stringToEnum<Exchange::PairingState>(statusObj["pairingState"].String(), Exchange::PairingState::IDLE) : Exchange::PairingState::IDLE;
         result.status.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
-        result.status.netTypesSupported = statusObj.HasLabel("netTypesSupported") ? jsonValueToString(statusObj["netTypesSupported"]) : "[]";
-        result.status.remoteData = statusObj.HasLabel("remoteData") ? jsonValueToString(statusObj["remoteData"]) : "[]";
-
-        // NetStatusData.netTypesSupported and .remoteData are @opaque with no @restrict —
-        // default uint16_t SetText limit is 65535 bytes.
-        checkRestrictLimit(result.status.netTypesSupported, 65535, "NetStatusData.netTypesSupported");
-        checkRestrictLimit(result.status.remoteData,        65535, "NetStatusData.remoteData");
+        result.status.netTypesSupported = statusObj.HasLabel("netTypesSupported") ? ParseUint32Array(statusObj["netTypesSupported"], 8, "NetStatusData.netTypesSupported") : std::vector<uint32_t>();
+        result.status.remoteData = statusObj.HasLabel("remoteData") ? ParseRemoteDataArray(statusObj["remoteData"], 32) : std::vector<Exchange::PairedRemoteInfo>();
 
         return Core::ERROR_NONE;
     }
