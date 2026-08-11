@@ -141,11 +141,18 @@ namespace Plugin {
         // the generated proxy stub's uint8_t size prefix never silently wraps.
         std::vector<uint32_t> ParseUint32Array(const JsonValue& value, size_t limit, const char* fieldName)
         {
+            LOGINFO("COMRPC-CKPT-PUA0 ParseUint32Array(%s): entered", fieldName);
             std::vector<uint32_t> result;
             auto elements = value.Array().Elements();
+            size_t idx = 0;
             while (elements.Next()) {
-                result.push_back(static_cast<uint32_t>(elements.Current().Number()));
+                uint32_t v = static_cast<uint32_t>(elements.Current().Number());
+                LOGINFO("COMRPC-CKPT-PUA1 ParseUint32Array(%s): element[%zu]=%u before push_back", fieldName, idx, v);
+                result.push_back(v);
+                LOGINFO("COMRPC-CKPT-PUA2 ParseUint32Array(%s): element[%zu] pushed, result.size()=%zu", fieldName, idx, result.size());
+                idx++;
             }
+            LOGINFO("COMRPC-CKPT-PUA3 ParseUint32Array(%s): loop done, result.size()=%zu, about to return", fieldName, result.size());
             if (result.size() > limit) {
                 LOGERR("COM-RPC field '%s' exceeds @restrict limit: %zu > %zu elements — truncating", fieldName, result.size(), limit);
                 result.resize(limit);
@@ -647,6 +654,8 @@ namespace Plugin {
             return Core::ERROR_NONE;
         }
 
+        LOGINFO("COMRPC-CKPT0 GetNetStatus: IARM call returned success, entering parse");
+
         JsonObject statusObj;
         if (iarmResult.HasLabel("status")) {
             statusObj = iarmResult["status"].Object();
@@ -656,8 +665,19 @@ namespace Plugin {
         result.status.netType = statusObj.HasLabel("netType") ? static_cast<uint32_t>(statusObj["netType"].Number()) : netType;
         result.status.pairingState = statusObj.HasLabel("pairingState") ? stringToEnum<Exchange::PairingState>(statusObj["pairingState"].String(), Exchange::PairingState::IDLE) : Exchange::PairingState::IDLE;
         result.status.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
+
+        LOGINFO("COMRPC-CKPT1 GetNetStatus: scalar fields set (netType=%u pairingState=%u irProgState=%u), about to parse netTypesSupported",
+                result.status.netType, static_cast<unsigned>(result.status.pairingState), static_cast<unsigned>(result.status.irProgState));
+
         result.status.netTypesSupported = statusObj.HasLabel("netTypesSupported") ? ParseUint32Array(statusObj["netTypesSupported"], 8, "NetStatusData.netTypesSupported") : std::vector<uint32_t>();
+
+        LOGINFO("COMRPC-CKPT2 GetNetStatus: netTypesSupported parsed, size=%zu, about to parse remoteData",
+                result.status.netTypesSupported.size());
+
         result.status.remoteData = statusObj.HasLabel("remoteData") ? ParseRemoteDataArray(statusObj["remoteData"], 32) : std::vector<Exchange::PairedRemoteInfo>();
+
+        LOGINFO("COMRPC-CKPT3 GetNetStatus: remoteData parsed, size=%zu, about to log DIAG-A and return",
+                result.status.remoteData.size());
 
         LOGINFO("COMRPC-DIAG-A GetNetStatus pre-return: success=%d netType=%u pairingState=%u irProgState=%u "
                 "netTypesSupported.size=%zu netTypesSupported[0]=%u remoteData.size=%zu",
