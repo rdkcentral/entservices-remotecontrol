@@ -141,7 +141,6 @@ namespace Plugin {
         // the generated proxy stub's uint8_t size prefix never silently wraps.
         std::vector<uint32_t> ParseUint32Array(const JsonValue& value, size_t limit, const char* fieldName)
         {
-            LOGINFO("COMRPC-CKPT-PUA0 ParseUint32Array(%s): entered", fieldName);
             std::vector<uint32_t> result;
             // NOTE: Array() returns a temporary ArrayType<Variant> by value. Bind it to a
             // named variable before calling Elements() — otherwise the returned iterator
@@ -149,15 +148,9 @@ namespace Plugin {
             // statement ends, and Next() past the first element is undefined behavior.
             JsonArray array = value.Array();
             auto elements = array.Elements();
-            size_t idx = 0;
             while (elements.Next()) {
-                uint32_t v = static_cast<uint32_t>(elements.Current().Number());
-                LOGINFO("COMRPC-CKPT-PUA1 ParseUint32Array(%s): element[%zu]=%u before push_back", fieldName, idx, v);
-                result.push_back(v);
-                LOGINFO("COMRPC-CKPT-PUA2 ParseUint32Array(%s): element[%zu] pushed, result.size()=%zu", fieldName, idx, result.size());
-                idx++;
+                result.push_back(static_cast<uint32_t>(elements.Current().Number()));
             }
-            LOGINFO("COMRPC-CKPT-PUA3 ParseUint32Array(%s): loop done, result.size()=%zu, about to return", fieldName, result.size());
             if (result.size() > limit) {
                 LOGERR("COM-RPC field '%s' exceeds @restrict limit: %zu > %zu elements — truncating", fieldName, result.size(), limit);
                 result.resize(limit);
@@ -167,7 +160,6 @@ namespace Plugin {
 
         Exchange::PairedRemoteInfo ParseRemoteInfo(const JsonObject& obj)
         {
-            LOGINFO("COMRPC-CKPT-PRI0 ParseRemoteInfo: entered");
             Exchange::PairedRemoteInfo info;
             info.macAddress = obj.HasLabel("macAddress") ? obj["macAddress"].String() : "";
             info.connected = obj.HasLabel("connected") ? obj["connected"].Boolean() : false;
@@ -194,22 +186,14 @@ namespace Plugin {
 
         std::vector<Exchange::PairedRemoteInfo> ParseRemoteDataArray(const JsonValue& value, size_t limit)
         {
-            LOGINFO("COMRPC-CKPT-PRD0 ParseRemoteDataArray: entered");
             std::vector<Exchange::PairedRemoteInfo> result;
             // See the NOTE in ParseUint32Array above — Array() must be bound to a named
             // variable to keep it alive for the lifetime of the Elements() iterator.
             JsonArray array = value.Array();
             auto elements = array.Elements();
-            size_t idx = 0;
             while (elements.Next()) {
-                LOGINFO("COMRPC-CKPT-PRD1 ParseRemoteDataArray: element[%zu] before ParseRemoteInfo", idx);
-                Exchange::PairedRemoteInfo info = ParseRemoteInfo(elements.Current().Object());
-                LOGINFO("COMRPC-CKPT-PRD2 ParseRemoteDataArray: element[%zu] parsed (macAddress='%s'), before push_back", idx, info.macAddress.c_str());
-                result.push_back(info);
-                LOGINFO("COMRPC-CKPT-PRD3 ParseRemoteDataArray: element[%zu] pushed, result.size()=%zu", idx, result.size());
-                idx++;
+                result.push_back(ParseRemoteInfo(elements.Current().Object()));
             }
-            LOGINFO("COMRPC-CKPT-PRD4 ParseRemoteDataArray: loop done, result.size()=%zu, about to return", result.size());
             if (result.size() > limit) {
                 LOGERR("COM-RPC field 'NetStatusData.remoteData' exceeds @restrict limit: %zu > %zu elements — truncating", result.size(), limit);
                 result.resize(limit);
@@ -671,8 +655,6 @@ namespace Plugin {
             return Core::ERROR_NONE;
         }
 
-        LOGINFO("COMRPC-CKPT0 GetNetStatus: IARM call returned success, entering parse");
-
         JsonObject statusObj;
         if (iarmResult.HasLabel("status")) {
             statusObj = iarmResult["status"].Object();
@@ -682,27 +664,8 @@ namespace Plugin {
         result.status.netType = statusObj.HasLabel("netType") ? static_cast<uint32_t>(statusObj["netType"].Number()) : netType;
         result.status.pairingState = statusObj.HasLabel("pairingState") ? stringToEnum<Exchange::PairingState>(statusObj["pairingState"].String(), Exchange::PairingState::IDLE) : Exchange::PairingState::IDLE;
         result.status.irProgState = statusObj.HasLabel("irProgState") ? stringToEnum<Exchange::IRProgState>(statusObj["irProgState"].String(), Exchange::IRProgState::IDLE) : Exchange::IRProgState::IDLE;
-
-        LOGINFO("COMRPC-CKPT1 GetNetStatus: scalar fields set (netType=%u pairingState=%u irProgState=%u), about to parse netTypesSupported",
-                result.status.netType, static_cast<unsigned>(result.status.pairingState), static_cast<unsigned>(result.status.irProgState));
-
         result.status.netTypesSupported = statusObj.HasLabel("netTypesSupported") ? ParseUint32Array(statusObj["netTypesSupported"], 8, "NetStatusData.netTypesSupported") : std::vector<uint32_t>();
-
-        LOGINFO("COMRPC-CKPT2 GetNetStatus: netTypesSupported parsed, size=%zu, about to parse remoteData",
-                result.status.netTypesSupported.size());
-
         result.status.remoteData = statusObj.HasLabel("remoteData") ? ParseRemoteDataArray(statusObj["remoteData"], 32) : std::vector<Exchange::PairedRemoteInfo>();
-
-        LOGINFO("COMRPC-CKPT3 GetNetStatus: remoteData parsed, size=%zu, about to log DIAG-A and return",
-                result.status.remoteData.size());
-
-        LOGINFO("COMRPC-DIAG-A GetNetStatus pre-return: success=%d netType=%u pairingState=%u irProgState=%u "
-                "netTypesSupported.size=%zu netTypesSupported[0]=%u remoteData.size=%zu",
-                result.success, result.status.netType,
-                static_cast<unsigned>(result.status.pairingState), static_cast<unsigned>(result.status.irProgState),
-                result.status.netTypesSupported.size(),
-                result.status.netTypesSupported.empty() ? 0u : result.status.netTypesSupported[0],
-                result.status.remoteData.size());
 
         return Core::ERROR_NONE;
     }
