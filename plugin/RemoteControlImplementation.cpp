@@ -143,7 +143,12 @@ namespace Plugin {
         {
             LOGINFO("COMRPC-CKPT-PUA0 ParseUint32Array(%s): entered", fieldName);
             std::vector<uint32_t> result;
-            auto elements = value.Array().Elements();
+            // NOTE: Array() returns a temporary ArrayType<Variant> by value. Bind it to a
+            // named variable before calling Elements() — otherwise the returned iterator
+            // holds a dangling pointer into the temporary's internal list once this
+            // statement ends, and Next() past the first element is undefined behavior.
+            JsonArray array = value.Array();
+            auto elements = array.Elements();
             size_t idx = 0;
             while (elements.Next()) {
                 uint32_t v = static_cast<uint32_t>(elements.Current().Number());
@@ -162,6 +167,7 @@ namespace Plugin {
 
         Exchange::PairedRemoteInfo ParseRemoteInfo(const JsonObject& obj)
         {
+            LOGINFO("COMRPC-CKPT-PRI0 ParseRemoteInfo: entered");
             Exchange::PairedRemoteInfo info;
             info.macAddress = obj.HasLabel("macAddress") ? obj["macAddress"].String() : "";
             info.connected = obj.HasLabel("connected") ? obj["connected"].Boolean() : false;
@@ -188,11 +194,22 @@ namespace Plugin {
 
         std::vector<Exchange::PairedRemoteInfo> ParseRemoteDataArray(const JsonValue& value, size_t limit)
         {
+            LOGINFO("COMRPC-CKPT-PRD0 ParseRemoteDataArray: entered");
             std::vector<Exchange::PairedRemoteInfo> result;
-            auto elements = value.Array().Elements();
+            // See the NOTE in ParseUint32Array above — Array() must be bound to a named
+            // variable to keep it alive for the lifetime of the Elements() iterator.
+            JsonArray array = value.Array();
+            auto elements = array.Elements();
+            size_t idx = 0;
             while (elements.Next()) {
-                result.push_back(ParseRemoteInfo(elements.Current().Object()));
+                LOGINFO("COMRPC-CKPT-PRD1 ParseRemoteDataArray: element[%zu] before ParseRemoteInfo", idx);
+                Exchange::PairedRemoteInfo info = ParseRemoteInfo(elements.Current().Object());
+                LOGINFO("COMRPC-CKPT-PRD2 ParseRemoteDataArray: element[%zu] parsed (macAddress='%s'), before push_back", idx, info.macAddress.c_str());
+                result.push_back(info);
+                LOGINFO("COMRPC-CKPT-PRD3 ParseRemoteDataArray: element[%zu] pushed, result.size()=%zu", idx, result.size());
+                idx++;
             }
+            LOGINFO("COMRPC-CKPT-PRD4 ParseRemoteDataArray: loop done, result.size()=%zu, about to return", result.size());
             if (result.size() > limit) {
                 LOGERR("COM-RPC field 'NetStatusData.remoteData' exceeds @restrict limit: %zu > %zu elements — truncating", result.size(), limit);
                 result.resize(limit);
