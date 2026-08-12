@@ -134,7 +134,6 @@ namespace Plugin {
         std::vector<uint32_t> ParseUint32Array(const JsonValue& value, size_t limit, const char* fieldName)
         {
             std::vector<uint32_t> result;
-            // Array() returns a temporary; must be named or Elements()'s iterator dangles.
             JsonArray array = value.Array();
             auto elements = array.Elements();
             while (elements.Next()) {
@@ -176,7 +175,6 @@ namespace Plugin {
         std::vector<Exchange::PairedRemoteInfo> ParseRemoteDataArray(const JsonValue& value, size_t limit)
         {
             std::vector<Exchange::PairedRemoteInfo> result;
-            // See ParseUint32Array above re: Array() returning a temporary.
             JsonArray array = value.Array();
             auto elements = array.Elements();
             while (elements.Next()) {
