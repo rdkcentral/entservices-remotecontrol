@@ -58,7 +58,7 @@ namespace Plugin {
         Core::hresult GetLastKeypressSource(Exchange::GetLastKeypressSourceResponse& response) override;
         Core::hresult ConfigureWakeupKeys(const Exchange::WakeupConfig wakeupConfig, const Core::OptionalType<string>& customKeys, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult InitializeIRDB(const uint32_t netType, Exchange::RemoteControlSuccessResult& result) override;
-        Core::hresult FindMyRemote(const Exchange::FindMyRemoteLevel level, Exchange::RemoteControlSuccessResult& result) override;
+        Core::hresult FindMyRemote(const Core::OptionalType<Exchange::FindMyRemoteLevel>& level, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult FactoryReset(Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult Unpair(Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const macAddressList) override;
         Core::hresult StartFirmwareUpdate(const string& macAddress, const string& fileName, const string& fileType, const uint32_t percentIncrement, bool& success, Exchange::IStringIterator*& sessionIdList) override;

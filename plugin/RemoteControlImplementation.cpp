@@ -57,7 +57,6 @@ namespace Plugin {
         template <>
         const char* enumToString<Exchange::FindMyRemoteLevel>(Exchange::FindMyRemoteLevel value) {
             switch (value) {
-                case Exchange::FindMyRemoteLevel::INVALID: return "";
                 case Exchange::FindMyRemoteLevel::OFF:  return "off";
                 case Exchange::FindMyRemoteLevel::MID:  return "mid";
                 case Exchange::FindMyRemoteLevel::HIGH: return "high";
@@ -75,8 +74,6 @@ namespace Plugin {
             }
         }
 
-        // AVDevType has no INVALID sentinel, so there's no sensible default to fall back to;
-        // an unrecognized or empty string means "not provided" rather than a fabricated value.
         Core::OptionalType<Exchange::AVDevType> stringToEnum(const string& str) {
             if (str == "TV") {
                 return Exchange::AVDevType::TV;
@@ -85,11 +82,6 @@ namespace Plugin {
                 return Exchange::AVDevType::AMP;
             }
             return Core::OptionalType<Exchange::AVDevType>();
-        }
-
-        bool isValidRequestEnum(const Exchange::FindMyRemoteLevel value)
-        {
-            return value != Exchange::FindMyRemoteLevel::INVALID;
         }
 
         // --- PairingState: ctrlm sends uppercase strings ---
@@ -1016,17 +1008,17 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::FindMyRemote(const Exchange::FindMyRemoteLevel level, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::FindMyRemote(const Core::OptionalType<Exchange::FindMyRemoteLevel>& level, Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: level=%s", enumToString(level));
-        if (isValidRequestEnum(level) == false) {
+        LOGINFO("params: level=%s", level.IsSet() ? enumToString(level.Value()) : "<not set>");
+        if (!level.IsSet()) {
             LOGERR("FindMyRemote requires level.");
             result.success = false;
             return Core::ERROR_NONE;
         }
 
         JsonObject params;
-        params["level"] = enumToString(level);
+        params["level"] = enumToString(level.Value());
 
         string jsonParams;
         params.ToString(jsonParams);
