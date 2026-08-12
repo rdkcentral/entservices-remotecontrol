@@ -142,10 +142,7 @@ namespace Plugin {
         std::vector<uint32_t> ParseUint32Array(const JsonValue& value, size_t limit, const char* fieldName)
         {
             std::vector<uint32_t> result;
-            // NOTE: Array() returns a temporary ArrayType<Variant> by value. Bind it to a
-            // named variable before calling Elements() — otherwise the returned iterator
-            // holds a dangling pointer into the temporary's internal list once this
-            // statement ends, and Next() past the first element is undefined behavior.
+            // Array() returns a temporary; must be named or Elements()'s iterator dangles.
             JsonArray array = value.Array();
             auto elements = array.Elements();
             while (elements.Next()) {
@@ -187,8 +184,7 @@ namespace Plugin {
         std::vector<Exchange::PairedRemoteInfo> ParseRemoteDataArray(const JsonValue& value, size_t limit)
         {
             std::vector<Exchange::PairedRemoteInfo> result;
-            // See the NOTE in ParseUint32Array above — Array() must be bound to a named
-            // variable to keep it alive for the lifetime of the Elements() iterator.
+            // See ParseUint32Array above re: Array() returning a temporary.
             JsonArray array = value.Array();
             auto elements = array.Elements();
             while (elements.Next()) {
