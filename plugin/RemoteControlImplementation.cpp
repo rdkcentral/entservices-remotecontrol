@@ -23,6 +23,7 @@
 #include "UtilsIarm.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <list>
 
 #define IARM_FACTORY_RESET_TIMEOUT  (15 * 1000)  // 15 seconds, in milliseconds
@@ -136,12 +137,24 @@ namespace Plugin {
             std::vector<uint32_t> result;
             JsonArray array = value.Array();
             auto elements = array.Elements();
+            size_t seen = 0;
             while (elements.Next()) {
-                result.push_back(static_cast<uint32_t>(elements.Current().Number()));
+                ++seen;
+                if (result.size() >= limit) {
+                    continue;
+                }
+                const double number = static_cast<double>(elements.Current().Number());
+                uint32_t clamped;
+                if (number >= 0.0 && number <= static_cast<double>(UINT32_MAX)) {
+                    clamped = static_cast<uint32_t>(number);
+                } else {
+                    clamped = (number > 0.0) ? UINT32_MAX : 0;
+                    LOGERR("COM-RPC field '%s' element out of uint32_t range: %f — clamping to %u", fieldName, number, clamped);
+                }
+                result.push_back(clamped);
             }
-            if (result.size() > limit) {
-                LOGERR("COM-RPC field '%s' exceeds @restrict limit: %zu > %zu elements — truncating", fieldName, result.size(), limit);
-                result.resize(limit);
+            if (seen > limit) {
+                LOGERR("COM-RPC field '%s' exceeds @restrict limit: %zu > %zu elements — truncating", fieldName, seen, limit);
             }
             return result;
         }
@@ -177,12 +190,16 @@ namespace Plugin {
             std::vector<Exchange::PairedRemoteInfo> result;
             JsonArray array = value.Array();
             auto elements = array.Elements();
+            size_t seen = 0;
             while (elements.Next()) {
+                ++seen;
+                if (result.size() >= limit) {
+                    continue;
+                }
                 result.push_back(ParseRemoteInfo(elements.Current().Object()));
             }
-            if (result.size() > limit) {
-                LOGERR("COM-RPC field 'NetStatusData.remoteData' exceeds @restrict limit: %zu > %zu elements — truncating", result.size(), limit);
-                result.resize(limit);
+            if (seen > limit) {
+                LOGERR("COM-RPC field 'NetStatusData.remoteData' exceeds @restrict limit: %zu > %zu elements — truncating", seen, limit);
             }
             return result;
         }
