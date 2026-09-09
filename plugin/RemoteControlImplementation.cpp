@@ -565,13 +565,13 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartPairing(const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, Exchange::IStringIterator* const macAddressList, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::StartPairing(const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, const std::vector<string>& macAddressList, Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: timeout=%s%u, screenBindEnable=%s%s, scanEnable=%s%s, macAddressList=%s",
+        LOGINFO("params: timeout=%s%u, screenBindEnable=%s%s, scanEnable=%s%s, macAddressList=%zu entries",
                 timeout.IsSet() ? "" : "<default>", timeout.IsSet() ? timeout.Value() : 0,
                 screenBindEnable.IsSet() ? "" : "<default>", screenBindEnable.IsSet() ? (screenBindEnable.Value() ? "true" : "false") : "",
                 scanEnable.IsSet() ? "" : "<default>", scanEnable.IsSet() ? (scanEnable.Value() ? "true" : "false") : "",
-                (macAddressList != nullptr) ? "<provided>" : "<not set>");
+                macAddressList.size());
 
         JsonObject params;
         if (timeout.IsSet()) {
@@ -584,15 +584,12 @@ namespace Plugin {
             params["scanEnable"] = scanEnable.Value();
         }
 
-        JsonArray macArray;
-        if (macAddressList != nullptr) {
-            string mac;
-            while (macAddressList->Next(mac)) {
+        if (!macAddressList.empty()) {
+            JsonArray macArray;
+            for (const auto& mac : macAddressList) {
                 macArray.Add(Core::JSON::Variant(mac));
             }
-            if (macArray.Length() > 0) {
-                params["macAddressList"] = macArray;
-            }
+            params["macAddressList"] = macArray;
         }
 
         string jsonParams;
@@ -1067,16 +1064,14 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::Unpair(Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const macAddressList)
+    Core::hresult RemoteControlImplementation::Unpair(Exchange::RemoteControlSuccessResult& result, const std::vector<string>& macAddressList)
     {
-        LOGINFO("params: macAddressList=%s",
-                (macAddressList != nullptr) ? "<provided>" : "<not set>");
+        LOGINFO("params: macAddressList=%zu entries", macAddressList.size());
         JsonObject params;
 
-        if (macAddressList != nullptr) {
+        if (!macAddressList.empty()) {
             JsonArray macArray;
-            string mac;
-            while (macAddressList->Next(mac)) {
+            for (const auto& mac : macAddressList) {
                 macArray.Add(Core::JSON::Variant(mac));
             }
             params["macAddressList"] = macArray;
@@ -1096,11 +1091,11 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartFirmwareUpdate(const string& macAddress, const string& fileName, const string& fileType, const uint32_t percentIncrement, bool& success, Exchange::IStringIterator*& sessionIdList)
+    Core::hresult RemoteControlImplementation::StartFirmwareUpdate(const string& macAddress, const string& fileName, const string& fileType, const uint32_t percentIncrement, bool& success, std::vector<string>& sessionIdList)
     {
         LOGINFO("params: macAddress=%s, fileName=%s, fileType=%s, percentIncrement=%u",
                 macAddress.c_str(), fileName.c_str(), fileType.c_str(), percentIncrement);
-        sessionIdList = nullptr;
+        sessionIdList.clear();
 
         JsonObject params;
         if (!macAddress.empty()) params["macAddress"] = macAddress;
@@ -1115,20 +1110,20 @@ namespace Plugin {
         Core::hresult callResult = IARMBusCall(CTRLM_MAIN_IARM_CALL_START_FIRMWARE_UPDATE, jsonParams, result);
         if (callResult != Core::ERROR_NONE) {
             success = false;
-            sessionIdList = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(std::list<string>{});
             return Core::ERROR_NONE;
         }
 
         success = result.HasLabel("success") ? result["success"].Boolean() : false;
 
-        std::list<string> sessions;
         if (result.HasLabel("sessionIdList")) {
             auto arr = result["sessionIdList"].Array();
-            for (uint16_t i = 0; i < arr.Length(); i++) {
-                sessions.push_back(arr[i].String());
+            for (uint16_t i = 0; i < arr.Length() && sessionIdList.size() < 32; i++) {
+                sessionIdList.push_back(arr[i].String());
+            }
+            if (arr.Length() > 32) {
+                LOGERR("COM-RPC field 'sessionIdList' exceeds @restrict limit: %u > 32 elements — truncating", static_cast<unsigned>(arr.Length()));
             }
         }
-        sessionIdList = Core::Service<RPC::StringIterator>::Create<Exchange::IStringIterator>(sessions);
 
         return Core::ERROR_NONE;
     }

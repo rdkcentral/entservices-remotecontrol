@@ -46,7 +46,7 @@ namespace Plugin {
 
         // IRemoteControl methods
         Core::hresult GetApiVersionNumber(Exchange::RemoteControlGetApiVersionNumberResponse& response) override;
-        Core::hresult StartPairing(const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, Exchange::IStringIterator* const macAddressList, Exchange::RemoteControlSuccessResult& result) override;
+        Core::hresult StartPairing(const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, const std::vector<string>& macAddressList, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult StopPairing(const Core::OptionalType<bool>& screenBindDisable, const Core::OptionalType<bool>& scanDisable, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResult& result) override;
         Core::hresult GetIRDBManufacturers(Core::OptionalType<Exchange::AVDevType>& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers) override;
@@ -60,8 +60,8 @@ namespace Plugin {
         Core::hresult InitializeIRDB(const uint32_t netType, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult FindMyRemote(const Core::OptionalType<Exchange::FindMyRemoteLevel>& level, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult FactoryReset(Exchange::RemoteControlSuccessResult& result) override;
-        Core::hresult Unpair(Exchange::RemoteControlSuccessResult& result, Exchange::IStringIterator* const macAddressList) override;
-        Core::hresult StartFirmwareUpdate(const string& macAddress, const string& fileName, const string& fileType, const uint32_t percentIncrement, bool& success, Exchange::IStringIterator*& sessionIdList) override;
+        Core::hresult Unpair(Exchange::RemoteControlSuccessResult& result, const std::vector<string>& macAddressList) override;
+        Core::hresult StartFirmwareUpdate(const string& macAddress, const string& fileName, const string& fileType, const uint32_t percentIncrement, bool& success, std::vector<string>& sessionIdList) override;
         Core::hresult CancelFirmwareUpdate(const string& sessionId, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult StatusFirmwareUpdate(const string& sessionId, Exchange::StatusFirmwareUpdateResponse& response) override;
 
