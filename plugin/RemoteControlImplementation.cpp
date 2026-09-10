@@ -743,7 +743,9 @@ namespace Plugin {
 
         JsonObject params;
         params["avDevType"] = enumToString(avDevType.Value());
-        params["manufacturer"] = manufacturer.IsSet() ? manufacturer.Value() : "";
+        if (manufacturer.IsSet()) {
+            params["manufacturer"] = manufacturer.Value();
+        }
         params["model"] = model;
 
         string jsonParams;
@@ -850,8 +852,12 @@ namespace Plugin {
 
         JsonObject params;
         params["avDevType"] = enumToString(avDevType.Value());
-        params["manufacturer"] = manufacturer.IsSet() ? manufacturer.Value() : "";
-        params["model"] = model.IsSet() ? model.Value() : "";
+        if (manufacturer.IsSet()) {
+            params["manufacturer"] = manufacturer.Value();
+        }
+        if (model.IsSet()) {
+            params["model"] = model.Value();
+        }
 
         string jsonParams;
         params.ToString(jsonParams);
