@@ -46,7 +46,7 @@ namespace Plugin {
 
         // IRemoteControl methods
         Core::hresult GetApiVersionNumber(Exchange::RemoteControlGetApiVersionNumberResponse& response) override;
-        Core::hresult StartPairing(const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, const std::vector<string>& macAddressList, Exchange::RemoteControlSuccessResult& result) override;
+        Core::hresult StartPairing(const Core::OptionalType<uint32_t>& netType, const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, const std::vector<string>& macAddressList, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult StopPairing(const Core::OptionalType<bool>& screenBindDisable, const Core::OptionalType<bool>& scanDisable, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResult& result) override;
         Core::hresult GetIRDBManufacturers(Core::OptionalType<Exchange::AVDevType>& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers) override;

@@ -565,15 +565,19 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartPairing(const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, const std::vector<string>& macAddressList, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::StartPairing(const Core::OptionalType<uint32_t>& netType, const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, const std::vector<string>& macAddressList, Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: timeout=%s%u, screenBindEnable=%s%s, scanEnable=%s%s, macAddressList=%zu entries",
+        LOGINFO("params: netType=%s%u, timeout=%s%u, screenBindEnable=%s%s, scanEnable=%s%s, macAddressList=%zu entries",
+                netType.IsSet() ? "" : "<default>", netType.IsSet() ? netType.Value() : 0,
                 timeout.IsSet() ? "" : "<default>", timeout.IsSet() ? timeout.Value() : 0,
                 screenBindEnable.IsSet() ? "" : "<default>", screenBindEnable.IsSet() ? (screenBindEnable.Value() ? "true" : "false") : "",
                 scanEnable.IsSet() ? "" : "<default>", scanEnable.IsSet() ? (scanEnable.Value() ? "true" : "false") : "",
                 macAddressList.size());
 
         JsonObject params;
+        if (netType.IsSet()) {
+            params["netType"] = netType.Value();
+        }
         if (timeout.IsSet()) {
             params["timeout"] = timeout.Value();
         }
