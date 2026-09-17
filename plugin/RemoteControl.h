@@ -88,8 +88,7 @@ namespace Plugin {
                 Exchange::JRemoteControl::Event::OnStatus(_parent, status);
             }
             void OnValidation(const Exchange::ValidationStatusObject& status) override {
-                LOGINFO("Notify onValidation netType=%u validationDigit1=%u validationDigit2=%u validationDigit3=%u",
-                    status.netType,
+                LOGINFO("Notify onValidation validationDigit1=%u validationDigit2=%u validationDigit3=%u",
                     status.validationDigit1,
                     status.validationDigit2,
                     status.validationDigit3);

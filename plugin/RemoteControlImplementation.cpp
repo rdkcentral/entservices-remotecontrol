@@ -468,11 +468,18 @@ namespace Plugin {
         JsonObject params;
         params.FromString(eventData->payload);
 
-        Exchange::ValidationStatusObject status;
-        status.netType = params.HasLabel("netType") ? static_cast<uint32_t>(params["netType"].Number()) : 0;
-        status.validationDigit1 = params.HasLabel("validationDigit1") ? static_cast<uint32_t>(params["validationDigit1"].Number()) : 0;
-        status.validationDigit2 = params.HasLabel("validationDigit2") ? static_cast<uint32_t>(params["validationDigit2"].Number()) : 0;
-        status.validationDigit3 = params.HasLabel("validationDigit3") ? static_cast<uint32_t>(params["validationDigit3"].Number()) : 0;
+        JsonObject statusObj;
+        if (params.HasLabel("status")) {
+            statusObj = params["status"].Object();
+        }
+
+        Exchange::ValidationStatusObject status{};
+        if (statusObj.HasLabel("code")) {
+            std::vector<uint32_t> code = ParseUint32Array(statusObj["code"], 3, "ValidationStatusObject.code");
+            status.validationDigit1 = code.size() > 0 ? code[0] : 0;
+            status.validationDigit2 = code.size() > 1 ? code[1] : 0;
+            status.validationDigit3 = code.size() > 2 ? code[2] : 0;
+        }
 
         auto observers = ObserverSnapshot();
 
