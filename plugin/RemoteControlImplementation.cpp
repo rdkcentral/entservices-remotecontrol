@@ -120,6 +120,23 @@ namespace Plugin {
             return defaultValue;
         }
 
+        // --- ValidationStatus: 1:1 mapping to ctrlm's ctrlm_rcu_validation_result_str() strings ---
+        template <>
+        Exchange::ValidationStatus stringToEnum<Exchange::ValidationStatus>(const string& str, Exchange::ValidationStatus defaultValue) {
+            if (str == "SUCCESS")         return Exchange::ValidationStatus::SUCCESS;
+            if (str == "PENDING")         return Exchange::ValidationStatus::PENDING;
+            if (str == "TIMEOUT")         return Exchange::ValidationStatus::TIMEOUT;
+            if (str == "COLLISION")       return Exchange::ValidationStatus::COLLISION;
+            if (str == "FAILURE")         return Exchange::ValidationStatus::FAILURE;
+            if (str == "ABORT")           return Exchange::ValidationStatus::ABORT;
+            if (str == "FULL_ABORT")      return Exchange::ValidationStatus::FULL_ABORT;
+            if (str == "FAILED")          return Exchange::ValidationStatus::FAILED;
+            if (str == "BIND_TABLE_FULL") return Exchange::ValidationStatus::BIND_TABLE_FULL;
+            if (str == "IN_PROGRESS")     return Exchange::ValidationStatus::IN_PROGRESS;
+            if (str == "CTRLM_RESTART")   return Exchange::ValidationStatus::CTRLM_RESTART;
+            return defaultValue;
+        }
+
         // --- WakeupConfig: ctrlm sends lowercase "all"/"none"/"custom" ---
         template <>
         Exchange::WakeupConfig stringToEnum<Exchange::WakeupConfig>(const string& str, Exchange::WakeupConfig defaultValue) {
@@ -473,12 +490,15 @@ namespace Plugin {
             statusObj = params["status"].Object();
         }
 
+        // ctrlm sends {"status": {"status": "PENDING", "code": [KEY_*, KEY_*, KEY_*]}} when the
+        // golden code is generated, {"status": "PENDING", "key": KEY_*} for each key pressed and
+        // {"status": "SUCCESS"} (or another result) when validation ends. The KEY_* codes are
+        // passed through unchanged, as they were before the move to COM-RPC.
         Exchange::ValidationStatusObject status{};
-        if (statusObj.HasLabel("code")) {
-            std::vector<uint32_t> code = ParseUint32Array(statusObj["code"], 3, "ValidationStatusObject.code");
-            status.validationDigit1 = code.size() > 0 ? code[0] : 0;
-            status.validationDigit2 = code.size() > 1 ? code[1] : 0;
-            status.validationDigit3 = code.size() > 2 ? code[2] : 0;
+        status.status = statusObj.HasLabel("status") ? stringToEnum<Exchange::ValidationStatus>(statusObj["status"].String(), Exchange::ValidationStatus::FAILED) : Exchange::ValidationStatus::FAILED;
+        status.code = statusObj.HasLabel("code") ? ParseUint32Array(statusObj["code"], 3, "ValidationStatusObject.code") : std::vector<uint32_t>();
+        if (statusObj.HasLabel("key")) {
+            status.key = static_cast<uint32_t>(statusObj["key"].Number());
         }
 
         auto observers = ObserverSnapshot();

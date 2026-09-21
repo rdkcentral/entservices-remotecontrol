@@ -88,10 +88,13 @@ namespace Plugin {
                 Exchange::JRemoteControl::Event::OnStatus(_parent, status);
             }
             void OnValidation(const Exchange::ValidationStatusObject& status) override {
-                LOGINFO("Notify onValidation validationDigit1=%u validationDigit2=%u validationDigit3=%u",
-                    status.validationDigit1,
-                    status.validationDigit2,
-                    status.validationDigit3);
+                LOGINFO("Notify onValidation status=%u codeSize=%zu code=%u,%u,%u key=%u",
+                    static_cast<unsigned>(status.status),
+                    status.code.size(),
+                    status.code.size() > 0 ? status.code[0] : 0,
+                    status.code.size() > 1 ? status.code[1] : 0,
+                    status.code.size() > 2 ? status.code[2] : 0,
+                    status.key.IsSet() ? status.key.Value() : 0);
                 Exchange::JRemoteControl::Event::OnValidation(_parent, status);
             }
             void OnFirmwareUpdateProgress(const Exchange::FirmwareUpdateStatusData& status) override {
