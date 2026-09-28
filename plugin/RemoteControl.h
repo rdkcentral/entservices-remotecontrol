@@ -79,20 +79,22 @@ namespace Plugin {
             ~Notification() override = default;
 
             void OnStatus(const Exchange::NetStatusData& status) override {
-                LOGINFO("Notify onStatus netType=%u pairingState=%u irProgState=%u netTypesSupported=%s remoteData=%s",
+                LOGINFO("Notify onStatus netType=%u pairingState=%u irProgState=%u netTypesSupportedCount=%zu remoteDataCount=%zu",
                     status.netType,
                     static_cast<unsigned>(status.pairingState),
                     static_cast<unsigned>(status.irProgState),
-                    status.netTypesSupported.c_str(),
-                    status.remoteData.c_str());
+                    status.netTypesSupported.size(),
+                    status.remoteData.size());
                 Exchange::JRemoteControl::Event::OnStatus(_parent, status);
             }
             void OnValidation(const Exchange::ValidationStatusObject& status) override {
-                LOGINFO("Notify onValidation netType=%u validationDigit1=%u validationDigit2=%u validationDigit3=%u",
-                    status.netType,
-                    status.validationDigit1,
-                    status.validationDigit2,
-                    status.validationDigit3);
+                LOGINFO("Notify onValidation status=%u codeSize=%zu code=%u,%u,%u key=%u",
+                    static_cast<unsigned>(status.status),
+                    status.code.size(),
+                    status.code.size() > 0 ? status.code[0] : 0,
+                    status.code.size() > 1 ? status.code[1] : 0,
+                    status.code.size() > 2 ? status.code[2] : 0,
+                    status.key.IsSet() ? status.key.Value() : 0);
                 Exchange::JRemoteControl::Event::OnValidation(_parent, status);
             }
             void OnFirmwareUpdateProgress(const Exchange::FirmwareUpdateStatusData& status) override {
@@ -101,7 +103,7 @@ namespace Plugin {
                     status.macAddress.c_str(),
                     static_cast<unsigned>(status.upgradeState),
                     status.percentComplete,
-                    status.errorString.c_str());
+                    status.errorString.IsSet() ? status.errorString.Value().c_str() : "");
                 Exchange::JRemoteControl::Event::OnFirmwareUpdateProgress(_parent, status);
             }
 
