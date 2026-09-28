@@ -49,6 +49,8 @@ namespace Plugin {
         ASSERT(_implementation == nullptr);
         ASSERT(_connectionId == 0);
 
+        LOGINFO("name <%-24s> version <%-9s> branch <%-20s> commit <%s>", "RemoteControl", PLUGIN_VERSION_STRING, PLUGIN_GIT_BRANCH, PLUGIN_GIT_HASH);
+
         _service = service;
         _service->AddRef();
         _service->Register(&_connectionNotification);
