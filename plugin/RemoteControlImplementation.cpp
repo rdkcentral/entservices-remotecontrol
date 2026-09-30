@@ -157,6 +157,23 @@ namespace Plugin {
             if (str == "invalid")  return Exchange::FirmwareUpdateState::INVALID;
             return defaultValue;
         }
+
+        // --- ValidationStatus: 1:1 mapping to ctrlm's ctrlm_rcu_validation_result_str() strings ---
+        template <>
+        Exchange::ValidationStatus stringToEnum<Exchange::ValidationStatus>(const string& str, Exchange::ValidationStatus defaultValue) {
+            if (str == "SUCCESS")         return Exchange::ValidationStatus::SUCCESS;
+            if (str == "PENDING")         return Exchange::ValidationStatus::PENDING;
+            if (str == "TIMEOUT")         return Exchange::ValidationStatus::TIMEOUT;
+            if (str == "COLLISION")       return Exchange::ValidationStatus::COLLISION;
+            if (str == "FAILURE")         return Exchange::ValidationStatus::FAILURE;
+            if (str == "ABORT")           return Exchange::ValidationStatus::ABORT;
+            if (str == "FULL_ABORT")      return Exchange::ValidationStatus::FULL_ABORT;
+            if (str == "FAILED")          return Exchange::ValidationStatus::FAILED;
+            if (str == "BIND_TABLE_FULL") return Exchange::ValidationStatus::BIND_TABLE_FULL;
+            if (str == "IN_PROGRESS")     return Exchange::ValidationStatus::IN_PROGRESS;
+            if (str == "CTRLM_RESTART")   return Exchange::ValidationStatus::CTRLM_RESTART;
+            return defaultValue;
+        }
     } // anonymous namespace
 
     SERVICE_REGISTRATION(RemoteControlImplementation, API_VERSION_NUMBER_MAJOR, API_VERSION_NUMBER_MINOR, API_VERSION_NUMBER_PATCH);
@@ -427,11 +444,24 @@ namespace Plugin {
         JsonObject params;
         params.FromString(eventData->payload);
 
+        JsonObject statusObj;
+        if (params.HasLabel("status")) {
+            statusObj = params["status"].Object();
+        }
+
+        // ctrlm sends {"status": {"status": "PENDING", "code": [KEY_*, KEY_*, KEY_*]}} when the
+        // golden code is generated, {"status": "PENDING", "key": KEY_*} for each key pressed and
+        // {"status": "SUCCESS"} (or another result) when validation ends. The KEY_* codes are
+        // passed through unchanged, as they were before the move to COM-RPC. An empty code or a
+        // key of 0 is omitted from the JSON-RPC event.
         Exchange::ValidationStatusObject status;
-        status.netType = params.HasLabel("netType") ? static_cast<uint32_t>(params["netType"].Number()) : 0;
-        status.validationDigit1 = params.HasLabel("validationDigit1") ? static_cast<uint32_t>(params["validationDigit1"].Number()) : 0;
-        status.validationDigit2 = params.HasLabel("validationDigit2") ? static_cast<uint32_t>(params["validationDigit2"].Number()) : 0;
-        status.validationDigit3 = params.HasLabel("validationDigit3") ? static_cast<uint32_t>(params["validationDigit3"].Number()) : 0;
+        status.status = statusObj.HasLabel("status") ? stringToEnum<Exchange::ValidationStatus>(statusObj["status"].String(), Exchange::ValidationStatus::FAILED) : Exchange::ValidationStatus::FAILED;
+        status.code = statusObj.HasLabel("code") ? jsonValueToString(statusObj["code"]) : "";
+        status.key = statusObj.HasLabel("key") ? static_cast<uint32_t>(statusObj["key"].Number()) : 0;
+
+        // ValidationStatusObject.code is @opaque with no @restrict —
+        // default uint16_t SetText limit is 65535 bytes.
+        checkRestrictLimit(status.code, 65535, "ValidationStatusObject.code");
 
         auto observers = ObserverSnapshot();
 
