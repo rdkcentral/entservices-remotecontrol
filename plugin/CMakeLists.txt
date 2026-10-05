@@ -41,6 +41,11 @@ if (BUILD_TESTS)
     add_subdirectory(test)
 endif(BUILD_TESTS)
 
+## Version info generated from git (see cmake/GitVersion.cmake and README.md "Versioning")
+include(GitVersion)
+message(STATUS "${PLUGIN_NAME} version ${PLUGIN_VERSION_STRING} branch ${PLUGIN_GIT_BRANCH} commit ${PLUGIN_GIT_HASH}")
+configure_file(PluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/PluginVersion.h @ONLY ESCAPE_QUOTES)
+
 ## Plugin library (loaded by Thunder framework — thin JSON-RPC + COM-RPC shell)
 add_library(${MODULE_NAME} SHARED
         RemoteControl.cpp
@@ -50,7 +55,10 @@ set_target_properties(${MODULE_NAME} PROPERTIES
         CXX_STANDARD 11
         CXX_STANDARD_REQUIRED YES)
 
-target_include_directories(${MODULE_NAME} PRIVATE ../helpers)
+target_include_directories(${MODULE_NAME} PRIVATE ../helpers ${CMAKE_CURRENT_BINARY_DIR})
+if (PLUGIN_BUILD_REFERENCE)
+    target_compile_definitions(${MODULE_NAME} PRIVATE BUILD_REFERENCE=${PLUGIN_BUILD_REFERENCE})
+endif()
 target_link_libraries(${MODULE_NAME} PRIVATE
         ${NAMESPACE}Plugins::${NAMESPACE}Plugins
         ${NAMESPACE}Definitions::${NAMESPACE}Definitions)
@@ -63,7 +71,10 @@ set_target_properties(${PLUGIN_IMPLEMENTATION} PROPERTIES
         CXX_STANDARD 11
         CXX_STANDARD_REQUIRED YES)
 
-target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ../helpers)
+target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ../helpers ${CMAKE_CURRENT_BINARY_DIR})
+if (PLUGIN_BUILD_REFERENCE)
+    target_compile_definitions(${PLUGIN_IMPLEMENTATION} PRIVATE BUILD_REFERENCE=${PLUGIN_BUILD_REFERENCE})
+endif()
 
 target_compile_definitions(${PLUGIN_IMPLEMENTATION} PRIVATE CTRLM_FOUND)
 target_include_directories(${PLUGIN_IMPLEMENTATION} PRIVATE ${CTRLM_INCLUDE_DIRS})
