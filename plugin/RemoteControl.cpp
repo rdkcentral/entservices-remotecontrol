@@ -18,7 +18,6 @@
   */
 
 #include "RemoteControl.h"
-#include "PluginVersion.h"
 #include <list>
 
 namespace WPEFramework {
