@@ -47,7 +47,7 @@ make
 ## Versioning
 
 The version comes from `-DCMAKE_PROJECT_VERSION` (the Yocto recipe passes `${PV}`, default `1.0.1`) and sets the plugin's API version numbers.
-The startup log prints `name <RemoteControl> version <x.y.z> branch <...> commit <hash>`, matching ctrlm and xr-voice-sdk, with `++` appended to the version if the source tree is modified.
+The startup log prints `name <RemoteControl> version <x.y.z> branch <...> commit <hash>`, with `++` appended to the version if the source tree is modified.
 
 ## Testing
 
