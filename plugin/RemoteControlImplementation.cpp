@@ -665,11 +665,14 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResult& result)
+    Core::hresult RemoteControlImplementation::GetNetStatus(const uint32_t netType, const Core::OptionalType<bool>& verbose, Exchange::GetNetStatusResult& result)
     {
-        LOGINFO("params: netType=%u", netType);
+        LOGINFO("params: netType=%u, verbose=%s", netType, verbose ? "true" : "false");
         JsonObject params;
         params["netType"] = netType;
+        if (verbose.IsSet()) {
+            params["verbose"] = verbose.Value();
+        }
 
         string jsonParams;
         params.ToString(jsonParams);

@@ -48,7 +48,7 @@ namespace Plugin {
         Core::hresult GetApiVersionNumber(Exchange::RemoteControlGetApiVersionNumberResponse& response) override;
         Core::hresult StartPairing(const Core::OptionalType<uint32_t>& netType, const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, const std::vector<string>& macAddressList, Exchange::RemoteControlSuccessResult& result) override;
         Core::hresult StopPairing(const Core::OptionalType<bool>& screenBindDisable, const Core::OptionalType<bool>& scanDisable, Exchange::RemoteControlSuccessResult& result) override;
-        Core::hresult GetNetStatus(const uint32_t netType, Exchange::GetNetStatusResult& result) override;
+        Core::hresult GetNetStatus(const uint32_t netType, const Core::OptionalType<bool>& verbose, Exchange::GetNetStatusResult& result) override;
         Core::hresult GetIRDBManufacturers(Core::OptionalType<Exchange::AVDevType>& avDevType, const string& manufacturer, bool& success, Exchange::IStringIterator*& manufacturers) override;
         Core::hresult GetIRDBModels(Core::OptionalType<Exchange::AVDevType>& avDevType, Core::OptionalType<string>& manufacturer, const string& model, bool& success, Exchange::IStringIterator*& models) override;
         Core::hresult GetIRCodesByAutoLookup(const uint32_t netType, string& tvManufacturer, string& tvModel, string& avrManufacturer, string& avrModel, bool& success, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes) override;
