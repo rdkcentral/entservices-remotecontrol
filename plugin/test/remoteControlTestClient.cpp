@@ -564,7 +564,6 @@ int main(int argc, char** argv)
                             {
                                 JsonObject params;
                                 string res;
-                                params["netType"] = netType;
 
                                 if (timeout > 0) {
                                     params["timeout"] = timeout;
@@ -608,7 +607,6 @@ int main(int argc, char** argv)
                                 JsonObject params;
                                 string res;
 
-                                params["netType"] = netType;
                                 params["avDevType"] = avDevType;
 
                                 std::cout<<"\nEnter at least part of a manufacturer name : ";
@@ -635,7 +633,6 @@ int main(int argc, char** argv)
                                 string     model;
                                 string     res;
 
-                                params["netType"] = netType;
                                 params["avDevType"] = avDevType;
 
                                 std::cout<<"\nEnter the full manufacturer name : ";
@@ -666,7 +663,6 @@ int main(int argc, char** argv)
                                 string     model;
                                 string     res;
 
-                                params["netType"] = netType;
                                 params["avDevType"] = avDevType;
 
                                 std::cout<<"\nEnter the full manufacturer name : ";
@@ -696,7 +692,6 @@ int main(int argc, char** argv)
                             {
                                 JsonObject params;
                                 string res;
-                                params["netType"] = netType;
                                 params["remoteId"] = remoteId;
                                 params["avDevType"] = avDevType;
 
@@ -727,7 +722,6 @@ int main(int argc, char** argv)
                             {
                                 JsonObject params;
                                 string res;
-                                params["netType"] = netType;
                                 params["remoteId"] = remoteId;
 
                                 ret = remoteObject->Invoke<JsonObject, JsonObject>(INVOKE_TIMEOUT,
@@ -750,7 +744,6 @@ int main(int argc, char** argv)
                                 string     model;
                                 string     res;
 
-                                params["netType"] = netType;
 
                                 ret = remoteObject->Invoke<JsonObject, JsonObject>(INVOKE_TIMEOUT,
                                                     _T("getIRCodesByAutoLookup"), params, result);
@@ -769,7 +762,6 @@ int main(int argc, char** argv)
                             {
                                 JsonObject params;
                                 string res;
-                                params["netType"] = netType;
                                 ret = remoteObject->Invoke<JsonObject, JsonObject>(1000,
                                                     _T("getLastKeypressSource"), params, result);
                                 std::cout<<"RemoteControl Invoke ret : "<< ret <<"\n";
@@ -788,7 +780,6 @@ int main(int argc, char** argv)
                             {
                                 JsonObject params;
                                 string res;
-                                params["netType"] = netType;
 
                                 ret = remoteObject->Invoke<JsonObject, JsonObject>(INVOKE_TIMEOUT,
                                                     _T("initializeIRDB"), params, result);
@@ -808,7 +799,6 @@ int main(int argc, char** argv)
                             {
                                 JsonObject params;
                                 string res;
-                                params["netType"] = netType;
                                 params["level"] = beepLevel;
 
                                 ret = remoteObject->Invoke<JsonObject, JsonObject>(INVOKE_TIMEOUT,
