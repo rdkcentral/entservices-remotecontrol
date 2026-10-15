@@ -592,19 +592,15 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::StartPairing(const Core::OptionalType<uint32_t>& netType, const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, const std::vector<string>& macAddressList, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::StartPairing(const Core::OptionalType<uint32_t>& timeout, const Core::OptionalType<bool>& screenBindEnable, const Core::OptionalType<bool>& scanEnable, const std::vector<string>& macAddressList, Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: netType=%s%u, timeout=%s%u, screenBindEnable=%s%s, scanEnable=%s%s, macAddressList=%zu entries",
-                netType.IsSet() ? "" : "<default>", netType.IsSet() ? netType.Value() : 0,
+        LOGINFO("params: timeout=%s%u, screenBindEnable=%s%s, scanEnable=%s%s, macAddressList=%zu entries",
                 timeout.IsSet() ? "" : "<default>", timeout.IsSet() ? timeout.Value() : 0,
                 screenBindEnable.IsSet() ? "" : "<default>", screenBindEnable.IsSet() ? (screenBindEnable.Value() ? "true" : "false") : "",
                 scanEnable.IsSet() ? "" : "<default>", scanEnable.IsSet() ? (scanEnable.Value() ? "true" : "false") : "",
                 macAddressList.size());
 
         JsonObject params;
-        if (netType.IsSet()) {
-            params["netType"] = netType.Value();
-        }
         if (timeout.IsSet()) {
             params["timeout"] = timeout.Value();
         }
@@ -816,11 +812,9 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::GetIRCodesByAutoLookup(const uint32_t netType, string& tvManufacturer, string& tvModel, string& avrManufacturer, string& avrModel, bool& success, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes)
+    Core::hresult RemoteControlImplementation::GetIRCodesByAutoLookup(string& tvManufacturer, string& tvModel, string& avrManufacturer, string& avrModel, bool& success, Exchange::IStringIterator*& tvCodes, Exchange::IStringIterator*& avrCodes)
     {
-        LOGINFO("params: netType=%u", netType);
         JsonObject params;
-        params["netType"] = netType;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -937,16 +931,15 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::SetIRCode(const uint32_t remoteId, const uint32_t netType, const Exchange::AVDevType avDevType, const string& code, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::SetIRCode(const uint32_t remoteId, const Exchange::AVDevType avDevType, const string& code, Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: remoteId=%u, netType=%u, avDevType=%s, code=%s",
-                remoteId, netType,
+        LOGINFO("params: remoteId=%u, avDevType=%s, code=%s",
+                remoteId,
                 enumToString(avDevType),
                 code.c_str());
 
         JsonObject params;
         params["remoteId"] = remoteId;
-        params["netType"] = netType;
         params["avDevType"] = enumToString(avDevType);
         if (!code.empty()) params["code"] = code;
 
@@ -964,12 +957,11 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::ClearIRCodes(const uint32_t remoteId, const uint32_t netType, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::ClearIRCodes(const uint32_t remoteId, Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: remoteId=%u, netType=%u", remoteId, netType);
+        LOGINFO("params: remoteId=%u", remoteId);
         JsonObject params;
         params["remoteId"] = remoteId;
-        params["netType"] = netType;
 
         string jsonParams;
         params.ToString(jsonParams);
@@ -1037,11 +1029,9 @@ namespace Plugin {
         return Core::ERROR_NONE;
     }
 
-    Core::hresult RemoteControlImplementation::InitializeIRDB(const uint32_t netType, Exchange::RemoteControlSuccessResult& result)
+    Core::hresult RemoteControlImplementation::InitializeIRDB(Exchange::RemoteControlSuccessResult& result)
     {
-        LOGINFO("params: netType=%u", netType);
         JsonObject params;
-        params["netType"] = netType;
 
         string jsonParams;
         params.ToString(jsonParams);
