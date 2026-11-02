@@ -35,7 +35,7 @@
 #define INVOKE_TIMEOUT  (5000)
 
 using namespace std;
-using namespace WPEFramework;
+using namespace Thunder;
 // Global data used to for arguments to pass to the plugin methods
 int deviceID = 1;
 
@@ -438,7 +438,7 @@ int main(int argc, char** argv)
     std::cout << "Retrieving security token" << std::endl;
     std::string sToken;
 
-    FILE *pSecurity = popen("/usr/bin/WPEFrameworkSecurityUtility", "r");
+    FILE *pSecurity = popen("/usr/bin/ThunderSecurityUtility", "r");
     if(pSecurity) {
         JsonObject pSecurityJson;
         std::string pSecurityOutput;
@@ -482,7 +482,7 @@ int main(int argc, char** argv)
 
             {
                 // Create a controller client
-                static auto& controllerClient = *new WPEFramework::JSONRPC::LinkType<WPEFramework::Core::JSON::IElement>("", "", false, sToken);
+                static auto& controllerClient = *new Thunder::JSONRPC::LinkType<Thunder::Core::JSON::IElement>("", "", false, sToken);
                 // In case the plugin isn't activated already, try to start it, BEFORE registering for the events!
                 string strres;
                 JsonObject params;

@@ -30,11 +30,11 @@ set_target_properties(${PLUGIN_NAME} PROPERTIES
 
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}Core::${NAMESPACE}Core GTest::gtest_main GTest::gtest)
 
-if (USE_THUNDER_R4)
+if (WPEFramework_FOUND)
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}COM::${NAMESPACE}COM  ${NAMESPACE}WebSocket::${NAMESPACE}WebSocket)
 else ()
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${NAMESPACE}Protocols::${NAMESPACE}Protocols)
-endif (USE_THUNDER_R4)
+endif ()
 
 find_library(TESTMOCKLIB_LIBRARIES NAMES TestMocklib)
 if (TESTMOCKLIB_LIBRARIES)
