@@ -328,6 +328,7 @@ namespace Plugin {
     {
         const bool alreadyConnected = Utils::IARM::isConnected();
         if (Utils::IARM::init()) {
+            LOGINFO("InitializeIARM Called...");
             _hasOwnProcess = !alreadyConnected;
             IARM_Result_t res;
 #define RC_REGISTER(EVENT) \
