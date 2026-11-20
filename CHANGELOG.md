@@ -9,19 +9,13 @@ All notable changes to this project will be documented in this file. Dates are d
 - RDKEMW-27441: Migrate Local Logging Wrappers [`#39`](https://github.com/rdkcentral/entservices-remotecontrol/pull/39)
 - RDKEMW-28682: Fix Copilot review instruction files in the RemoteControl plugin [`0bbb531`](https://github.com/rdkcentral/entservices-remotecontrol/commit/0bbb5311)
 
-#### [1.0.7](https://github.com/rdkcentral/entservices-remotecontrol/compare/1.0.5.1...1.0.7)
+#### [1.0.7](https://github.com/rdkcentral/entservices-remotecontrol/compare/1.0.6...1.0.7)
 
 > 5 November 2026
 
 - RDKEMW-26613: Fix documentation for the RemoteControl plugin [`#38`](https://github.com/rdkcentral/entservices-remotecontrol/pull/38)
 - RDKEMW-24945: Print version and git hash for the RemoteControl plugin [`#35`](https://github.com/rdkcentral/entservices-remotecontrol/pull/35)
 - RDKEMW-22650: Pin entservices-apis version in ci [`#37`](https://github.com/rdkcentral/entservices-remotecontrol/pull/37)
-
-#### [1.0.5.1](https://github.com/rdkcentral/entservices-remotecontrol/compare/1.0.6...1.0.5.1)
-
-> 30 September 2026
-
-- No changes. Tagged from `develop` after 1.0.6, so it contains everything in 1.0.6.
 
 #### [1.0.6](https://github.com/rdkcentral/entservices-remotecontrol/compare/1.0.5...1.0.6)
 
@@ -30,14 +24,6 @@ All notable changes to this project will be documented in this file. Dates are d
 - RDKEMW-22650: Replace opaque strings with Optional Type in RemoteControl plugin [`#28`](https://github.com/rdkcentral/entservices-remotecontrol/pull/28)
 - RDKEMW-22169: Updated version to 4.4.6 [`#26`](https://github.com/rdkcentral/entservices-remotecontrol/pull/26)
 - RDKEMW-22169: use 4.0.8 tag of entservices-apis [`#30`](https://github.com/rdkcentral/entservices-remotecontrol/pull/30)
-
-#### [1.0.4.1](https://github.com/rdkcentral/entservices-remotecontrol/compare/1.0.4...1.0.4.1)
-
-> 24 September 2026
-
-Hotfix released from `support/8.6.3.0`, which was branched from `develop` on 18 August 2026 (1.0.5 plus `#26` and `#30`).
-
-- RDKEMW-25301: RF4CE remote manual pairing code zeros [`#34`](https://github.com/rdkcentral/entservices-remotecontrol/pull/34)
 
 #### [1.0.5](https://github.com/rdkcentral/entservices-remotecontrol/compare/1.0.4...1.0.5)
 
