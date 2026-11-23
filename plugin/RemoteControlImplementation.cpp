@@ -32,6 +32,8 @@ namespace WPEFramework {
 namespace Plugin {
 
     namespace {
+        constexpr const char* IARM_CLIENT_NAME = "Thunder_Plugins_RemoteCtrl";
+
         // ─── Enum ↔ string helpers for ctrlm IARM serialization ───
         // ctrlm expects/sends string representations of enums over JSON.
         // These templated helpers centralize the conversions.
@@ -276,7 +278,7 @@ namespace Plugin {
             _service = nullptr;
             return Core::ERROR_GENERAL;
         }
-        if (Utils::IARM::isConnected() == false) {
+        if (Utils::IARM::isConnected(IARM_CLIENT_NAME) == false) {
             LOGERR("Failed to initialize IARM for RemoteControlImplementation, configuration will fail");
             DeinitializeIARM();
             _service->Release();
@@ -326,8 +328,8 @@ namespace Plugin {
 
     bool RemoteControlImplementation::InitializeIARM()
     {
-        const bool alreadyConnected = Utils::IARM::isConnected();
-        if (Utils::IARM::init()) {
+        const bool alreadyConnected = Utils::IARM::isConnected(IARM_CLIENT_NAME);
+        if (Utils::IARM::init(IARM_CLIENT_NAME)) {
             _hasOwnProcess = !alreadyConnected;
             IARM_Result_t res;
 #define RC_REGISTER(EVENT) \
