@@ -198,6 +198,9 @@ namespace Plugin {
             if (obj.HasLabel("wakeupCustomList")) {
                 info.wakeupCustomList = ParseUint32Array(obj["wakeupCustomList"], 32, "PairedRemoteInfo.wakeupCustomList");
             }
+            if (obj.HasLabel("keyCodeList")) {
+                info.keyCodeList = ParseUint32Array(obj["keyCodeList"], 63, "PairedRemoteInfo.keyCodeList");
+            }
             return info;
         }
 
