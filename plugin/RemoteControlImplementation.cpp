@@ -27,6 +27,7 @@
 
 #define IARM_FACTORY_RESET_TIMEOUT  (15 * 1000)  // 15 seconds, in milliseconds
 #define IARM_IRDB_CALLS_TIMEOUT     (10 * 1000)  // 10 seconds, in milliseconds
+#define REMOTECONTROL_IARM_MEMBER_NAME "Thunder_Plugins_RemoteCtrl"
 
 namespace WPEFramework {
 namespace Plugin {
@@ -276,7 +277,7 @@ namespace Plugin {
             _service = nullptr;
             return Core::ERROR_GENERAL;
         }
-        if (Utils::IARM::isConnected() == false) {
+        if (Utils::IARM::isConnected(REMOTECONTROL_IARM_MEMBER_NAME) == false) {
             LOGERR("Failed to initialize IARM for RemoteControlImplementation, configuration will fail");
             DeinitializeIARM();
             _service->Release();
@@ -326,8 +327,8 @@ namespace Plugin {
 
     bool RemoteControlImplementation::InitializeIARM()
     {
-        const bool alreadyConnected = Utils::IARM::isConnected();
-        if (Utils::IARM::init()) {
+        const bool alreadyConnected = Utils::IARM::isConnected(REMOTECONTROL_IARM_MEMBER_NAME);
+        if (Utils::IARM::init(REMOTECONTROL_IARM_MEMBER_NAME)) {
             _hasOwnProcess = !alreadyConnected;
             IARM_Result_t res;
 #define RC_REGISTER(EVENT) \
